@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Journal page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta charset=utf-8>
+
+    <link rel="stylesheet" href="/static/styles.css"/>
+    <link rel="stylesheet" href="/static/datepicker-widget.css"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.38.0/js/tempusdominus-bootstrap-4.min.js"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.38.0/css/tempusdominus-bootstrap-4.min.css"
+          crossorigin="anonymous"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+    <!--    &lt;!&ndash; Bootstrap 4 &ndash;&gt;-->
+    <!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">-->
+    <!--    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>-->
+    <!--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>-->
+
+    <!--    &lt;!&ndash; Font Awesome &ndash;&gt;-->
+    <!--    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">-->
+
+    <!--    &lt;!&ndash; Moment.js &ndash;&gt;-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>-->
+
+    <!--    &lt;!&ndash; Tempus Dominus Bootstrap 4 &ndash;&gt;-->
+    <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css" integrity="sha256-XPTBwC3SBoWHSmKasAk01c08M6sIA5gF5+sRxqak2Qs=" crossorigin="anonymous" />-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>-->
+
+
+    <script src="/static/src/libs/leaflet-src.js"></script>
+    <link rel="stylesheet" href="/static/src/libs/leaflet.css"/>
+
+    <script src="/static/src/Leaflet.draw.js"></script>
+    <script src="/static/src/Leaflet.Draw.Event.js"></script>
+    <link rel="stylesheet" href="/static/src/leaflet.draw.css"/>
+
+    <script src="/static/src/Toolbar.js"></script>
+    <script src="/static/src/Tooltip.js"></script>
+
+    <script src="/static/src/ext/GeometryUtil.js"></script>
+    <script src="/static/src/ext/LatLngUtil.js"></script>
+    <script src="/static/src/ext/LineUtil.Intersect.js"></script>
+    <script src="/static/src/ext/Polygon.Intersect.js"></script>
+    <script src="/static/src/ext/Polyline.Intersect.js"></script>
+    <script src="/static/src/ext/TouchEvents.js"></script>
+
+    <script src="/static/src/draw/DrawToolbar.js"></script>
+    <script src="/static/src/draw/handler/Draw.Feature.js"></script>
+    <script src="/static/src/draw/handler/Draw.SimpleShape.js"></script>
+    <script src="/static/src/draw/handler/Draw.Polyline.js"></script>
+    <script src="/static/src/draw/handler/Draw.Marker.js"></script>
+    <script src="/static/src/draw/handler/Draw.Circle.js"></script>
+    <script src="/static/src/draw/handler/Draw.CircleMarker.js"></script>
+    <script src="/static/src/draw/handler/Draw.Polygon.js"></script>
+    <script src="/static/src/draw/handler/Draw.Rectangle.js"></script>
+
+    <script src="/static/src/edit/EditToolbar.js"></script>
+    <script src="/static/src/edit/handler/EditToolbar.Edit.js"></script>
+    <script src="/static/src/edit/handler/EditToolbar.Delete.js"></script>
+
+    <script src="/static/src/Control.Draw.js"></script>
+
+    <script src="/static/src/edit/handler/Edit.Poly.js"></script>
+    <script src="/static/src/edit/handler/Edit.SimpleShape.js"></script>
+    <script src="/static/src/edit/handler/Edit.Rectangle.js"></script>
+    <script src="/static/src/edit/handler/Edit.Marker.js"></script>
+    <script src="/static/src/edit/handler/Edit.CircleMarker.js"></script>
+    <script src="/static/src/edit/handler/Edit.Circle.js"></script>
+
+
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet">
+    <script crossorigin="anonymous" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"
+            src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script crossorigin="anonymous" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script crossorigin="anonymous" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css"
+          type="text/css" media="all" rel="stylesheet">
+    <link href="datepicker-widget.css" type="text/css" media="all" rel="stylesheet">
+    <!--    <link href="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/css/datepicker-widget.css"-->
+    <!--          type="text/css" media="all" rel="stylesheet"/>-->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript"
+            src="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>
+    {% csrf_token %}
+</head>
+<body>
+<div class="everything">
+    <div class="map-info" style="margin: 1%">
+
+        <div class="row">
+            <div class="col-8 ">
+                <div class="map-box" style="height: 70vh">
+                    <div class="row" style="margin: 1%">
+                        <form action="menu" method='GET'>
+                            <button class="button-blue"> Меню</button>
+                        </form>
+                        <form action="main" method='GET'>
+                            <button class="button-blue"> Титул</button>
+                        </form>
+                        <form action="journal" method='GET'>
+                            <button class="button-blue"> Журнал</button>
+                        </form>
+                        <form action="configuration" method='GET'>
+                            <button class="button-blue"> Конфигуратор</button>
+                        </form>
+
+                    </div>
+
+                    <div id="map" style="height: 66vh; width: 100%; border: 0.5vh solid #dfee99">
+                    </div>
+                </div>
+                <div class="information-bottom" style="height: 25vh; margin-top: 1%; border: 0.5vh solid #dfee99">
+                    Инфо по последним засечкам
+                </div>
+
+            </div>
+            <div class="col-4">
+                <div class="filters-all" style="height: 60vh; border: 0.5vh solid #dfee99">
+                    <div class="export-csv" style="margin-left: 5%;margin-top: 1%">
+                        <form action="main" method='GET'>
+                            <button class="button-blue"> Экспортировать csv</button>
+                        </form>
+
+                        <div class="functions-cont" style="margin-top: 2%; ">
+                            <form action="choose_numbers_strizhes" method="post">
+                                {% csrf_token %}
+                                <h3>Введите номера стрижей</h3>
+
+                                <input type="number" style="height: 48px; width: 60%" name="nomer_strizha"
+                                       placeholder="1,2,3">
+                                <form action='apply_numbers_strizhes' method='GET'>
+                                    <button class="button-green-small" type='submit'> Фильтр</button>
+                                </form>
+                            </form>
+
+
+                            <form action="apply_period" method="post">
+                                {% csrf_token %}
+                                <h3> Период </h3>
+                                <h4 style="color: #72849e">
+                                    <div class="form-group">
+                                        <label for="id_start_datetime">Начало</label>
+                                        <div class="input-group date" style="height: 48px; width: 90%">
+                                            <input type="text" name="start_datetime" value="Начало"
+                                                   class="form-control" placeholder={{start_datetime}} title=""
+                                                   required="" id="id_start_datetime"
+                                                   dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
+                                            <div class="input-group-addon input-group-append"
+                                                 data-target="#datetimepicker1" data-toggle="datetimepickerv">
+                                                <div class="input-group-text">
+                                                    <i class="glyphicon glyphicon-calendar"></i>
+                                                </div>
+                                            </div>
+                                        <button class="button-green-small" type='submit'> Применить</button>
+                                        </div>
+                                    </div>
+                                </h4>
+<!--                                <input type="submit" value="применить">-->
+
+                            </form>
+
+                            <form action="apply_period" method="post">
+                                {% csrf_token %}
+                                <h4 style="color: #72849e">
+                                    <div class="form-group">
+                                        <label for="id_end_datetime">Конец</label>
+                                        <div class="input-group date" style="height: 48px; width: 90%">
+                                            <input type="text" name="end_datetime" value="Конец"
+                                                   class="form-control" placeholder={{end_datetime}} title=""
+                                                   required="" id="id_end_datetime"
+                                                   dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
+                                            <div class="input-group-addon input-group-append"
+                                                 data-target="#datetimepicker1" data-toggle="datetimepickerv">
+                                                <div class="input-group-text">
+                                                    <i class="glyphicon glyphicon-calendar"></i>
+                                                </div>
+                                            </div>
+                                            <button class="button-green-small" type='submit'> Применить</button>
+                                        </div>
+                                    </div>
+                                </h4>
+
+<!--                            <input type="submit" value="применить">-->
+                            </form>
+
+                            <script>
+                                $(function () {
+                                    $("#datetimepicker1").datetimepicker({
+                                        format: 'DD/MM/YYYY HH:mm',
+                                    });
+                                });
+                            </script>
+
+
+                            <form action="choose_period" method="post">
+                                {% csrf_token %}
+                                <form action='apply_period' method='GET'>
+                                    <button class="button-red" type='submit'> Сбросить фильтры</button>
+                                </form>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="information-bottom" style="height: 35vh; margin-top: 1%; border: 0.5vh solid #dfee99">
+                    Служебка, Uniping, АГМ, логи
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script>
+    var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: "ASB Production"}),
+        map = new L.Map('map', {center: new L.LatLng(60.014356, 30.452744), zoom: 13}),
+        drawnItems = L.featureGroup().addTo(map);
+    L.control.layers({
+        'osm': osm.addTo(map),
+        "google": L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
+                attribution: 'google'
+            },
+        ),
+
+    }, {'drawlayer': drawnItems}, {position: 'topleft', collapsed: false})
+        .addTo(map);
+
+    map.addControl(new L.Control.Draw({
+        edit: {
+            featureGroup: drawnItems,
+            poly: {
+                allowIntersection: false
+            }
+        },
+        draw: {
+            polygon: {
+                allowIntersection: false,
+                showArea: true
+            }
+        }
+    }));
+
+    map.on(L.Draw.Event.CREATED, function (event) {
+        var layer = event.layer;
+
+        drawnItems.addLayer(layer);
+    });
+
+</script>
+</body>
+</html>
