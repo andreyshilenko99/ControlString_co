@@ -36,8 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'leaflet',
-    'djgeojson',
-    'map'
+    'map',
+    'django.contrib.gis',
+    'geo'
+
 ]
 
 MIDDLEWARE = [
@@ -71,14 +73,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ControlString_co.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'
+
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'stuff',
+        'USER': 'dron',
+        'PASSWORD': '555',
+        'HOST': '127.0.0.1',
+        'PORT': '5432', }
 }
 
 # Password validation
@@ -126,7 +136,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LEAFLET_CONFIG = {
-    'SPATIAL_EXTENT': (30.415, 59.999,  30.477, 60.022),
+    'SPATIAL_EXTENT': (30.415, 59.999, 30.477, 60.022),
     'DEFAULT_CENTER': (60.013674, 30.452474),
     'RESET_VIEW': False,
     'DEFAULT_ZOOM': 16,
@@ -134,14 +144,15 @@ LEAFLET_CONFIG = {
     'MAX_ZOOM': 18,
     'TILES': [('lol', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; IGN'})],
     'PLUGINS': {
-        'name-of-plugin': {
+        'draw': {
             'css': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.css',
                     '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css'],
             'js': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.js',
                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js'],
             'auto-include': True
         },
-        'name': {'js': ['/static/node_modules/leaflet-ajax/dist/leaflet.ajax.js'], 'auto-include': True},
-        'ggg': {'js': ['/static/node_modules/jquery/dist/jquery.js'], 'auto-include': True}
+        'ajax': {'js': ['/static/node_modules/leaflet-ajax/dist/leaflet.ajax.js'], 'auto-include': True},
+        'jquery': {'js': ['/static/node_modules/jquery/dist/jquery.js'], 'auto-include': True},
+
     }
 }
