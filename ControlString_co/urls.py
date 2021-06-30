@@ -21,9 +21,10 @@ from map import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('geo/', include('geo.urls')),
     # # path(r' ', include('map.urls'))
     # path(r'', include('geo.urls')),
-    # path('data/', geojson_view, name='data'),
+
     path('', views.index),
     path('menu', views.index),
     path('main', views.main),

@@ -3,10 +3,8 @@
 
 <html>
 <head>
-    {% leaflet_js %}
-    {% leaflet_css %}
-    {% leaflet_js plugins="ALL" %}
-    {% leaflet_css plugins="ALL" %}
+
+
     <title>Leaflet.draw vector editing handlers</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -14,45 +12,49 @@
 
     <link rel="stylesheet" href="/static/styles.css"/>
 
-    <script src="/static/src/libs/leaflet-src.js"></script>
-    <link rel="stylesheet" href="/static/src/libs/leaflet.css"/>
+<!--    <script src="/static/src/libs/leaflet-src.js"></script>-->
+<!--    <link rel="stylesheet" href="/static/src/libs/leaflet.css"/>-->
 
-    <script src="/static/src/Leaflet.draw.js"></script>
-    <script src="/static/src/Leaflet.Draw.Event.js"></script>
-    <link rel="stylesheet" href="/static/src/leaflet.draw.css"/>
+<!--    <script src="/static/src/Leaflet.draw.js"></script>-->
+<!--    <script src="/static/src/Leaflet.Draw.Event.js"></script>-->
+<!--    <link rel="stylesheet" href="/static/src/leaflet.draw.css"/>-->
 
-    <script src="/static/src/Toolbar.js"></script>
-    <script src="/static/src/Tooltip.js"></script>
+<!--    <script src="/static/src/Toolbar.js"></script>-->
+<!--    <script src="/static/src/Tooltip.js"></script>-->
 
-    <script src="/static/src/ext/GeometryUtil.js"></script>
-    <script src="/static/src/ext/LatLngUtil.js"></script>
-    <script src="/static/src/ext/LineUtil.Intersect.js"></script>
-    <script src="/static/src/ext/Polygon.Intersect.js"></script>
-    <script src="/static/src/ext/Polyline.Intersect.js"></script>
-    <script src="/static/src/ext/TouchEvents.js"></script>
+<!--    <script src="/static/src/ext/GeometryUtil.js"></script>-->
+<!--    <script src="/static/src/ext/LatLngUtil.js"></script>-->
+<!--    <script src="/static/src/ext/LineUtil.Intersect.js"></script>-->
+<!--    <script src="/static/src/ext/Polygon.Intersect.js"></script>-->
+<!--    <script src="/static/src/ext/Polyline.Intersect.js"></script>-->
+<!--    <script src="/static/src/ext/TouchEvents.js"></script>-->
 
-    <script src="/static/src/draw/DrawToolbar.js"></script>
-    <script src="/static/src/draw/handler/Draw.Feature.js"></script>
-    <script src="/static/src/draw/handler/Draw.SimpleShape.js"></script>
-    <script src="/static/src/draw/handler/Draw.Polyline.js"></script>
-    <script src="/static/src/draw/handler/Draw.Marker.js"></script>
-    <script src="/static/src/draw/handler/Draw.Circle.js"></script>
-    <script src="/static/src/draw/handler/Draw.CircleMarker.js"></script>
-    <script src="/static/src/draw/handler/Draw.Polygon.js"></script>
-    <script src="/static/src/draw/handler/Draw.Rectangle.js"></script>
+<!--    <script src="/static/src/draw/DrawToolbar.js"></script>-->
+<!--    <script src="/static/src/draw/handler/Draw.Feature.js"></script>-->
+<!--    <script src="/static/src/draw/handler/Draw.SimpleShape.js"></script>-->
+<!--    <script src="/static/src/draw/handler/Draw.Polyline.js"></script>-->
+<!--    <script src="/static/src/draw/handler/Draw.Marker.js"></script>-->
+<!--    <script src="/static/src/draw/handler/Draw.Circle.js"></script>-->
+<!--    <script src="/static/src/draw/handler/Draw.CircleMarker.js"></script>-->
+<!--    <script src="/static/src/draw/handler/Draw.Polygon.js"></script>-->
+<!--    <script src="/static/src/draw/handler/Draw.Rectangle.js"></script>-->
 
-    <script src="/static/src/edit/EditToolbar.js"></script>
-    <script src="/static/src/edit/handler/EditToolbar.Edit.js"></script>
-    <script src="/static/src/edit/handler/EditToolbar.Delete.js"></script>
+<!--    <script src="/static/src/edit/EditToolbar.js"></script>-->
+<!--    <script src="/static/src/edit/handler/EditToolbar.Edit.js"></script>-->
+<!--    <script src="/static/src/edit/handler/EditToolbar.Delete.js"></script>-->
 
-    <script src="/static/src/Control.Draw.js"></script>
+<!--    <script src="/static/src/Control.Draw.js"></script>-->
 
-    <script src="/static/src/edit/handler/Edit.Poly.js"></script>
-    <script src="/static/src/edit/handler/Edit.SimpleShape.js"></script>
-    <script src="/static/src/edit/handler/Edit.Rectangle.js"></script>
-    <script src="/static/src/edit/handler/Edit.Marker.js"></script>
-    <script src="/static/src/edit/handler/Edit.CircleMarker.js"></script>
-    <script src="/static/src/edit/handler/Edit.Circle.js"></script>
+<!--    <script src="/static/src/edit/handler/Edit.Poly.js"></script>-->
+<!--    <script src="/static/src/edit/handler/Edit.SimpleShape.js"></script>-->
+<!--    <script src="/static/src/edit/handler/Edit.Rectangle.js"></script>-->
+<!--    <script src="/static/src/edit/handler/Edit.Marker.js"></script>-->
+<!--    <script src="/static/src/edit/handler/Edit.CircleMarker.js"></script>-->
+<!--    <script src="/static/src/edit/handler/Edit.Circle.js"></script>-->
+
+<!--    <script src="/static/src/leaflet.ajax.js"></script>-->
+    {% leaflet_js plugins="ALL" %}
+    {% leaflet_css plugins="ALL" %}
     {% leaflet_js %}
     {% leaflet_css %}
     {% csrf_token %}
@@ -212,41 +214,7 @@
 </div>
 
 <script>
-    {#var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',#}
-    {#    osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',#}
-    {#    osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: "ASB Production"}),#}
-    {#    map = new L.Map('map', {center: new L.LatLng(60.014356, 30.452744), zoom: 13}),#}
-    {#    drawnItems = L.featureGroup().addTo(map);#}
-    {#L.control.layers({#}
-    {#    'osm': osm.addTo(map),#}
-    {#    "google": L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {#}
-    {#            attribution: 'google'#}
-    {#        },#}
-    {#    ),#}
-    {##}
-    {#    .addTo(map);#}
-    {##}
-    {#map.addControl(new L.Control.Draw({#}
-    {#    edit: {#}
-    {#        featureGroup: drawnItems,#}
-    {#        poly: {#}
-    {#            allowIntersection: false#}
-    {#        }#}
-    {#    },#}
-    {#    draw: {#}
-    {#        polygon: {#}
-    {#            allowIntersection: false,#}
-    {#            showArea: true#}
-    {#        }#}
-    {#    }#}
 
-    {##}
-    {#map.on(L.Draw.Event.CREATED, function (event) {#}
-    {#    var layer = event.layer;#}
-    {##}
-    {#    drawnItems.addLayer(layer);#}
-
-    {#function main_map_init(map, options) {}#}
 
 </script>
 

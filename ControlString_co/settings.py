@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'leaflet',
     'map',
     'django.contrib.gis',
-    'geo'
+    'geo',
+    'djgeojson'
 
 ]
 
@@ -168,8 +169,8 @@ LEAFLET_CONFIG = {
                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js'],
             'auto-include': True
         },
-        'ajax': {'js': ['/static/node_modules/leaflet-ajax/dist/leaflet.ajax.js'], 'auto-include': True},
-        'jquery': {'js': ['/static/node_modules/jquery/dist/jquery.js'], 'auto-include': True},
+        'ajax': {'js': ['/static/src/leaflet.ajax.js'], 'auto-include': True},
+        'jquery': {'js': ['/static/src/jquery.js'], 'auto-include': True},
 
     }
 }
