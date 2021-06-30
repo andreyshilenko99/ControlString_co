@@ -1,0 +1,75 @@
+import "found_signal_params.proto";
+
+message TraceRemoteMessage
+{
+    enum MessageType
+    {
+        SCANNER_BUTTON_TOGGLE                      = 0; //старт/стоп сканирования
+        JAMMER_BUTTON_TOGGLE                       = 1; //старт/стоп модулей подавления
+        SYSTEN_CHECK_BUTTON_TOGGLE                 = 2; //запуск проверки системы
+        SCANNER_ONLY_MODE_TOGGLE                   = 3; //режим только сканирования
+        SCANNER_AND_IMMEDIATELY_JAMMER_MODE_TOGGLE = 4; //режим сканирования с подавлением без задержки
+        SCANNER_AND_DELAYED_JAMMER_MODE_TOGGLE     = 5; //режим сканирования с подавлением по таймеру
+        ALARM                                      = 6; //включение/выключение тревоги
+        FAST_CHECK_STATE                           = 7; //состояние работы модулей сканирования и подавления (быстрое без опроса модулей - по последнему известному состояниию)
+  }
+
+  required MessageType     message_type      = 1;  //тип сообщения
+  optional AlarmState      alarm_state       = 2;  //сообщение о тревоге
+  optional ButtonState     button_state      = 3;  //сообщение о состоянии кнопок управления
+  optional SystemState     system_state      = 4;  //сообщение o состоянии работы
+  optional ModeState       mode_state        = 5;  //сообщение о режиме работы системы
+  optional FastSystemState fast_system_state = 6;  //сообщенимя о последнем известном состоянии модулей (без опроса)
+}
+
+message ModeState
+{
+    enum ModeStateType
+    {
+        scanner_and_jammer = 0; //сканирование и подавление
+        scanner_only       = 1; //только сканирование (модулей подавления нет в системе)
+    }
+
+    enum JammerStateType
+    {
+        scanner_only_mode              = 0;//режим только сканирования + ручной режим подаления
+        scanner_and_immediately_jammer = 1;//режим сканирования с подавлением без задержки
+        scanner_and_timed_jammer       = 2;//режим сканирования с подавлением по таймеру
+
+    }
+
+    required ModeStateType    mode_state   = 1; //режим работы системы
+    optional JammerStateType  jammer_state = 2; //режим работы модулей подавления
+}
+
+message  FastSystemState
+{
+    required bool      is_scanner_activate = 1 [default = false]; //активирован режим сканирования
+    required bool      is_jammer_activate  = 2 [default = false]; //активирован режим подавления
+    required bool      is_system_ready     = 3 [default = false]; //система готова к работе
+    required ModeState mode_state          = 4;
+}
+
+message AlarmState
+{
+    required bool                                   is_enabled    = 1 [default = false]; //тревога активирована/деактивирована
+    optional TraceRemoteNotifying.FoundSignalParams signal_params = 2;                   //парамерты сигнала в случае активации тревоги
+}
+
+message ButtonState
+{
+    required bool   is_enabled          = 1 [default = false]; //состояние кнопки
+    required bool   is_error            = 2 [default = false];
+    required string error_description   = 3 [default = "no error"];
+}
+
+message SystemState
+{
+    required bool is_system_ready     = 1 [default = false]; //система готова к работе
+    required bool is_scanner_activate = 2 [default = false]; //активирован режим сканирования
+    required bool is_jammer_activate  = 3 [default = false]; //активирован режим подавления
+}
+
+
+
+
