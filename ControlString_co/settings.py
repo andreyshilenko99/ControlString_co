@@ -166,7 +166,10 @@ LEAFLET_CONFIG = {
             'css': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.css',
                     '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css'],
             'js': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.js',
-                   '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js'],
+                   '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js',
+                   '/static/src/leaflet.sector.js',
+                   '/static/src/leaflet.arc.js',
+                   ],
             'auto-include': True
         },
         'ajax': {'js': ['/static/src/leaflet.ajax.js'], 'auto-include': True},

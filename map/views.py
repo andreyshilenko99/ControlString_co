@@ -20,6 +20,7 @@ end_datetime = "Конец"
 logs = ''
 logs_list = []
 
+
 c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime)
 
 #
@@ -164,7 +165,6 @@ message_condition = ''
 
 def return_conditions():
     global low_t, high_t, low_h, high_h, humidity, humidity_temp
-    global temperature
     global url
     global auth
     weather_state = 'not ok'
@@ -196,6 +196,7 @@ def return_conditions():
     c["weather_state"] = weather_state
     return temperature, humidity, humidity_temp, weather_state
 
+temperature, humidity, humidity_temp, weather_state = return_conditions()
 
 def get_conditions(request):
     # global temperature, humidity, humidity_temp, weather_state
@@ -221,6 +222,7 @@ def check_condition(value, low_border, high_border, condition="температ�
     elif value < low_border:
         print("{} ниже разрешенной ({} < {})".format(condition, value, low_border))
         return -1
+
 
 
 lines_map = {'обогрев': 1,
@@ -321,6 +323,7 @@ def obtain_state(line_name, to_collect_logs=False):
 
 
 def set_correct_temperature(temperature_state):
+    global temperature
     if temperature_state != 0:
         while temperature_state != 0:
             temperature_state = check_condition(temperature, low_border=low_t, high_border=high_t)

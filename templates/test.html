@@ -14,6 +14,7 @@
 
     <link rel="stylesheet" href="/static/styles.css"/>
     <script src="../static/src/leaflet.ajax.js"></script>
+    <!--    <script src="../static/src/leaflet.sector.js"></script>-->
     {% leaflet_js plugins="ALL" %}
     {% leaflet_css plugins="ALL" %}
     {% leaflet_js %}
@@ -96,19 +97,138 @@
 
     // function map_init_basic(map, options) {
     //     L.geoJson(geojsonMarker, {style: myStyle}).addTo(map);
-    //     var raw_data = '{{location}}';
-    //     console.log(raw_data);
     // }
 
     function map_init_basic(map, options) {
-        var raw_data1 = '{{location1}}'
-        var raw_data2 = '{"type": "Feature", "properties": {"name": "Location Location Location"}, ' +
-            '"geometry": {"type": "Point", "coordinates": [30.45482039451599, 60.014365484549685]}}'
-        console.log(typeof (raw_data1));
-        console.log(typeof (raw_data2));
-        // var data = JSON.parse(raw_data1);
-        console.log(data);
-        L.geoJSON(data).addTo(map);
+        var geojsonMarker = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.45331835746765,
+                            60.014732785555395
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.453994274139404,
+                            60.01450757958334
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.453983545303345,
+                            60.01494726600732
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.452492237091064,
+                            60.0143359930511
+                        ]
+                    }
+                }
+            ]
+        };
+
+        $.getJSON('/geo/data/', function (data) {
+            var logoMarkerStyle = L.Icon.extend({
+                options: {
+                    iconSize: [85, 90],
+                    iconAnchor: [38, 86],
+                    popupAnchor: [0, -80]
+                }
+            });
+            // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
+            var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
+            var len_arr = data.features.length
+            console.log(geojsonMarker)
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                data.features[step].geometry = {}
+                data.features[step].geometry.coordinates = [0, 0]
+                data.features[step].geometry.type = "Point"
+                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                data.features[step].properties = {}
+                // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
+            }
+            console.log(data);
+
+        })
+
+        $.getJSON('/geo/strizh_view/', function (data) {
+            var logoMarkerStyle = L.Icon.extend({
+                options: {
+                    iconSize: [85, 90],
+                    iconAnchor: [38, 86],
+                    popupAnchor: [0, -80]
+                }
+            });
+            var logoMarker = new logoMarkerStyle({
+                iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
+                    'electronics-signal-technology-wifi-radiowaves-6-3098.png'
+            });
+            var len_arr = data.features.length
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                data.features[step].geometry = {}
+                data.features[step].geometry.coordinates = [0, 0]
+                data.features[step].geometry.type = "Point"
+                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                data.features[step].properties = {}
+                // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
+
+
+                let sector1 = L.sector({
+                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    innerRadius: 0,
+                    outerRadius: 500,
+                    startBearing: -30,
+                    endBearing: 30,
+                    color: 'red'
+                });
+
+                let arc1 = L.arc({
+                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    radius: 500,
+                    color: 'pink',
+                    startBearing: 0,
+                    endBearing: 360,
+
+                });
+
+                map.addLayer(sector1)
+                map.addLayer(arc1)
+            }
+
+            console.log(data);
+
+        })
     }
 
 
