@@ -27,7 +27,7 @@
 
         <div class="row">
             <div class="col-8 ">
-                <div class="map-box" style="height: 70vh">
+                <div class="map-box" style="height: 65vh">
                     <div class="row" style="margin: 1%">
                         <form action="menu" method='GET'>
                             <button class="button-blue"> Меню</button>
@@ -41,7 +41,6 @@
                         <form action="configuration" method='GET'>
                             <button class="button-blue"> Конфигуратор</button>
                         </form>
-
                         <!--                        <form action="journal">-->
                         <!--                        <input type="submit" value="Журнал" />-->
                         <!--                        </form>-->
@@ -53,7 +52,7 @@
 
 
                 </div>
-                <div class="information-bottom" style="height: 25vh; margin-top: 1%; border: 0.5vh solid #dfee99">
+                <div class="information-bottom" style="height: 25vh; margin-top: 3%; border: 0.5vh solid #dfee99">
 
                     Инфо по последним засечкам
 
@@ -61,7 +60,7 @@
 
             </div>
             <div class="col-4">
-                <div class="strizhes-all" style="height: 60vh; border: 0.5vh solid #dfee99">
+                <div class="strizhes-all" style="height: 40vh; border: 0.5vh solid #dfee99">
                     <div class="strizh" style="margin-left: 5%;margin-top: 1%">
                         <div class="row">
                             <h3>
@@ -84,22 +83,38 @@
                                 </form>
                             </div>
                         </div>
+                        <!--                        <div class="row" style="margin-top: 2%">-->
+                        <!--                            <h3>-->
+                        <!--                                <form action="choose_nomer_strizha" method="post">-->
+                        <!--                                    {% csrf_token %}-->
+                        <!--                                    Стриж #-->
+                        <!--                                    <input type="number" style="width: 15%" name="nomer_strizha"-->
+                        <!--                                           placeholder={{ nomer_strizha }}>-->
+                        <!--                                    <input type="submit" value="ввод">-->
+                        <!--                                </form>-->
+                        <!--                            </h3>-->
+                        <!--                        </div>-->
+
                         <div class="row" style="margin-top: 2%">
+
                             <h3>
-                                <form action="choose_nomer_strizha" method="post">
+                                <form action="choose_nomer_strizha" method="post" >
                                     {% csrf_token %}
-                                    Стриж #
-                                    <input type="number" style="width: 15%" name="nomer_strizha"
-                                           placeholder={{ nomer }}>
+<!--                                    {{ form.name }}-->
+                                    {{ form.as_p }}
+<!--                                    {{ form }}-->
                                     <input type="submit" value="ввод">
                                 </form>
                             </h3>
-                            <!--                            <form action="update_nomer_strizha" method="get">-->
-                            <!--                                upd {{  nomer }}-->
-                            <!--                                <input type="submit" value="ввод">-->
-                            <!--                            </form>-->
-
                         </div>
+
+                        <div class="row">
+                            <h5>
+                                {{action_strizh}}
+                            </h5>
+                        </div>
+
+
                         <div class="strizh-each">
                             <div class="row">
                                 <form action='butt_skan' method='GET'>
@@ -117,10 +132,11 @@
                             </div>
                         </div>
 
+
                     </div>
 
                 </div>
-                <div class="information-bottom" style="height: 37vh; margin-top: 1%; border: 0.5vh solid #dfee99">
+                <div class="information-bottom" style="height: 55vh; margin-top: 1%; border: 0.5vh solid #dfee99">
                     Служебка, Uniping, АГМ, логи
                     <!--                    <a href="http://192.168.2.51/termo.html"> Термодатчики</a>-->
                     <!--                    <a href="http://192.168.2.51/curdet.html"> Датчик дыма </a>-->
@@ -137,14 +153,6 @@
                         <h5>
                         </h5>
                     </form>
-                    <div class="box-scroll">
-                        <form action='show_logs' method='GET'>
-
-                            {% for el in logs_list %}
-                            {{ el }} <br>
-                            {% endfor %}
-                        </form>
-                    </div>
 
                     <div class="row" style="margin: 2%;">
                         <form action='turn_on_bp' method='GET'>
@@ -155,6 +163,15 @@
                         </form>
                     </div>
 
+                    <div class="box-scroll" style="height: 50%">
+                        <form action='show_logs' method='GET'>
+
+                            {% for el in logs_list %}
+                            {{ el }} <br>
+                            {% endfor %}
+
+                        </form>
+                    </div>
 
                 </div>
             </div>
@@ -186,9 +203,9 @@
             $.getJSON('/geo/data/', function (data) {
                 var logoMarkerStyle = L.Icon.extend({
                     options: {
-                        iconSize: [45, 45],
-                        iconAnchor: [38, 86],
-                        popupAnchor: [0, -80]
+                        iconSize: [46, 46],
+                        iconAnchor: [23, 23],
+                        popupAnchor: [0, -46]
                     }
                 });
                 // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
@@ -209,6 +226,7 @@
             });
             layerGroup.clearLayers();
         }
+
         refreshMarkers()
         setInterval(refreshMarkers, 5000);
 

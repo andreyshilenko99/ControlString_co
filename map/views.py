@@ -1,159 +1,24 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-
 import re
 import time
 
 import requests
+from django.core.serializers import serialize
+from django.shortcuts import redirect
 from django.shortcuts import render
+from django.views.generic import CreateView
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 
+from geo.models import Strizh
 
-def index(request):
-    return render(request, "index.html")
+from .models import MyModel, MyStrizh
+from .forms import MyModelForm, StrizhForm
 
-
-#
-#
 nomer_strizha = 0
 start_datetime = "Начало"
 end_datetime = "Конец"
 logs = ''
 logs_list = []
-
-
-c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime)
-
-#
-def journal(request):
-    global c
-    return render(request, "journal.html", context=c)
-
-
-#
-#
-def main(request):
-    return render(request, "main.html", context=c)
-
-
-#
-def configuration(request):
-    return render(request, "configuration.html", context=c)
-
-
-def butt_skan_all(request):
-    global c
-    # nomer_strizha = 0
-    print('skanirovanie vseh')
-    # TODO action 1 button
-    return render(request, "main.html", context=c)
-
-
-def butt_glush_all(request):
-    global c
-    print('glushenie vseh')
-    # TODO action 2 button
-    return render(request, "main.html", context=c)
-
-
-def butt_gps_all(request):
-    global c
-    print('gps vseh')
-    # TODO action 3 button
-    return render(request, "main.html", context=c)
-
-
-def butt_ku_all(request):
-    global c
-    print(c)
-    print('KU vseh #', nomer_strizha)
-    # TODO action 4 button
-    return render(request, "main.html", context=c)
-
-
-#
-def choose_nomer_strizha(request):
-    global nomer_strizha
-    global c
-    print(c)
-    # TODO action 2 button
-    if request.method == 'POST':
-        nomer = request.POST['nomer_strizha']
-        print('send', nomer, '\n')
-        nomer_strizha = nomer
-        c = {'nomer': nomer_strizha}
-        # return render(request,"main.html", context=c)
-    return render(request, "main.html", context=c)
-
-
-# def update_nomer_strizha(request):
-#     error = False
-#     if 'nomer' in request.GET:
-#         nomer = request.GET['nomer']
-#         if not nomer:
-#             error = True
-#         else:
-#             return render(request, 'main.html',
-#                 {'nomer': nomer})
-#
-#     return render(request, 'main.html',
-#         {'error': error})
-
-
-def butt_skan(request):
-    global c
-    if nomer_strizha != 0:
-        print('skanirovanie dlya strizha #', nomer_strizha)
-        # TODO action 1 button
-
-    return render(request, "main.html", context=c)
-
-
-#
-def butt_glush(request):
-    global c
-    if nomer_strizha != 0:
-        print('glushenie dlya strizha #', nomer_strizha)
-        # TODO action 2 button
-    return render(request, "main.html", context=c)
-
-
-def butt_gps(request):
-    global c
-    if nomer_strizha != 0:
-        print('gps dlya strizha #', nomer_strizha)
-        # TODO action 3 button
-    return render(request, "main.html", context=c)
-
-
-def butt_ku(request):
-    global c
-    if nomer_strizha != 0:
-        print('KU dlya strizha #', nomer_strizha)
-        # TODO action 4 button
-    return render(request, "main.html", context=c)
-
-
-def apply_period(request):
-    global c, start_datetime, end_datetime
-    # TODO action 2 button
-    if request.method == 'POST':
-        if request.POST.get('start_datetime'):
-            start = request.POST['start_datetime']
-            print('got start ', start, '\n')
-            start_arr = start.split(' ')
-            start_datetime = "-".join(start_arr)
-        if request.POST.get('end_datetime'):
-            end = request.POST['end_datetime']
-            print('got end', end, '\n')
-            end_arr = end.split(' ')
-            end_datetime = "-".join(end_arr)
-
-        c = {'start_datetime': start_datetime,
-             'end_datetime': end_datetime}
-        # return render(request, "journal.html", context=c)
-    return render(request, "journal.html", context=c)
-
-
 low_t = 10
 high_t = 60
 low_h = 5
@@ -161,6 +26,13 @@ high_h = 85
 url = "http://192.168.2.51/"
 auth = ('user', '555')
 message_condition = ''
+
+
+
+
+
+def index(request):
+    return render(request, "index.html")
 
 
 def return_conditions():
@@ -196,7 +68,177 @@ def return_conditions():
     c["weather_state"] = weather_state
     return temperature, humidity, humidity_temp, weather_state
 
-temperature, humidity, humidity_temp, weather_state = return_conditions()
+
+c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime, available_strizhes=[])
+
+
+def journal(request):
+    global c
+    # temperature, humidity, humidity_temp, weather_state = return_conditions()
+    #
+    # c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime,
+    #          available_strizhes=get_strizhes(), temperature=temperature,
+    #          humidity=humidity, humidity_temp=humidity_temp, weather_state=weather_state)
+    return render(request, "journal.html", context=c)
+
+
+def get_strizhes():
+    geojson_strizhes = serialize('geojson', Strizh.objects.all())
+    parsed_json = (json.loads(geojson_strizhes))
+    arr_strizh = []
+    for i in range(len(parsed_json.get("features"))):
+        strizh_name = parsed_json.get("features")[i].get("properties").get("name")
+        arr_strizh.append(strizh_name)
+    return arr_strizh
+
+
+def main(request):
+    temperature, humidity, humidity_temp, weather_state = return_conditions()
+
+    c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime,
+             available_strizhes=get_strizhes(), temperature=temperature,
+             humidity=humidity, humidity_temp=humidity_temp, weather_state=weather_state)
+
+    return render(request, "main.html", context=c)
+
+
+def configuration(request):
+    return render(request, "configuration.html", context=c)
+
+
+def butt_skan_all(request):
+    global c
+    # nomer_strizha = 0
+    print('skanirovanie vseh')
+    # TODO action 1 button
+    # return render(request, "journal.html", context=c)
+    c["action_strizh"] = "Сканирование всех"
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def butt_glush_all(request):
+    global c
+    print('glushenie vseh')
+    # TODO action 2 button
+    c["action_strizh"] = "Глушение всех"
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def butt_gps_all(request):
+    global c
+    print('gps vseh')
+    # TODO action 3 button
+    c["action_strizh"] = "GPS для всех"
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def butt_ku_all(request):
+    global c
+    print(c)
+    print('KU vseh #', nomer_strizha)
+    # TODO action 4 button
+    c["action_strizh"] = "КУ всех"
+    return redirect(request.META['HTTP_REFERER'])
+
+
+import json
+
+
+def choose_nomer_strizha(request):
+    global c
+    # geojson_strizhes = serialize('geojson', Strizh.objects.all())
+    # parsed_json = (json.loads(geojson_strizhes))
+    # arr_strizh = []
+    # for i in range(len(parsed_json.get("features"))):
+    #     strizh_name = parsed_json.get("features")[i].get("properties").get("name")
+    #     arr_strizh.append(strizh_name)
+    # c["available_strizhes"] = arr_strizh
+    # print(c["available_strizhes"])
+
+    if request.method == 'POST':
+        nomer = request.POST['choice_strizh']
+        print('send', nomer, '\n')
+        c = {'nomer_strizha': nomer}
+        # return render(request,"main.html", context=c)
+    if c.get("nomer_strizha"):
+        c["action_strizh"] = "Выбран стриж №{}".format(c.get("nomer_strizha"))
+    xx =c
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
+    # return HttpResponseRedirect('/main')
+
+
+class CreateMyModelView(CreateView):
+
+    # model = Strizh
+    model = MyStrizh
+    form_class = StrizhForm
+    template_name = 'main.html'
+    success_url = 'main.html'
+    print(form_class)
+    temperature, humidity, humidity_temp, weather_state = return_conditions()
+
+    c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime,
+             available_strizhes=get_strizhes(), temperature=temperature,
+             humidity=humidity, humidity_temp=humidity_temp, weather_state=weather_state)
+
+
+def butt_skan(request):
+    global c
+    if c.get("nomer_strizha") != 0:
+        print('skanirovanie dlya strizha #', nomer_strizha)
+        # TODO action 1 button
+    c["action_strizh"] = "Сканирование для стрижа №{}".format(c.get("nomer_strizha"))
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def butt_glush(request):
+    global c
+    if c.get("nomer_strizha") != 0:
+        print('glushenie dlya strizha #', nomer_strizha)
+        # TODO action 2 button
+    c["action_strizh"] = "Глушение для стрижа №{}".format(c.get("nomer_strizha"))
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def butt_gps(request):
+    global c
+    if c.get("nomer_strizha") != 0:
+        print('gps dlya strizha #', nomer_strizha)
+        # TODO action 3 button
+    c["action_strizh"] = "GPS для стрижа №{}".format(c.get("nomer_strizha"))
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def butt_ku(request):
+    global c
+    if c.get("nomer_strizha") != 0:
+        print('KU dlya strizha #', nomer_strizha)
+        # TODO action 4 button
+    c["action_strizh"] = "КУ для стрижа №{}".format(c.get("nomer_strizha"))
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def apply_period(request):
+    global c, start_datetime, end_datetime
+    # TODO action 2 button
+    if request.method == 'POST':
+        if request.POST.get('start_datetime'):
+            start = request.POST['start_datetime']
+            print('got start ', start, '\n')
+            start_arr = start.split(' ')
+            start_datetime = "-".join(start_arr)
+        if request.POST.get('end_datetime'):
+            end = request.POST['end_datetime']
+            print('got end', end, '\n')
+            end_arr = end.split(' ')
+            end_datetime = "-".join(end_arr)
+
+        c = {'start_datetime': start_datetime,
+             'end_datetime': end_datetime}
+        # return render(request, "journal.html", context=c)
+    return render(request, "journal.html", context=c)
+
 
 def get_conditions(request):
     # global temperature, humidity, humidity_temp, weather_state
@@ -222,7 +264,6 @@ def check_condition(value, low_border, high_border, condition="температ�
     elif value < low_border:
         print("{} ниже разрешенной ({} < {})".format(condition, value, low_border))
         return -1
-
 
 
 lines_map = {'обогрев': 1,

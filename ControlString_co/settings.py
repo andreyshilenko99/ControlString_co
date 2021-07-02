@@ -179,3 +179,7 @@ LEAFLET_CONFIG = {
 
     }
 }
+
+SERIALIZATION_MODULES = {
+    "geojson": "django.contrib.gis.serializers.geojson",
+ }

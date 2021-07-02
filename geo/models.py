@@ -16,7 +16,7 @@ class Point(models.Model):
 
 
 class Strizh(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, default="3")
     lat = models.FloatField()
     lon = models.FloatField()
     def __str__(self):
