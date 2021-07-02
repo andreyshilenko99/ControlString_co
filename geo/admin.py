@@ -1,5 +1,5 @@
 from django.contrib import admin
-from geo.models import Point, Strizh
+from geo.models import Point, Strizh, Sector
 
 
 class Inc(admin.ModelAdmin):
@@ -9,4 +9,5 @@ class Inc(admin.ModelAdmin):
 
 admin.site.register(Point)
 admin.site.register(Strizh)
+admin.site.register(Sector)
 

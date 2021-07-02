@@ -230,41 +230,154 @@
 </div>
 
 <script>
-    var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: "ASB Production"}),
-        map = new L.Map('map', {center: new L.LatLng(60.014356, 30.452744), zoom: 13}),
-        drawnItems = L.featureGroup().addTo(map);
-    L.control.layers({
-        'osm': osm.addTo(map),
-        "google": L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
-                attribution: 'google'
-            },
-        ),
+function map_init_basic(map, options) {
+        var geojsonMarker = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.45331835746765,
+                            60.014732785555395
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.453994274139404,
+                            60.01450757958334
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.453983545303345,
+                            60.01494726600732
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.452492237091064,
+                            60.0143359930511
+                        ]
+                    }
+                }
+            ]
+        };
 
-    }, {'drawlayer': drawnItems}, {position: 'topleft', collapsed: false})
-        .addTo(map);
-
-    map.addControl(new L.Control.Draw({
-        edit: {
-            featureGroup: drawnItems,
-            poly: {
-                allowIntersection: false
+        $.getJSON('/geo/data/', function (data) {
+            var logoMarkerStyle = L.Icon.extend({
+                options: {
+                    iconSize: [65, 65],
+                    iconAnchor: [38, 86],
+                    popupAnchor: [0, -80]
+                }
+            });
+            // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
+            var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
+            var len_arr = data.features.length
+            console.log(geojsonMarker)
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                data.features[step].geometry = {}
+                data.features[step].geometry.coordinates = [0, 0]
+                data.features[step].geometry.type = "Point"
+                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                data.features[step].properties = {}
+                // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
             }
-        },
-        draw: {
-            polygon: {
-                allowIntersection: false,
-                showArea: true
+            console.log(data);
+
+        });
+
+        $.getJSON('/geo/strizh_view/', function (data) {
+            var logoMarkerStyle = L.Icon.extend({
+                options: {
+                    iconSize: [85, 90],
+                    iconAnchor: [38, 86],
+                    popupAnchor: [0, -80]
+                }
+            });
+            var logoMarker = new logoMarkerStyle({
+                iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
+                    'electronics-signal-technology-wifi-radiowaves-6-3098.png'
+            });
+            var len_arr = data.features.length
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                data.features[step].geometry = {}
+                data.features[step].geometry.coordinates = [0, 0]
+                data.features[step].geometry.type = "Point"
+                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                data.features[step].properties = {}
+                // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
+                let sector1 = L.sector({
+                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    innerRadius: 0,
+                    outerRadius: 500,
+                    startBearing: 230,
+                    endBearing: 250,
+                    color: 'red'
+                });
+
+                let arc1 = L.arc({
+                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    radius: 500,
+                    color: 'pink',
+                    startBearing: 0,
+                    endBearing: 360,
+
+                });
+
+                map.addLayer(sector1)
+                map.addLayer(arc1)
             }
-        }
-    }));
 
-    map.on(L.Draw.Event.CREATED, function (event) {
-        var layer = event.layer;
+            console.log(data);
 
-        drawnItems.addLayer(layer);
-    });
+        })
+
+        $.getJSON('/geo/sector_view/', function (data) {
+
+            var len_arr = data.features.length
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                let sector1 = L.sector({
+                    center: [data.features[step].properties.center_lat, data.features[step].properties.center_lon],
+                    innerRadius: data.features[step].properties.innerRadius,
+                    outerRadius: data.features[step].properties.outerRadius,
+                    startBearing: data.features[step].properties.startBearing,
+                    endBearing: data.features[step].properties.endBearing,
+                    color: data.features[step].properties.color
+                });
+                map.addLayer(sector1)
+            }
+        })
+
+    }
 
 </script>
 </body>

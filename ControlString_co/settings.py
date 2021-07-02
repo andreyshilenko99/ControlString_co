@@ -169,6 +169,8 @@ LEAFLET_CONFIG = {
                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js',
                    '/static/src/leaflet.sector.js',
                    '/static/src/leaflet.arc.js',
+                   '/static/src/L.Realtime.js',
+                   '/static/src/leaflet-realtime.js',
                    ],
             'auto-include': True
         },

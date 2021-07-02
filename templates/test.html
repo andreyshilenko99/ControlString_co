@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 {% load leaflet_tags %}
 {% load geojson_tags %}
-<!--{% leaflet_js %}-->
-<!--{% leaflet_css %}-->
 
 <html>
 <head>
     <title>Leaflet.draw vector editing handlers</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>-->
     <meta charset=utf-8>
-
     <link rel="stylesheet" href="/static/styles.css"/>
-    <script src="../static/src/leaflet.ajax.js"></script>
-    <!--    <script src="../static/src/leaflet.sector.js"></script>-->
+
     {% leaflet_js plugins="ALL" %}
     {% leaflet_css plugins="ALL" %}
     {% leaflet_js %}
@@ -22,23 +18,19 @@
     {% csrf_token %}
 </head>
 
-
 <body>
 <h1>Office</h1>
-<!--<h2>{{location}}</h2>-->
 
-{{ location1 }}
-<div class="leaflet-container" style=" height: 80vh; width: 90%; border: 0.5vh solid #dfee99">
-    <!--   {% leaflet_map "mymap"%}-->
-    {% leaflet_map "map" callback="window.map_init_basic" %}
+<div id="result">
+    <div id="table" class="leaflet-container" style=" height: 80vh; width: 90%; border: 0.5vh solid #dfee99">
+        <!--   {% leaflet_map "mymap"%}-->
+        {% leaflet_map "map" callback="window.map_init_basic" %}
+    </div>
+
+
 </div>
 
 
-<!--<script>-->
-<!--    function map_init_basic(map, options) {-->
-<!--        L.marker([60.014876, 30.451338]).addTo(map);-->
-<!--    }-->
-<!--</script>-->
 <script type="text/javascript">
     var geojsonMarker = {
         "type": "FeatureCollection",
@@ -95,88 +87,52 @@
         "opacity": 0.65
     };
 
-    // function map_init_basic(map, options) {
-    //     L.geoJson(geojsonMarker, {style: myStyle}).addTo(map);
-    // }
-
     function map_init_basic(map, options) {
-        var geojsonMarker = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            30.45331835746765,
-                            60.014732785555395
-                        ]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            30.453994274139404,
-                            60.01450757958334
-                        ]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            30.453983545303345,
-                            60.01494726600732
-                        ]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            30.452492237091064,
-                            60.0143359930511
-                        ]
-                    }
-                }
-            ]
-        };
 
-        $.getJSON('/geo/data/', function (data) {
-            var logoMarkerStyle = L.Icon.extend({
-                options: {
-                    iconSize: [85, 90],
-                    iconAnchor: [38, 86],
-                    popupAnchor: [0, -80]
+        //      30.45331835746765,
+        //      60.014732785555395
+
+        //     30.453994274139404,
+        //     60.01450757958334
+
+        //     30.453983545303345,
+        //     60.01494726600732
+
+        //    30.452492237091064,
+        //    60.0143359930511
+
+        var layerGroup = L.layerGroup().addTo(map);
+
+        function refreshMarkers() {
+            layerGroup.clearLayers();
+
+            $.getJSON('/geo/data/', function (data) {
+                var logoMarkerStyle = L.Icon.extend({
+                    options: {
+                        iconSize: [65, 65],
+                        iconAnchor: [38, 86],
+                        popupAnchor: [0, -80]
+                    }
+                });
+                // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
+                var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
+                var len_arr = data.features.length
+                console.log(len_arr)
+                for (let step = 0; step < len_arr; step++) {
+                    data.features[step].geometry = {}
+                    data.features[step].geometry.coordinates = [0, 0]
+                    data.features[step].geometry.type = "Point"
+                    data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                    data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                    data.features[step].properties = {}
+                    // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                    L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                        {icon: logoMarker}).addTo(layerGroup);
                 }
             });
-            // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
-            var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
-            var len_arr = data.features.length
-            console.log(geojsonMarker)
-            console.log(data)
-            console.log(len_arr)
-            for (let step = 0; step < len_arr; step++) {
-                data.features[step].geometry = {}
-                data.features[step].geometry.coordinates = [0, 0]
-                data.features[step].geometry.type = "Point"
-                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
-                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
-                data.features[step].properties = {}
-                // L.geoJson(data, {icon: logoMarker}).addTo(map);
-                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
-            }
-            console.log(data);
+        }
 
-        })
+        setInterval(refreshMarkers, 5000);
 
         $.getJSON('/geo/strizh_view/', function (data) {
             var logoMarkerStyle = L.Icon.extend({
@@ -202,14 +158,12 @@
                 data.features[step].properties = {}
                 // L.geoJson(data, {icon: logoMarker}).addTo(map);
                 L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
-
-
                 let sector1 = L.sector({
                     center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
                     innerRadius: 0,
                     outerRadius: 500,
-                    startBearing: -30,
-                    endBearing: 30,
+                    startBearing: 230,
+                    endBearing: 250,
                     color: 'red'
                 });
 
@@ -229,23 +183,27 @@
             console.log(data);
 
         })
+
+        $.getJSON('/geo/sector_view/', function (data) {
+
+            var len_arr = data.features.length
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                let sector1 = L.sector({
+                    center: [data.features[step].properties.center_lat, data.features[step].properties.center_lon],
+                    innerRadius: data.features[step].properties.innerRadius,
+                    outerRadius: data.features[step].properties.outerRadius,
+                    startBearing: data.features[step].properties.startBearing,
+                    endBearing: data.features[step].properties.endBearing,
+                    color: data.features[step].properties.color
+                });
+
+                map.addLayer(sector1)
+            }
+        })
+
     }
-
-
-    // var layer = L.geoJson();
-    // map.addLayer(layer);
-    // $.getJSON("geojson_file.json", function (data) {
-    //     layer.addData(data);
-    // });
-
-    // $.getJSON("data.geojson", function (data) {
-    //     var geojson = L.geoJson(data, {
-    //         onEachFeature: function (feature, layer) {
-    //             layer.bindPopup('pop-up content');
-    //         }
-    //     });
-    //     geojson.addTo(map);
-    // });
 
 
 </script>

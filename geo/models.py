@@ -24,6 +24,22 @@ class Strizh(models.Model):
     class Meta:
         verbose_name_plural = 'Strizh'
 
+
+class Sector(models.Model):
+    name = models.CharField(max_length=50)
+    center_lat = models.FloatField()
+    center_lon = models.FloatField()
+    innerRadius = models.FloatField(default=0)
+    outerRadius = models.FloatField(default=500)
+    startBearing = models.FloatField()
+    endBearing = models.FloatField()
+    color = models.CharField(max_length=50, default='yellow')
+    def __str__(self):
+        return self.name
+    class Meta:
+        verbose_name_plural = 'Sector'
+
+
 # class LoadDict(models.Model):
 #     with open('geo/geojson_file.json', 'r') as reader:
 #         x = json.load(reader)
