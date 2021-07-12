@@ -21,19 +21,25 @@ from map import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('geo/', include('geo.urls')),
     # # path(r' ', include('map.urls'))
     # path(r'', include('geo.urls')),
-    # path('data/', geojson_view, name='data'),
+
     path('', views.index),
     path('menu', views.index),
-    path('main', views.main),
+    # path('main', views.CreateMyModelView.as_view()),
+    path('main', views.render_main_page),
+
+
     path('journal', views.journal),
     path('configuration', views.configuration),
     path('butt_skan_all', views.butt_skan_all),
     path('butt_glush_all', views.butt_glush_all),
     path('butt_gps_all', views.butt_gps_all),
     path('butt_ku_all', views.butt_ku_all),
-    path(r'choose_nomer_strizha', views.choose_nomer_strizha),
+    path('choose_nomer_strizha', views.choose_nomer_strizha),
+    # path(r'strizh_view', views.strizh_view),
+
     # path(r'update_nomer_strizha', views.update_nomer_strizha),
     path('butt_skan', views.butt_skan),
     path('butt_glush', views.butt_glush),

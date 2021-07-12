@@ -1,12 +1,12 @@
 <!DOCTYPE html>
+
+{% load leaflet_tags %}
+{% load geojson_tags %}
+
 <html>
 <head>
     <title>Journal page</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <meta charset=utf-8>
 
-    <link rel="stylesheet" href="/static/styles.css"/>
     <link rel="stylesheet" href="/static/datepicker-widget.css"/>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.38.0/js/tempusdominus-bootstrap-4.min.js"
@@ -14,68 +14,7 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.38.0/css/tempusdominus-bootstrap-4.min.css"
           crossorigin="anonymous"/>
-
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-
-    <!--    &lt;!&ndash; Bootstrap 4 &ndash;&gt;-->
-    <!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">-->
-    <!--    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
-    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>-->
-    <!--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>-->
-
-    <!--    &lt;!&ndash; Font Awesome &ndash;&gt;-->
-    <!--    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">-->
-
-    <!--    &lt;!&ndash; Moment.js &ndash;&gt;-->
-    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>-->
-
-    <!--    &lt;!&ndash; Tempus Dominus Bootstrap 4 &ndash;&gt;-->
-    <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css" integrity="sha256-XPTBwC3SBoWHSmKasAk01c08M6sIA5gF5+sRxqak2Qs=" crossorigin="anonymous" />-->
-    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>-->
-
-
-    <script src="/static/src/libs/leaflet-src.js"></script>
-    <link rel="stylesheet" href="/static/src/libs/leaflet.css"/>
-
-    <script src="/static/src/Leaflet.draw.js"></script>
-    <script src="/static/src/Leaflet.Draw.Event.js"></script>
-    <link rel="stylesheet" href="/static/src/leaflet.draw.css"/>
-
-    <script src="/static/src/Toolbar.js"></script>
-    <script src="/static/src/Tooltip.js"></script>
-
-    <script src="/static/src/ext/GeometryUtil.js"></script>
-    <script src="/static/src/ext/LatLngUtil.js"></script>
-    <script src="/static/src/ext/LineUtil.Intersect.js"></script>
-    <script src="/static/src/ext/Polygon.Intersect.js"></script>
-    <script src="/static/src/ext/Polyline.Intersect.js"></script>
-    <script src="/static/src/ext/TouchEvents.js"></script>
-
-    <script src="/static/src/draw/DrawToolbar.js"></script>
-    <script src="/static/src/draw/handler/Draw.Feature.js"></script>
-    <script src="/static/src/draw/handler/Draw.SimpleShape.js"></script>
-    <script src="/static/src/draw/handler/Draw.Polyline.js"></script>
-    <script src="/static/src/draw/handler/Draw.Marker.js"></script>
-    <script src="/static/src/draw/handler/Draw.Circle.js"></script>
-    <script src="/static/src/draw/handler/Draw.CircleMarker.js"></script>
-    <script src="/static/src/draw/handler/Draw.Polygon.js"></script>
-    <script src="/static/src/draw/handler/Draw.Rectangle.js"></script>
-
-    <script src="/static/src/edit/EditToolbar.js"></script>
-    <script src="/static/src/edit/handler/EditToolbar.Edit.js"></script>
-    <script src="/static/src/edit/handler/EditToolbar.Delete.js"></script>
-
-    <script src="/static/src/Control.Draw.js"></script>
-
-    <script src="/static/src/edit/handler/Edit.Poly.js"></script>
-    <script src="/static/src/edit/handler/Edit.SimpleShape.js"></script>
-    <script src="/static/src/edit/handler/Edit.Rectangle.js"></script>
-    <script src="/static/src/edit/handler/Edit.Marker.js"></script>
-    <script src="/static/src/edit/handler/Edit.CircleMarker.js"></script>
-    <script src="/static/src/edit/handler/Edit.Circle.js"></script>
-
-
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet">
@@ -89,14 +28,23 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css"
           type="text/css" media="all" rel="stylesheet">
     <link href="datepicker-widget.css" type="text/css" media="all" rel="stylesheet">
-    <!--    <link href="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/css/datepicker-widget.css"-->
-    <!--          type="text/css" media="all" rel="stylesheet"/>-->
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
     <script type="text/javascript"
             src="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <meta charset=utf-8>
+
+    <link rel="stylesheet" href="/static/styles.css"/>
+
+    {% leaflet_js plugins="ALL" %}
+    {% leaflet_css plugins="ALL" %}
+    {% leaflet_js %}
+    {% leaflet_css %}
     {% csrf_token %}
 </head>
 <body>
@@ -122,7 +70,9 @@
 
                     </div>
 
-                    <div id="map" style="height: 66vh; width: 100%; border: 0.5vh solid #dfee99">
+                    <div class="leaflet-container" style="border: 0.5vh solid #dfee99">
+
+                        {% leaflet_map "map" callback="window.map_init_basic" %}
                     </div>
                 </div>
                 <div class="information-bottom" style="height: 25vh; margin-top: 1%; border: 0.5vh solid #dfee99">
@@ -167,11 +117,11 @@
                                                     <i class="glyphicon glyphicon-calendar"></i>
                                                 </div>
                                             </div>
-                                        <button class="button-green-small" type='submit'> Применить</button>
+                                            <button class="button-green-small" type='submit'> Применить</button>
                                         </div>
                                     </div>
                                 </h4>
-<!--                                <input type="submit" value="применить">-->
+                                <!--                                <input type="submit" value="применить">-->
 
                             </form>
 
@@ -196,7 +146,7 @@
                                     </div>
                                 </h4>
 
-<!--                            <input type="submit" value="применить">-->
+                                <!--                            <input type="submit" value="применить">-->
                             </form>
 
                             <script>
@@ -219,8 +169,42 @@
                     </div>
 
                 </div>
-                <div class="information-bottom" style="height: 35vh; margin-top: 1%; border: 0.5vh solid #dfee99">
+                <div class="information-bottom" style="height: 37vh; margin-top: 1%; border: 0.5vh solid #dfee99">
                     Служебка, Uniping, АГМ, логи
+                    <!--                    <a href="http://192.168.2.51/termo.html"> Термодатчики</a>-->
+                    <!--                    <a href="http://192.168.2.51/curdet.html"> Датчик дыма </a>-->
+                    <!--                    <a href="http://192.168.2.51/rh.html"> Датчик влажности </a>-->
+                    <!--                    <a href="http://192.168.2.51/log.html"> Журнал </a>-->
+
+                    <form action='functioning_loop' method='GET'>
+                        <h5> Температура: {{ temperature }}&deg,</h5>
+                        <h5> Влажность: {{ humidity }}%,</h5>
+                        <!--                        <h5>Температура датчика влажности: {{humidity_temp}}&deg</h5>-->
+                        <h5> Состояние: {{ weather_state }}</h5>
+                        <h5> Комплекс {{ complex_state }} </h5>
+
+                        <h5>
+                        </h5>
+                    </form>
+
+                    <div class="row" style="margin: 2%;">
+                        <form action='turn_on_bp' method='GET'>
+                            <button class="button-green-small">Включение комплекса</button>
+                        </form>
+                        <form action='turn_off_bp' method='GET'>
+                            <button class="button-red">Выключение комплекса</button>
+                        </form>
+                    </div>
+
+                    <div class="box-scroll">
+                        <form action='show_logs' method='GET'>
+
+                            {% for el in logs_list %}
+                            {{ el }} <br>
+                            {% endfor %}
+                        </form>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -230,41 +214,154 @@
 </div>
 
 <script>
-    var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: "ASB Production"}),
-        map = new L.Map('map', {center: new L.LatLng(60.014356, 30.452744), zoom: 13}),
-        drawnItems = L.featureGroup().addTo(map);
-    L.control.layers({
-        'osm': osm.addTo(map),
-        "google": L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
-                attribution: 'google'
-            },
-        ),
+function map_init_basic(map, options) {
+        var geojsonMarker = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.45331835746765,
+                            60.014732785555395
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.453994274139404,
+                            60.01450757958334
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.453983545303345,
+                            60.01494726600732
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            30.452492237091064,
+                            60.0143359930511
+                        ]
+                    }
+                }
+            ]
+        };
 
-    }, {'drawlayer': drawnItems}, {position: 'topleft', collapsed: false})
-        .addTo(map);
-
-    map.addControl(new L.Control.Draw({
-        edit: {
-            featureGroup: drawnItems,
-            poly: {
-                allowIntersection: false
+        $.getJSON('/geo/data/', function (data) {
+            var logoMarkerStyle = L.Icon.extend({
+                options: {
+                    iconSize: [65, 65],
+                    iconAnchor: [38, 86],
+                    popupAnchor: [0, -80]
+                }
+            });
+            // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
+            var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
+            var len_arr = data.features.length
+            console.log(geojsonMarker)
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                data.features[step].geometry = {}
+                data.features[step].geometry.coordinates = [0, 0]
+                data.features[step].geometry.type = "Point"
+                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                data.features[step].properties = {}
+                // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
             }
-        },
-        draw: {
-            polygon: {
-                allowIntersection: false,
-                showArea: true
+            console.log(data);
+
+        });
+
+        $.getJSON('/geo/strizh_view/', function (data) {
+            var logoMarkerStyle = L.Icon.extend({
+                options: {
+                    iconSize: [85, 90],
+                    iconAnchor: [38, 86],
+                    popupAnchor: [0, -80]
+                }
+            });
+            var logoMarker = new logoMarkerStyle({
+                iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
+                    'electronics-signal-technology-wifi-radiowaves-6-3098.png'
+            });
+            var len_arr = data.features.length
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                data.features[step].geometry = {}
+                data.features[step].geometry.coordinates = [0, 0]
+                data.features[step].geometry.type = "Point"
+                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                data.features[step].properties = {}
+                // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
+                let sector1 = L.sector({
+                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    innerRadius: 0,
+                    outerRadius: 500,
+                    startBearing: 230,
+                    endBearing: 250,
+                    color: 'red'
+                });
+
+                let arc1 = L.arc({
+                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    radius: 500,
+                    color: 'pink',
+                    startBearing: 0,
+                    endBearing: 360,
+
+                });
+
+                map.addLayer(sector1)
+                map.addLayer(arc1)
             }
-        }
-    }));
 
-    map.on(L.Draw.Event.CREATED, function (event) {
-        var layer = event.layer;
+            console.log(data);
 
-        drawnItems.addLayer(layer);
-    });
+        })
+
+        $.getJSON('/geo/sector_view/', function (data) {
+
+            var len_arr = data.features.length
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                let sector1 = L.sector({
+                    center: [data.features[step].properties.center_lat, data.features[step].properties.center_lon],
+                    innerRadius: data.features[step].properties.innerRadius,
+                    outerRadius: data.features[step].properties.outerRadius,
+                    startBearing: data.features[step].properties.startBearing,
+                    endBearing: data.features[step].properties.endBearing,
+                    color: data.features[step].properties.color
+                });
+                map.addLayer(sector1)
+            }
+        })
+
+    }
 
 </script>
 </body>

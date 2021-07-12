@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'leaflet',
     'map',
     'django.contrib.gis',
-    'geo'
+    'geo',
+    'djgeojson'
 
 ]
 
@@ -78,15 +79,32 @@ CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 CELERY_TIMEZONE = 'Europe/Moscow'
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'stuff',
+#         'USER': 'dron',
+#         'PASSWORD': '555',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432', }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'stuff',
-        'USER': 'dron',
+        'NAME': 'postgres',
+        'USER': 'postgres',
         'PASSWORD': '555',
         'HOST': '127.0.0.1',
         'PORT': '5432', }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -145,11 +163,20 @@ LEAFLET_CONFIG = {
             'css': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.css',
                     '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css'],
             'js': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.js',
-                   '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js'],
+                   '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js',
+                   '/static/src/leaflet.sector.js',
+                   '/static/src/leaflet.arc.js',
+                   '/static/src/L.Realtime.js',
+                   '/static/src/leaflet-realtime.js',
+                   ],
             'auto-include': True
         },
-        'ajax': {'js': ['/static/node_modules/leaflet-ajax/dist/leaflet.ajax.js'], 'auto-include': True},
-        'jquery': {'js': ['/static/node_modules/jquery/dist/jquery.js'], 'auto-include': True},
+        'ajax': {'js': ['/static/src/leaflet.ajax.js'], 'auto-include': True},
+        'jquery': {'js': ['/static/src/jquery.js'], 'auto-include': True},
 
     }
 }
+
+SERIALIZATION_MODULES = {
+    "geojson": "django.contrib.gis.serializers.geojson",
+ }

@@ -1,140 +1,213 @@
 <!DOCTYPE html>
 {% load leaflet_tags %}
-{% leaflet_js %}
-{% leaflet_css %}
-{% leaflet_js plugins="ALL" %}
-{% leaflet_css plugins="ALL" %}
+{% load geojson_tags %}
+
 <html>
 <head>
+    <title>Leaflet.draw vector editing handlers</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>-->
+    <meta charset=utf-8>
+    <link rel="stylesheet" href="/static/styles.css"/>
+
+    {% leaflet_js plugins="ALL" %}
+    {% leaflet_css plugins="ALL" %}
     {% leaflet_js %}
     {% leaflet_css %}
+    {% csrf_token %}
 </head>
+
 <body>
 <h1>Office</h1>
-<div style=" border: 0.5vh solid #dfee99">
-   {% leaflet_map "main"%}
+
+<div id="result">
+    <div id="table" class="leaflet-container" style=" height: 40vh; width: 40%; border: 0.5vh solid #dfee99">
+        <!--   {% leaflet_map "mymap"%}-->
+        {% leaflet_map "map" callback="window.map_init_basic" %}
+    </div>
+
+
 </div>
 
 
 <script type="text/javascript">
+    var geojsonMarker = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        30.454042553901676,
+                        60.014775681757094
+                    ]
+                }
+            }
+        ]
+    };
+    var myObjects = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [
+                        [
+                            30.45482039451599,
+                            60.014365484549685
+                        ],
+                        [
+                            30.456048846244812,
+                            60.01466576012881
+                        ]
+                    ]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        30.454165935516357,
+                        60.014730104540945
+                    ]
+                }
+            }
+        ]
+    }
+    var myStyle = {
+        "color": "#ff7800",
+        "weight": 5,
+        "opacity": 0.65
+    };
+
+    function map_init_basic(map, options) {
+
+        //      30.45331835746765,
+        //      60.014732785555395
+
+        //     30.453994274139404,
+        //     60.01450757958334
+
+        //     30.453983545303345,
+        //     60.01494726600732
+
+        //    30.452492237091064,
+        //    60.0143359930511
+
+        var layerGroup = L.layerGroup().addTo(map);
+
+        function refreshMarkers() {
+            layerGroup.clearLayers();
+
+            $.getJSON('/geo/data/', function (data) {
+                var logoMarkerStyle = L.Icon.extend({
+                    options: {
+                        iconSize: [65, 65],
+                        iconAnchor: [38, 86],
+                        popupAnchor: [0, -80]
+                    }
+                });
+                // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
+                var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
+                var len_arr = data.features.length
+                console.log(len_arr)
+                for (let step = 0; step < len_arr; step++) {
+                    data.features[step].geometry = {}
+                    data.features[step].geometry.coordinates = [0, 0]
+                    data.features[step].geometry.type = "Point"
+                    data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                    data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                    data.features[step].properties = {}
+                    // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                    L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                        {icon: logoMarker}).addTo(layerGroup);
+                }
+            });
+        }
+
+        setInterval(refreshMarkers, 5000);
+
+        $.getJSON('/geo/strizh_view/', function (data) {
+            var logoMarkerStyle = L.Icon.extend({
+                options: {
+                    iconSize: [85, 90],
+                    iconAnchor: [38, 86],
+                    popupAnchor: [0, -80]
+                }
+            });
+            var logoMarker = new logoMarkerStyle({
+                iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
+                    'electronics-signal-technology-wifi-radiowaves-6-3098.png'
+            });
+            var len_arr = data.features.length
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                data.features[step].geometry = {}
+                data.features[step].geometry.coordinates = [0, 0]
+                data.features[step].geometry.type = "Point"
+                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                data.features[step].properties = {}
+                // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
+                let sector1 = L.sector({
+                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    innerRadius: 0,
+                    outerRadius: 500,
+                    startBearing: 230,
+                    endBearing: 250,
+                    color: 'red'
+                });
+
+                let arc1 = L.arc({
+                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    radius: 500,
+                    color: 'pink',
+                    startBearing: 0,
+                    endBearing: 360,
+
+                });
+
+                map.addLayer(sector1)
+                map.addLayer(arc1)
+            }
+
+            console.log(data);
+
+        })
+
+        $.getJSON('/geo/sector_view/', function (data) {
+
+            var len_arr = data.features.length
+            console.log(data)
+            console.log(len_arr)
+            for (let step = 0; step < len_arr; step++) {
+                let sector1 = L.sector({
+                    center: [data.features[step].properties.center_lat, data.features[step].properties.center_lon],
+                    innerRadius: data.features[step].properties.innerRadius,
+                    outerRadius: data.features[step].properties.outerRadius,
+                    startBearing: data.features[step].properties.startBearing,
+                    endBearing: data.features[step].properties.endBearing,
+                    color: data.features[step].properties.color
+                });
+
+                map.addLayer(sector1)
+            }
+        })
+
+    }
 
 
 </script>
+
+
 </body>
 </html>
-{#<html lang="en">#}
-
-{#<head>#}
-{#    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>#}
-{#    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>#}
-{#    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>#}
-{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>#}
-{#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>#}
-{#    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>#}
-{#    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>#}
-{#    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>#}
-{#    <link rel="stylesheet"#}
-{#          href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>#}
-{#    <link rel="stylesheet"#}
-{#          href="https://rawcdn.githack.com/python-visualization/folium/master/folium/templates/leaflet.awesome.rotate.css"/>#}
-{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>#}
-{#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css"/>#}
-{#    <script src="https://rawcdn.githack.com/ardhi/Leaflet.MousePosition/c32f1c84/src/L.Control.MousePosition.js"></script>#}
-{#    <link rel="stylesheet"#}
-{#          href="https://rawcdn.githack.com/ardhi/Leaflet.MousePosition/c32f1c84/src/L.Control.MousePosition.css"/>#}
-{#    <script src="node_modules/leaflet-ajax/dist/leaflet.ajax.min.js"></script>#}
-{#    {% leaflet_js %}#}
-{#    {% leaflet_css %}#}
-{#    {% leaflet_js plugins="ALL" %}#}
-{#    {% leaflet_css plugins="ALL" %}#}
-{##}
-{##}
-{#    <style>#}
-{##}
-{#        .leaflet-container { /* all maps */#}
-{#            width: 1000px;#}
-{#            height: 1000px;#}
-{#        }#}
-{##}
-{#        #specialbigmap {#}
-{#            height: 800px;#}
-{#        }#}
-{##}
-{#        /* Resize the "display_raw" textbox */#}
-{#        .django-leaflet-raw-textarea {#}
-{#            width: 100%;#}
-{#        }#}
-{##}
-{##}
-{#        #export {#}
-{#            position: absolute;#}
-{#            top: 5px;#}
-{#            right: 10px;#}
-{#            z-index: 999;#}
-{#            background: white;#}
-{#            color: black;#}
-{#            padding: 6px;#}
-{#            border-radius: 4px;#}
-{#            font-family: 'Helvetica Neue';#}
-{#            cursor: pointer;#}
-{#            font-size: 12px;#}
-{#            text-decoration: none;#}
-{#            top: 90px;#}
-{#        }#}
-{##}
-{##}
-{#    </style>#}
-{##}
-{#</head>#}
-{#<script>#}
-{##}
-{##}
-{#    function map_init_basic(map, options) {#}
-{##}
-{#        var featureGroup = L.featureGroup().addTo(map);#}
-{##}
-{#        var drawControl = new L.Control.Draw({#}
-{#            edit: {#}
-{#                featureGroup: featureGroup#}
-{#            }#}
-{#        }).addTo(map);#}
-{##}
-{#        map.on('draw:created', function (e) {#}
-{##}
-{#            // Each time a feaute is created, it's added to the over arching feature group#}
-{##}
-{#            featureGroup.addLayer(e.layer);#}
-{#        });#}
-{#        var overlayMaps = {#}
-{#            "Paintings": featureGroup#}
-{#        };#}
-{#        var bases = {#}
-{#            "base": map#}
-{#        };#}
-{#        var geojsonLayer = 'http://127.0.0.1:8000/static/data.jsonp';#}
-{#        var jsonLayer = new L.geoJson().addTo(map); //#}
-{#geojsonLayer.addTo(featureGroup);#}
-{#L.control.layers(jsonLayer).addTo(map);#}
-{#geojsonLayer.addTo(map);#}
-{##}
-{#        $.ajax({#}
-{#            dataType: "json",#}
-{#            url: geojsonLayer,#}
-{#            success: function (data) {#}
-{#                $(data.features).each(function (key, data) {#}
-{#                    jsonLayer.addData(data);#}
-{#                });#}
-{#            }#}
-{##}
-{#        });#}
-{##}
-{#    }#}
-{##}
-{#</script>#}
-{##}
-{##}
-{#<body>#}
-{#{% leaflet_map "yourmap" callback="window.map_init_basic" %}#}
-{#</body>#}
-{##}
-{#</html>#}
