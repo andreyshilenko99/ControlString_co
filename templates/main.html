@@ -96,22 +96,34 @@
                         <!--                        </div>-->
 
                         <div class="row" style="margin-top: 2%">
-
-                            <h3>
-                                <form action="choose_nomer_strizha" method="post" >
+                            {% if chosen_strizh == 0 %}
+                            <h5>
+                                <form action="choose_nomer_strizha" method="post">
                                     {% csrf_token %}
-<!--                                    {{ form.name }}-->
-                                    {{ form.as_p }}
-<!--                                    {{ form }}-->
+
+                                    <!--                                    {{strizhes.available_strizhes}}-->
+<!--                                                                        {{chosen_strizh}}-->
+                                    {{ forma.as_p }}
                                     <input type="submit" value="ввод">
                                 </form>
-                            </h3>
+                            </h5>
+                            {% elif chosen_strizh != 0 %}
+                            <h5>
+                                <form action="main" method="post">
+                                    {% csrf_token %}
+                                    <input type="submit" value="выбрать другой">
+                                </form>
+                            </h5>
+                            {% endif %}
                         </div>
 
+
                         <div class="row">
+                            {% if chosen_strizh != 0 %}
                             <h5>
-                                {{action_strizh}}
+                                Выбран: {{chosen_strizh}}
                             </h5>
+                            {% endif %}
                         </div>
 
 

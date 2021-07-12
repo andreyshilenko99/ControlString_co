@@ -1,5 +1,6 @@
 from django.contrib import admin
 from geo.models import Point, Strizh, Sector
+# from map.models import MyStrizh
 
 
 class Inc(admin.ModelAdmin):

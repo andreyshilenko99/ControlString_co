@@ -27,7 +27,8 @@ urlpatterns = [
 
     path('', views.index),
     path('menu', views.index),
-    path('main', views.CreateMyModelView.as_view()),
+    # path('main', views.CreateMyModelView.as_view()),
+    path('main', views.render_main_page),
 
 
     path('journal', views.journal),

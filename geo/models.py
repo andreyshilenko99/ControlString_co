@@ -12,17 +12,23 @@ class Point(models.Model):
     def __str__(self):
         return self.name
     class Meta:
-        verbose_name_plural = 'Incidences'
+        verbose_name_plural = 'Дроны'
+        verbose_name = 'Дрон'
 
 
 class Strizh(models.Model):
-    name = models.CharField(max_length=50, default="3")
-    lat = models.FloatField()
-    lon = models.FloatField()
+    name = models.CharField(max_length=50, default='стриж 0 (по умолчанию)')
+    lat = models.FloatField('Широта', blank=True, null=True)
+    lon = models.FloatField('Долгота', blank=True, null=True)
     def __str__(self):
         return self.name
+    def __unicode__(self):
+        return self.name
+
     class Meta:
-        verbose_name_plural = 'Strizh'
+        verbose_name = 'Стриж'
+        verbose_name_plural = 'Стрижи'
+        ordering = ['name']
 
 
 class Sector(models.Model):
@@ -40,23 +46,4 @@ class Sector(models.Model):
         verbose_name_plural = 'Sector'
 
 
-# class LoadDict(models.Model):
-#     with open('geo/geojson_file.json', 'r') as reader:
-#         x = json.load(reader)
-#         print(x)
-#
-# class Location(models.Model):
-#     name = models.CharField(max_length=50)
-#     lon = models.FloatField()
-#     lat = models.FloatField()
-#
-#     def serialize(self):
-#         json_dict = {}
-#         json_dict['type'] = 'Feature'
-#         json_dict['properties'] = dict(name=self.name)
-#         json_dict['geometry'] = dict(type='Point', coordinates=list([self.lon, self.lat]))
-#         return(json.dumps(json_dict))
-#
-#         # update - allow multiple geoms
-#         # return Py dict (will do json.dumps in view)
-#         # return (json_dict)
+
