@@ -17,18 +17,15 @@ class Point(models.Model):
 
 
 class Strizh(models.Model):
-    name = models.CharField(max_length=50, default='стриж 0 (по умолчанию)')
+    name = models.CharField('Имя стрижа', max_length=50, default='стриж 0 (по умолчанию)')
     lat = models.FloatField('Широта', blank=True, null=True)
     lon = models.FloatField('Долгота', blank=True, null=True)
     def __str__(self):
-        return self.name
-    def __unicode__(self):
         return self.name
 
     class Meta:
         verbose_name = 'Стриж'
         verbose_name_plural = 'Стрижи'
-        ordering = ['name']
 
 
 class Sector(models.Model):

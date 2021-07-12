@@ -5,12 +5,8 @@ import requests
 from django.core.serializers import serialize
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.views.generic import CreateView
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 
 from geo.models import Strizh
-
 # from .models import MyModel, MyStrizh
 # from .forms import MyModelForm
 from .forms import StrizhForm
@@ -27,9 +23,6 @@ high_h = 85
 url = "http://192.168.2.51/"
 auth = ('user', '555')
 message_condition = ''
-
-
-
 
 
 def index(request):
@@ -67,7 +60,6 @@ def return_conditions():
     c['humidity'] = humidity
     c['temperature'] = temperature
 
-
     if 'error' not in temperature and 'error' not in humidity:
         if low_t < float(temperature) < high_t and low_h < float(humidity) < high_h:
             weather_state = "OK"
@@ -102,26 +94,26 @@ def get_strizhes():
     return arr_strizh
 
 
-def main(request):
-    temperature, humidity, weather_state = return_conditions()
-
-    c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime,
-             available_strizhes=get_strizhes(), temperature=temperature,
-             humidity=humidity, weather_state=weather_state)
-
-    if request.method == 'POST':
-        form = StrizhForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return
-        else:
-            error = "форма неверная"
-    form = StrizhForm()
-    if c.get('form'):
-        c['form'] = form
-    else:
-        c['form'] = ''
-    return render(request, "main.html", context=c)
+# def main(request):
+#     temperature, humidity, weather_state = return_conditions()
+#
+#     c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime,
+#              available_strizhes=get_strizhes(), temperature=temperature,
+#              humidity=humidity, weather_state=weather_state)
+#
+#     if request.method == 'POST':
+#         form = StrizhForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return
+#         else:
+#             error = "форма неверная"
+#     form = StrizhForm()
+#     if c.get('form'):
+#         c['form'] = form
+#     else:
+#         c['form'] = ''
+#     return render(request, "main.html", context=c)
 
 
 def configuration(request):
@@ -143,6 +135,10 @@ def butt_glush_all(request):
     print('glushenie vseh')
     # TODO action 2 button
     c["action_strizh"] = "Глушение всех"
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def back2main(request):
     return redirect(request.META['HTTP_REFERER'])
 
 
@@ -177,11 +173,16 @@ def choose_nomer_strizha(request):
     # c["available_strizhes"] = arr_strizh
     # print(c["available_strizhes"])
 
+    temperature, humidity, weather_state = return_conditions()
+    c['temperature'] = temperature
+    c['humidity'] = humidity
+    c['weather_state'] = weather_state
+
     if request.method == 'POST':
-        forma = StrizhForm(request.POST)
-        if forma.is_valid():
-            print(forma.cleaned_data)
-            chosen_strizh = forma.cleaned_data.get('chosen_strizh')
+        form = StrizhForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            chosen_strizh = form.cleaned_data.get('chosen_strizh')
             c['chosen_strizh'] = chosen_strizh
 
         nomer = request.POST['chosen_strizh']
@@ -190,33 +191,32 @@ def choose_nomer_strizha(request):
         # return render(request,"main.html", context=c)
     if c.get("chosen_strizh"):
         c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
-    xx = c
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
     # return HttpResponseRedirect('/main')
 
+
 def render_main_page(request):
-    c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime,
-             available_strizhes=get_strizhes())
+    global c
+    c['chosen_strizh'] = 0
+    c['start_datetime'] = start_datetime
+    c['end_datetime'] = end_datetime
+    c['available_strizhes'] = get_strizhes()
 
     temperature, humidity, weather_state = return_conditions()
-    strizhes = Strizh.objects.order_by('-name')
-    if request.method == 'POST':
-        forma = StrizhForm(request.POST)
-        if forma.is_valid():
-            print(forma.cleaned_data)
-            chosen_strizh = forma.cleaned_data.get('chosen_strizh')
-            c['chosen_strizh'] = chosen_strizh
-        forma.save()
-    else:
-        forma = StrizhForm()
-
     c['temperature'] = temperature
     c['humidity'] = humidity
     c['weather_state'] = weather_state
-    c['strizhes'] = strizhes
-    c['forma'] = forma
 
+    if request.method == 'POST':
+        form = StrizhForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            chosen_strizh = form.cleaned_data.get('chosen_strizh')
+            c['chosen_strizh'] = chosen_strizh
+    else:
+        form = StrizhForm()
+    c['form'] = form
 
     return render(request, "main.html", context=c)
 
@@ -385,12 +385,6 @@ def send_impulse(line_name, time_pulse=3, action=''):
     time.sleep(time_pulse + 1)
 
 
-
-def do_nothing():
-    print('do nothing, all is good')
-    #     TODO check ventilator state
-
-
 def obtain_state(line_name, to_collect_logs=False):
     global lines_control_map
     result_state = 0
@@ -416,7 +410,7 @@ def set_correct_temperature(temperature_state):
     global temperature
     if temperature_state != 0:
         while temperature_state != 0:
-            temperature_state = check_condition(temperature, low_border=low_t, high_border=high_t)
+            temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
             if temperature_state == 1:
                 send_line_command('вентилятор', 1)
                 state0 = obtain_state('датчик потока')
@@ -433,7 +427,7 @@ complex_state = ''
 def check_states_on():
     # global complex_state
     # if complex_state == 'вкл':
-    temperature_state = check_condition(temperature, low_border=low_t, high_border=high_t)
+    temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
     if temperature_state != 0:
         collect_logs('температура не в порядке')
         set_correct_temperature(temperature_state)
@@ -469,7 +463,7 @@ def check_states_on():
 
 def turn_on_bp(request):
     global comlex_state, logs
-    temperature_state = check_condition(temperature, low_border=low_t, high_border=high_t)
+    temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
     if temperature_state != 0:
         print('температура не в порядке')
         set_correct_temperature(temperature_state)

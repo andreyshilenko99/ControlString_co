@@ -11,13 +11,16 @@ from geo.models import Strizh
 
 class StrizhForm(ModelForm):
     chosen_strizh = ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
-                                     required=False, help_text="Выбор стрижа", to_field_name="name")
-    print(chosen_strizh)
+                                     required=False, to_field_name="name",
+                                     label="")
+    # print(chosen_strizh)
     class Meta:
         model = Strizh
         # model = MyStrizh
-        fields = ['name']
+        fields = ['chosen_strizh']
 
         widgets = {
-            'name': Select(attrs={'id': 'name'}),
+            'chosen_strizh': Select(attrs={'id': 'name'}),
+            # 'chosen_strizh': ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
+            #                                  required=False, help_text="Выбор стрижа", to_field_name="name")
         }

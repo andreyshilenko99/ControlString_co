@@ -11,7 +11,8 @@
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 4px 2px;
+  /*margin: 4px 2px;*/
+  margin-left: 10px;
 }
 .button-green-small {
   background-color: #04AA6D;
@@ -36,6 +37,18 @@
   display: inline-block;
   font-size: 16px;
   margin: 2px 2px;
+}
+
+.button-blue-small {
+  background-color: #0483aa;
+  border: none;
+  color: white;
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 5px 5px;
+  font-size: 26px;
 }
 
 .button-red {
