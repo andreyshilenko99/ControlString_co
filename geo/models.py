@@ -14,3 +14,6 @@ class Point(models.Model):
 
     class Meta:
         verbose_name_plural = 'Incidences'
+
+
+
