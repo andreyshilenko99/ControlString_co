@@ -1,0 +1,39 @@
+syntax="proto2";
+
+package TraceRemoteNotifying;
+
+message FoundSignalParams {
+    required int64  protocol_version        = 1;
+    required int64  center_frequency_hz     = 2;                 // несущая в Гц
+    required int64  bandwidth_hz            = 3;                 // ширина полосы в Гц
+    optional string detection_time          = 4;                 // время измерения
+    optional string system_name             = 5;                 // название системы связи, к которой относится обнаруженный сигнал
+    optional int32  dev_id                  = 6 [default = -1];  // id устройства
+    optional int32  system_id               = 7 [default = -1];  // id системы
+    optional int32  modulation_id           = 8;                 // id модуляции
+    optional int32  systems_modes_id        = 9;                 // id конфигурации системы
+    optional int32  network_id              = 10 [default = -1]; // id системы
+    optional string system_mode_name        = 11;                // имя конфигурации системы
+    optional double symbol_rate_bod         = 12;                // символьная скорость 
+    optional double start_time_sec          = 13;                // время начала
+    optional double end_time_sec            = 14;                // время окончания
+    optional double average_snr_db          = 15;                // отношение с\ш
+    optional double duty_cycle              = 16;                // "скважность", т.е. буквально скважность в минус первой степени
+    optional double min_packet_period_sec   = 17;                // минимальное расстояние между началом пакетов, в секундах
+    optional bool   is_continuous           = 18;                // непрерывное или пакетное излучение
+    optional double identification_prob     = 19;                // вероятность идентификации сигнала
+    optional bool   is_spectrum_inversion   = 20;                // =true при наличии инверсии, =false при отсутствии
+    optional string comment_string          = 21;                // примечание
+
+    message Location
+    {
+        optional string name                   = 1;
+        optional double latitude               = 2;
+        optional double longitude              = 3;
+        optional double area_sector_start_grad = 4;
+        optional double area_sector_end_grad   = 5;
+        optional double area_radius_m          = 6;
+    }
+    optional Location location              = 22;                // местоположение источника сигнала
+    optional int32    id_foreign_db         = 23 [default = -1]; // уникальный идентификатор сообщения по нескольким базам данных
+}
