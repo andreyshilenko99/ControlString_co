@@ -61,6 +61,18 @@
     margin: 2px 2px;
 }
 
+.button-csv {
+    background-color: #ef9900;
+    border: none;
+    color: white;
+    padding: 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    margin: 2px 10px;
+}
+
 .button-blue-big {
     background-color: #0483aa;
     border: none;

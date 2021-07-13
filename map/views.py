@@ -9,7 +9,7 @@ from django.shortcuts import render
 from geo.models import Strizh, Point
 # from .models import MyModel, MyStrizh
 # from .forms import MyModelForm
-from .forms import StrizhForm
+from .forms import StrizhForm, StrizhFilterForm
 
 chosen_strizh = 0
 start_datetime = "Начало"
@@ -75,13 +75,59 @@ c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_dateti
 
 
 def journal(request):
-    global c
+
     # temperature, humidity, weather_state = return_conditions()
     #
     # c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime,
     #          available_strizhes=get_strizhes(), temperature=temperature,
     #          humidity=humidity, weather_state=weather_state)
+
+    global c
+    c['filtered_strizhes'] = 0
+    c['start_datetime'] = start_datetime
+    c['end_datetime'] = end_datetime
+    c['available_strizhes'] = get_strizhes()
+
+    temperature, humidity, weather_state = return_conditions()
+    c['temperature'] = temperature
+    c['humidity'] = humidity
+    c['weather_state'] = weather_state
+
+    if request.method == 'POST':
+        form = StrizhFilterForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            filtered_strizhes = form.cleaned_data.get('filtered_strizhes')
+            c['filtered_strizhes'] = filtered_strizhes
+    else:
+        form_filter = StrizhFilterForm()
+    c['form_filter'] = form_filter
     return render(request, "journal.html", context=c)
+
+
+def filter_nomer_strizha(request):
+    global c
+    temperature, humidity, weather_state = return_conditions()
+    c['temperature'] = temperature
+    c['humidity'] = humidity
+    c['weather_state'] = weather_state
+    if request.method == 'POST':
+        form_filter = StrizhFilterForm(request.POST)
+        if form_filter.is_valid():
+            print(form_filter.cleaned_data)
+            filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
+            c['filtered_strizhes'] = filtered_strizhes
+        # nomer = request.POST['filtered_strizhes']
+        nomer = filtered_strizhes
+        print('got', nomer, '\n')
+        c = {'filtered_strizhes': nomer}
+        # return render(request,"main.html", context=c)
+    # if c.get("filtered_strizhes"):
+    #     c["filtered_strizhes"] = "{}".format(c.get("filtered_strizhes"))
+    xx = c
+    print(len(c['filtered_strizhes']))
+    return render(request, "journal.html", context=c)
+
 
 
 def get_strizhes():
@@ -225,7 +271,7 @@ def render_main_page(request):
     c['actual_strizhes'] = strizhes
     c['drone_lat'] = drones[0].lat
     c['drone_lon'] = drones[0].lon
-    c['drone_name'] = drones[0].name
+    c['drone_name'] = drones[0].system_name
     return render(request, "main.html", context=c)
 
 
@@ -296,9 +342,16 @@ def apply_period(request):
             end_arr = end.split(' ')
             end_datetime = "-".join(end_arr)
 
-        c = {'start_datetime': start_datetime,
-             'end_datetime': end_datetime}
+        c['start_datetime'] = start_datetime
+        c['end_datetime'] = end_datetime
         # return render(request, "journal.html", context=c)
+    return render(request, "journal.html", context=c)
+
+def reset_filter(request):
+    global c
+    c['filtered_strizhes'] = 0
+    c['start_datetime'] = 0
+    c['end_datetime'] = 0
     return render(request, "journal.html", context=c)
 
 

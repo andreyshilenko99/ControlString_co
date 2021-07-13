@@ -36,6 +36,9 @@ urlpatterns = [
 
 
     path('journal', views.journal),
+    path('filter_nomer_strizha', views.filter_nomer_strizha),
+    path('reset_filter', views.reset_filter),
+
     path('configuration', views.configuration),
     path('butt_skan_all', views.butt_skan_all),
     path('butt_glush_all', views.butt_glush_all),

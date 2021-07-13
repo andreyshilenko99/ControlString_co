@@ -83,139 +83,179 @@
             <div class="col-4">
                 <div class="filters-all" style="height: 60vh; border: 0.5vh solid #dfee99">
                     <div class="export-csv" style="margin-left: 5%;margin-top: 1%">
-                        <form action="main" method='GET'>
-                            <button class="button-blue"> Экспортировать csv</button>
+                        <div class="functions-cont" style="margin-top: 2%; ">
+
+                            {% csrf_token %}
+                            <div class="row" style="margin-top: 2%; width: 100vh">
+                                {% if filtered_strizhes == 0%}
+                                <form action="filter_nomer_strizha" method="post">
+                                    {% csrf_token %}
+                                    <div class="row" style="margin: 2% 2%; align-items:center; width: 100vh">
+                                    <h3>
+                                        Выбор стрижей
+                                    </h3>
+                                    </div>
+<!--                                    </div>-->
+                                    <div class="row" style="margin-left: 2%">
+
+<!--                                    <h5>-->
+                                        {{ form_filter }}
+                                        <button class="button-green-small" style="margin: 0px 20px">
+                                            выбор
+                                        </button>
+<!--                                    </h5>-->
+                                    </div>
+                                </form>
+                                {% endif %}
+                            </div>
+                            <div class="row">
+                                {% if filtered_strizhes != 0%}
+                                <h3 style="text-align: center">
+                                    Выбрано:
+                                </h3>
+                                <h5 style="text-align: center">
+                                    {% for f_str in filtered_strizhes %}
+                                    <p style="text-align: center">
+                                        {{f_str}}
+                                    </p>
+                                    {% endfor %}
+                                </h5>
+                                <h5>
+                                    <form action="journal" method="get">
+                                        {% csrf_token %}
+                                        <button class="button-blue-small">
+                                            выбрать другой
+                                        </button>
+                                    </form>
+                                </h5>
+                                {% endif %}
+                            </div>
+
+<!--                            <form action='apply_numbers_strizhes' method='GET'>-->
+<!--                                <button class="button-green-small" type='submit'> Фильтр</button>-->
+<!--                            </form>-->
+                        </div>
+
+
+                        <form action="apply_period" method="post">
+                            {% csrf_token %}
+                            <h3> Период </h3>
+                            <h4 style="color: #72849e">
+                                <div class="form-group">
+                                    <label for="id_start_datetime">Начало</label>
+                                    <div class="input-group date" style="height: 48px; width: 90%">
+                                        <input type="text" name="start_datetime" value="Начало"
+                                               class="form-control" placeholder="{{start_datetime}}"
+                                               required="" id="id_start_datetime"
+                                               dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
+                                        <div class="input-group-addon input-group-append"
+                                             data-target="#datetimepicker1" data-toggle="datetimepickerv">
+                                            <div class="input-group-text">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </div>
+                                        </div>
+                                        <button class="button-green-small" type='submit'> Применить</button>
+                                    </div>
+                                </div>
+                            </h4>
+                            <!--                                <input type="submit" value="применить">-->
+
                         </form>
 
-                        <div class="functions-cont" style="margin-top: 2%; ">
-                            <form action="choose_numbers_strizhes" method="post">
-                                {% csrf_token %}
-                                <h3>Введите номера стрижей</h3>
-
-                                <input type="number" style="height: 48px; width: 60%" name="nomer_strizha"
-                                       placeholder="1,2,3">
-                                <form action='apply_numbers_strizhes' method='GET'>
-                                    <button class="button-green-small" type='submit'> Фильтр</button>
-                                </form>
-                            </form>
-
-
-                            <form action="apply_period" method="post">
-                                {% csrf_token %}
-                                <h3> Период </h3>
-                                <h4 style="color: #72849e">
-                                    <div class="form-group">
-                                        <label for="id_start_datetime">Начало</label>
-                                        <div class="input-group date" style="height: 48px; width: 90%">
-                                            <input type="text" name="start_datetime" value="Начало"
-                                                   class="form-control" placeholder={{start_datetime}} title=""
-                                                   required="" id="id_start_datetime"
-                                                   dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
-                                            <div class="input-group-addon input-group-append"
-                                                 data-target="#datetimepicker1" data-toggle="datetimepickerv">
-                                                <div class="input-group-text">
-                                                    <i class="glyphicon glyphicon-calendar"></i>
-                                                </div>
+                        <form action="apply_period" method="post">
+                            {% csrf_token %}
+                            <h4 style="color: #72849e">
+                                <div class="form-group">
+                                    <label for="id_end_datetime">Конец</label>
+                                    <div class="input-group date" style="height: 48px; width: 90%">
+                                        <input type="text" name="end_datetime" value="Конец"
+                                               class="form-control" placeholder="{{end_datetime}}"
+                                               required="" id="id_end_datetime"
+                                               dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
+                                        <div class="input-group-addon input-group-append"
+                                             data-target="#datetimepicker1" data-toggle="datetimepickerv">
+                                            <div class="input-group-text">
+                                                <i class="glyphicon glyphicon-calendar"></i>
                                             </div>
-                                            <button class="button-green-small" type='submit'> Применить</button>
                                         </div>
+                                        <button class="button-green-small" type='submit'> Применить</button>
                                     </div>
-                                </h4>
-                                <!--                                <input type="submit" value="применить">-->
+                                </div>
+                            </h4>
 
-                            </form>
+                            <!--                            <input type="submit" value="применить">-->
+                        </form>
 
-                            <form action="apply_period" method="post">
-                                {% csrf_token %}
-                                <h4 style="color: #72849e">
-                                    <div class="form-group">
-                                        <label for="id_end_datetime">Конец</label>
-                                        <div class="input-group date" style="height: 48px; width: 90%">
-                                            <input type="text" name="end_datetime" value="Конец"
-                                                   class="form-control" placeholder={{end_datetime}} title=""
-                                                   required="" id="id_end_datetime"
-                                                   dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
-                                            <div class="input-group-addon input-group-append"
-                                                 data-target="#datetimepicker1" data-toggle="datetimepickerv">
-                                                <div class="input-group-text">
-                                                    <i class="glyphicon glyphicon-calendar"></i>
-                                                </div>
-                                            </div>
-                                            <button class="button-green-small" type='submit'> Применить</button>
-                                        </div>
-                                    </div>
-                                </h4>
-
-                                <!--                            <input type="submit" value="применить">-->
-                            </form>
-
-                            <script>
-                                $(function () {
-                                    $("#datetimepicker1").datetimepicker({
-                                        format: 'DD/MM/YYYY HH:mm',
-                                    });
+                        <script>
+                            $(function () {
+                                $("#datetimepicker1").datetimepicker({
+                                    format: 'DD/MM/YYYY HH:mm',
                                 });
-                            </script>
+                            });
+                        </script>
 
 
-                            <form action="choose_period" method="post">
-                                {% csrf_token %}
-                                <form action='apply_period' method='GET'>
-                                    <button class="button-red" type='submit'> Сбросить фильтры</button>
-                                </form>
+                        <div class="row" style="align-items: center; margin-left: 2%">
+                            {% csrf_token %}
+                            <form action='reset_filter' method='post'>
+                                <button class="button-red" type='submit'> Сбросить фильтры</button>
                             </form>
-
+                        <form action="export_csv" method='GET'>
+                            <button class="button-csv"> Экспортировать csv</button>
+                        </form>
                         </div>
 
                     </div>
 
                 </div>
-                <div class="information-bottom" style="height: 37vh; margin-top: 1%; border: 0.5vh solid #dfee99">
-                    Служебка, Uniping, АГМ, логи
-                    <!--                    <a href="http://192.168.2.51/termo.html"> Термодатчики</a>-->
-                    <!--                    <a href="http://192.168.2.51/curdet.html"> Датчик дыма </a>-->
-                    <!--                    <a href="http://192.168.2.51/rh.html"> Датчик влажности </a>-->
-                    <!--                    <a href="http://192.168.2.51/log.html"> Журнал </a>-->
 
-                    <form action='functioning_loop' method='GET'>
-                        <h5> Температура: {{ temperature }}&deg,</h5>
-                        <h5> Влажность: {{ humidity }}%,</h5>
-                        <!--                        <h5>Температура датчика влажности: {{humidity_temp}}&deg</h5>-->
-                        <h5> Состояние: {{ weather_state }}</h5>
-                        <h5> Комплекс {{ complex_state }} </h5>
+            </div>
+            <div class="information-bottom" style="height: 37vh; margin-top: 1%; border: 0.5vh solid #dfee99">
+                Служебка, Uniping, АГМ, логи
+                <!--                    <a href="http://192.168.2.51/termo.html"> Термодатчики</a>-->
+                <!--                    <a href="http://192.168.2.51/curdet.html"> Датчик дыма </a>-->
+                <!--                    <a href="http://192.168.2.51/rh.html"> Датчик влажности </a>-->
+                <!--                    <a href="http://192.168.2.51/log.html"> Журнал </a>-->
 
-                        <h5>
-                        </h5>
+                <form action='functioning_loop' method='GET'>
+                    <h5> Температура: {{ temperature }}&deg,</h5>
+                    <h5> Влажность: {{ humidity }}%,</h5>
+                    <!--                        <h5>Температура датчика влажности: {{humidity_temp}}&deg</h5>-->
+                    <h5> Состояние: {{ weather_state }}</h5>
+                    <h5> Комплекс {{ complex_state }} </h5>
+
+                    <h5>
+                    </h5>
+                </form>
+
+                <div class="row" style="margin: 2%;">
+                    <form action='turn_on_bp' method='GET'>
+                        <button class="button-green-small">Включение комплекса</button>
                     </form>
-
-                    <div class="row" style="margin: 2%;">
-                        <form action='turn_on_bp' method='GET'>
-                            <button class="button-green-small">Включение комплекса</button>
-                        </form>
-                        <form action='turn_off_bp' method='GET'>
-                            <button class="button-red">Выключение комплекса</button>
-                        </form>
-                    </div>
-
-                    <div class="box-scroll">
-                        <form action='show_logs' method='GET'>
-
-                            {% for el in logs_list %}
-                            {{ el }} <br>
-                            {% endfor %}
-                        </form>
-                    </div>
-
+                    <form action='turn_off_bp' method='GET'>
+                        <button class="button-red">Выключение комплекса</button>
+                    </form>
                 </div>
+
+                <div class="box-scroll">
+                    <form action='show_logs' method='GET'>
+
+                        {% for el in logs_list %}
+                        {{ el }} <br>
+                        {% endfor %}
+                    </form>
+                </div>
+
             </div>
         </div>
     </div>
+</div>
 
 
 </div>
 
 <script>
-function map_init_basic(map, options) {
+    function map_init_basic(map, options) {
         var geojsonMarker = {
             "type": "FeatureCollection",
             "features": [
