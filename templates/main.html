@@ -38,8 +38,8 @@
                         <form action="journal" method='GET'>
                             <button class="button-blue"> Журнал</button>
                         </form>
-                        <form action="configuration" method='GET'>
-                            <button class="button-blue"> Конфигуратор</button>
+                        <form action="admin" method='GET'>
+                            <button class="button-blue"> Администратор</button>
                         </form>
                         <!--                        <form action="journal">-->
                         <!--                        <input type="submit" value="Журнал" />-->
@@ -55,6 +55,9 @@
                 <div class="information-bottom" style="height: 25vh; margin-top: 3%; border: 0.5vh solid #dfee99">
 
                     Инфо по последним засечкам
+                    {% for st in actual_drones %}
+                    {{st.lon}}, {{st.lat}}, {{st.name}}
+                    {% endfor %}
 
                 </div>
 
@@ -110,7 +113,7 @@
 
                         <div class="row">
                             {% if chosen_strizh != 0 %}
-                            <h3 style="text-align: center" >
+                            <h3 style="text-align: center">
                                 Выбран: {{chosen_strizh}}
                             </h3>
                             <h5>
@@ -220,17 +223,27 @@
                 });
                 // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
                 var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
-                var len_arr = data.features.length
-                console.log(len_arr)
-                for (let step = 0; step < len_arr; step++) {
-                    data.features[step].geometry = {}
-                    data.features[step].geometry.coordinates = [0, 0]
-                    data.features[step].geometry.type = "Point"
-                    data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
-                    data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
-                    data.features[step].properties = {}
-                    // L.geoJson(data, {icon: logoMarker}).addTo(map);
-                    L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                var len_arr = data.features.length;
+                var drone_lon = parseFloat("{{drone_lon}}");
+                var drone_name = "{{drone_name}}";
+                var drone_lat = parseFloat("{{drone_lat}}");
+
+                // console.log(len_arr)
+                for (let step = 0; step < len_arr; step++)
+
+                // for (let i = 0; i < actual_drones.length; i++)
+                {
+                    // data.features[step].geometry = {}
+                    // data.features[step].geometry.coordinates = [0, 0]
+                    // data.features[step].geometry.type = "Point"
+                    // data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
+                    // data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
+                    // data.features[step].properties = {}
+                    // // L.geoJson(data, {icon: logoMarker}).addTo(map);
+                    // L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    //     {icon: logoMarker}).addTo(layerGroup);
+                    console.log('DRONE   ', drone_lat, drone_lon, drone_name)
+                    L.marker([drone_lat, drone_lon],
                         {icon: logoMarker}).addTo(layerGroup);
                 }
             });
@@ -263,7 +276,17 @@
                 data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
                 data.features[step].properties = {}
                 // L.geoJson(data, {icon: logoMarker}).addTo(map);
-                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
+                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    {icon: logoMarker}).addTo(map);
+                var name_strizh = "{{ chosen_strizh }}"
+                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                    {
+                        icon: L.divIcon({
+                            className: 'text-labels',   // Set class for CSS styling
+                            html: name_strizh
+                        })
+                    }).addTo(map);
+
                 let sector1 = L.sector({
                     center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
                     innerRadius: 0,
@@ -284,6 +307,7 @@
 
                 map.addLayer(sector1)
                 map.addLayer(arc1)
+
             }
 
             console.log(data);

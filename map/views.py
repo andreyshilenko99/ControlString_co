@@ -6,7 +6,7 @@ from django.core.serializers import serialize
 from django.shortcuts import redirect
 from django.shortcuts import render
 
-from geo.models import Strizh
+from geo.models import Strizh, Point
 # from .models import MyModel, MyStrizh
 # from .forms import MyModelForm
 from .forms import StrizhForm
@@ -195,9 +195,10 @@ def choose_nomer_strizha(request):
     return render(request, "main.html", context=c)
     # return HttpResponseRedirect('/main')
 
+actual_strizhes = {}
 
 def render_main_page(request):
-    global c
+    global c, actual_strizhes
     c['chosen_strizh'] = 0
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
@@ -217,7 +218,14 @@ def render_main_page(request):
     else:
         form = StrizhForm()
     c['form'] = form
+    # filter(id=id)
+    strizhes = Strizh.objects.order_by('-lon').all()
+    drones = Point.objects.order_by('-lon').all()
 
+    c['actual_strizhes'] = strizhes
+    c['drone_lat'] = drones[0].lat
+    c['drone_lon'] = drones[0].lon
+    c['drone_name'] = drones[0].name
     return render(request, "main.html", context=c)
 
 

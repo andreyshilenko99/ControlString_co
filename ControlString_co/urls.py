@@ -42,7 +42,9 @@ urlpatterns = [
     path('butt_gps_all', views.butt_gps_all),
     path('butt_ku_all', views.butt_ku_all),
     path('choose_nomer_strizha', views.choose_nomer_strizha),
-    # path(r'strizh_view', views.strizh_view),
+
+
+    path(r'strizh_view', geojson_view),
 
     # path(r'update_nomer_strizha', views.update_nomer_strizha),
     path('butt_skan', views.butt_skan),
