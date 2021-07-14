@@ -157,13 +157,17 @@ LEAFLET_CONFIG = {
     'PLUGINS': {
         'draw': {
             'css': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.css',
-                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css'],
+                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css',
+                    '/static/src/L.Icon.Pulse.css',
+                    '/static/styles.css',
+                    ],
             'js': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.js',
                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js',
                    '/static/src/leaflet.sector.js',
                    '/static/src/leaflet.arc.js',
                    '/static/src/L.Realtime.js',
                    '/static/src/leaflet-realtime.js',
+                   '/static/src/L.Icon.Pulse.js',
                    ],
             'auto-include': True
         },

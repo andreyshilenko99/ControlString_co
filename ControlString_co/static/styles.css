@@ -166,9 +166,33 @@
 }
 
 .text-labels {
-    font-size: 2em;
-    font-weight: 700;
-    color: white;
-    background: #a35c5c;
+    font-size: 22px;
+    font-weight: 400;
+    color: #ff0000;
+    /*background: #a35c5c;*/
     /* Use color, background, set margins for offset, etc */
 }
+
+
+@keyframes fade {
+  from { opacity: 0.2; }
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+.blink_me {
+  animation: blinker 1s linear infinite;
+}
+
+.blinking {
+  animation: fade 0.5s infinite alternate;
+}
+
+
+
+/*60.014340, 30.452578*/
+/*60.012439, 30.447278*/

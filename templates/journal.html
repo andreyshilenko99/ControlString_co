@@ -81,29 +81,29 @@
 
             </div>
             <div class="col-4">
-                <div class="filters-all" style="height: 60vh; border: 0.5vh solid #dfee99">
+                <div class="filters-all" style="height: 54%; border: 0.5vh solid #dfee99">
                     <div class="export-csv" style="margin-left: 5%;margin-top: 1%">
                         <div class="functions-cont" style="margin-top: 2%; ">
 
                             {% csrf_token %}
                             <div class="row" style="margin-top: 2%; width: 100vh">
-                                {% if filtered_strizhes == 0%}
+                                {% if filtered_strizhes == 0 %}
                                 <form action="filter_nomer_strizha" method="post">
                                     {% csrf_token %}
-                                    <div class="row" style="margin: 2% 2%; align-items:center; width: 100vh">
-                                    <h3>
-                                        Выбор стрижей
-                                    </h3>
+                                    <div class="row" style="margin-left: 2%; align-items:center; width: 100vh">
+                                        <h3>
+                                            Выбор стрижей
+                                        </h3>
                                     </div>
-<!--                                    </div>-->
+                                    <!--                                    </div>-->
                                     <div class="row" style="margin-left: 2%">
 
-<!--                                    <h5>-->
+                                        <!--                                    <h5>-->
                                         {{ form_filter }}
                                         <button class="button-green-small" style="margin: 0px 20px">
                                             выбор
                                         </button>
-<!--                                    </h5>-->
+                                        <!--                                    </h5>-->
                                     </div>
                                 </form>
                                 {% endif %}
@@ -131,9 +131,9 @@
                                 {% endif %}
                             </div>
 
-<!--                            <form action='apply_numbers_strizhes' method='GET'>-->
-<!--                                <button class="button-green-small" type='submit'> Фильтр</button>-->
-<!--                            </form>-->
+                            <!--                            <form action='apply_numbers_strizhes' method='GET'>-->
+                            <!--                                <button class="button-green-small" type='submit'> Фильтр</button>-->
+                            <!--                            </form>-->
                         </div>
 
 
@@ -196,56 +196,56 @@
 
 
                         <div class="row" style="align-items: center; margin-left: 2%">
-                            {% csrf_token %}
                             <form action='reset_filter' method='post'>
+                                {% csrf_token %}
                                 <button class="button-red" type='submit'> Сбросить фильтры</button>
                             </form>
-                        <form action="export_csv" method='GET'>
-                            <button class="button-csv"> Экспортировать csv</button>
-                        </form>
+                            <form action="export_csv" method='GET'>
+                                <button class="button-csv"> Экспортировать csv</button>
+                            </form>
                         </div>
 
                     </div>
 
                 </div>
 
-            </div>
-            <div class="information-bottom" style="height: 37vh; margin-top: 1%; border: 0.5vh solid #dfee99">
-                Служебка, Uniping, АГМ, логи
-                <!--                    <a href="http://192.168.2.51/termo.html"> Термодатчики</a>-->
-                <!--                    <a href="http://192.168.2.51/curdet.html"> Датчик дыма </a>-->
-                <!--                    <a href="http://192.168.2.51/rh.html"> Датчик влажности </a>-->
-                <!--                    <a href="http://192.168.2.51/log.html"> Журнал </a>-->
 
-                <form action='functioning_loop' method='GET'>
-                    <h5> Температура: {{ temperature }}&deg,</h5>
-                    <h5> Влажность: {{ humidity }}%,</h5>
-                    <!--                        <h5>Температура датчика влажности: {{humidity_temp}}&deg</h5>-->
-                    <h5> Состояние: {{ weather_state }}</h5>
-                    <h5> Комплекс {{ complex_state }} </h5>
+                <div class="information-bottom" style="height: 42%; margin-top: 1%; border: 0.5vh solid #dfee99">
+                    <!--                    <a href="http://192.168.2.51/termo.html"> Термодатчики</a>-->
+                    <!--                    <a href="http://192.168.2.51/curdet.html"> Датчик дыма </a>-->
+                    <!--                    <a href="http://192.168.2.51/rh.html"> Датчик влажности </a>-->
+                    <!--                    <a href="http://192.168.2.51/log.html"> Журнал </a>-->
 
-                    <h5>
-                    </h5>
-                </form>
+                    <form action='functioning_loop' style="margin-left: 3%" method='GET'>
+                        <h5> Температура: {{ temperature }}&deg,</h5>
+                        <h5> Влажность: {{ humidity }}%,</h5>
+                        <!--                        <h5>Температура датчика влажности: {{humidity_temp}}&deg</h5>-->
+                        <h5> Состояние: {{ weather_state }}</h5>
+                        <h5> Комплекс {{ complex_state }} </h5>
 
-                <div class="row" style="margin: 2%;">
-                    <form action='turn_on_bp' method='GET'>
-                        <button class="button-green-small">Включение комплекса</button>
+                        <h5>
+                        </h5>
                     </form>
-                    <form action='turn_off_bp' method='GET'>
-                        <button class="button-red">Выключение комплекса</button>
-                    </form>
+
+                    <div class="row" style="margin: 2%;">
+                        <form action='turn_on_bp' method='GET'>
+                            <button class="button-green-small">Включение комплекса</button>
+                        </form>
+                        <form action='turn_off_bp' method='GET'>
+                            <button class="button-red">Выключение комплекса</button>
+                        </form>
+                    </div>
+
+                    <div class="box-scroll">
+                        <form action='show_logs' method='GET'>
+
+                            {% for el in logs_list %}
+                            {{ el }} <br>
+                            {% endfor %}
+                        </form>
+                    </div>
+
                 </div>
-
-                <div class="box-scroll">
-                    <form action='show_logs' method='GET'>
-
-                        {% for el in logs_list %}
-                        {{ el }} <br>
-                        {% endfor %}
-                    </form>
-                </div>
-
             </div>
         </div>
     </div>

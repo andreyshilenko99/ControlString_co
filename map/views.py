@@ -36,7 +36,7 @@ def return_conditions():
     weather_state = 'not ok'
 
     try:
-        temp = requests.get(url + 'thermo.cgi?t1', auth=auth, timeout=0.001)
+        temp = requests.get(url + 'thermo.cgi?t1', auth=auth, timeout=0.05)
         temp_str = temp.content.decode("utf-8")
         temp_list = re.findall('[0-9]+', temp_str)
         if len(temp_list) > 0:
@@ -46,7 +46,7 @@ def return_conditions():
     except:
         temperature = 'error in connection to uniping'
     try:
-        hum = requests.get(url + 'relhum.cgi?h1', auth=auth, timeout=0.001)
+        hum = requests.get(url + 'relhum.cgi?h1', auth=auth, timeout=0.05)
         hum_str = hum.content.decode("utf-8")
         hum_list = re.findall('[0-9]+', hum_str)
         if len(hum_list) > 1:
@@ -94,10 +94,10 @@ def journal(request):
     c['weather_state'] = weather_state
 
     if request.method == 'POST':
-        form = StrizhFilterForm(request.POST)
-        if form.is_valid():
-            print(form.cleaned_data)
-            filtered_strizhes = form.cleaned_data.get('filtered_strizhes')
+        form_filter = StrizhFilterForm(request.POST)
+        if form_filter.is_valid():
+            print(form_filter.cleaned_data)
+            filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
             c['filtered_strizhes'] = filtered_strizhes
     else:
         form_filter = StrizhFilterForm()
@@ -124,8 +124,6 @@ def filter_nomer_strizha(request):
         # return render(request,"main.html", context=c)
     # if c.get("filtered_strizhes"):
     #     c["filtered_strizhes"] = "{}".format(c.get("filtered_strizhes"))
-    xx = c
-    print(len(c['filtered_strizhes']))
     return render(request, "journal.html", context=c)
 
 
@@ -233,7 +231,7 @@ def choose_nomer_strizha(request):
 
         nomer = request.POST['chosen_strizh']
         print('send', nomer, '\n')
-        c = {'chosen_strizh': nomer}
+        c['chosen_strizh'] = nomer
         # return render(request,"main.html", context=c)
     if c.get("chosen_strizh"):
         c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
@@ -350,8 +348,15 @@ def apply_period(request):
 def reset_filter(request):
     global c
     c['filtered_strizhes'] = 0
-    c['start_datetime'] = 0
-    c['end_datetime'] = 0
+    c['start_datetime'] = 'Начало'
+
+    if request.method == 'POST':
+        form_filter = StrizhFilterForm(request.POST)
+    else:
+        form_filter = StrizhFilterForm()
+    c['form_filter'] = form_filter
+
+    c['end_datetime'] = 'Конец'
     return render(request, "journal.html", context=c)
 
 
@@ -420,7 +425,7 @@ def send_line_command(line_name, arg):
     log_str = '{} {}ючен'.format(line_name, state)
     line = lines_map.get(line_name)
     try:
-        result_get = requests.get(url + 'io.cgi?io{}={}'.format(line, arg), auth=auth, timeout=0.001) \
+        result_get = requests.get(url + 'io.cgi?io{}={}'.format(line, arg), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         result_get = 'err in connection to uniping'
@@ -434,7 +439,7 @@ def send_impulse(line_name, time_pulse=3, action=''):
     global url, auth, lines_map
     line = lines_map.get(line_name)
     try:
-        result_get = requests.get(url + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth, timeout=0.001) \
+        result_get = requests.get(url + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         result_get = 'err in connection to uniping'
@@ -451,7 +456,7 @@ def obtain_state(line_name, to_collect_logs=False):
     result_state = 0
     line = lines_control_map.get(line_name)
     try:
-        stroka = requests.get(url + 'io.cgi?io{}'.format(line), auth=auth, timeout=0.001) \
+        stroka = requests.get(url + 'io.cgi?io{}'.format(line), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         stroka = 'err in connection to uniping'
