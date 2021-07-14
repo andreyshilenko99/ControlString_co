@@ -12,8 +12,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <meta charset=utf-8>
 
-    <link rel="stylesheet" href="/static/styles.css"/>
-
     {% leaflet_js plugins="ALL" %}
     {% leaflet_css plugins="ALL" %}
     {% leaflet_js %}
@@ -55,9 +53,7 @@
                 <div class="information-bottom" style="height: 25vh; margin-top: 3%; border: 0.5vh solid #dfee99">
 
                     Инфо по последним засечкам
-                    {% for st in actual_drones %}
-                    {{st.lon}}, {{st.lat}}, {{st.name}}
-                    {% endfor %}
+
 
                 </div>
 
@@ -110,12 +106,12 @@
                                 Выбран: {{chosen_strizh}}
                             </h3>
                             <h5>
-                                <form action="main" method="get">
-                                    {% csrf_token %}
-                                    <button class="button-blue-small">
-                                        выбрать другой
-                                    </button>
-                                </form>
+                                <!--                                <form action="main" method="get">-->
+                                <!--                                    {% csrf_token %}-->
+                                <!--                                    <button class="button-blue-small">-->
+                                <!--                                        выбрать другой-->
+                                <!--                                    </button>-->
+                                <!--                                </form>-->
                             </h5>
                             {% endif %}
                         </div>
@@ -143,13 +139,9 @@
 
                 </div>
                 <div class="information-bottom" style="height: 55vh; margin-top: 1%; border: 0.5vh solid #dfee99">
-                    Служебка, Uniping, АГМ, логи
-                    <!--                    <a href="http://192.168.2.51/termo.html"> Термодатчики</a>-->
-                    <!--                    <a href="http://192.168.2.51/curdet.html"> Датчик дыма </a>-->
-                    <!--                    <a href="http://192.168.2.51/rh.html"> Датчик влажности </a>-->
-                    <!--                    <a href="http://192.168.2.51/log.html"> Журнал </a>-->
 
-                    <form action='functioning_loop' method='GET'>
+
+                    <form action='functioning_loop' style="margin: 2% 3%" method='GET'>
                         <h5> Температура: {{ temperature }}&deg,</h5>
                         <h5> Влажность: {{ humidity }}%,</h5>
                         <!--                        <h5>Температура датчика влажности: {{humidity_temp}}&deg</h5>-->
@@ -190,28 +182,15 @@
 <script>
 
     function map_init_basic(map, options) {
-
-        //      30.45331835746765,
-        //      60.014732785555395
-
-        //     30.453994274139404,
-        //     60.01450757958334
-
-        //     30.453983545303345,
-        //     60.01494726600732
-
-        //    30.452492237091064,
-        //    60.0143359930511
-
-        var layerGroup = L.layerGroup().addTo(map);
+        let layerGroup = L.layerGroup().addTo(map);
 
         function onlyUnique(value, index, self) {
             return self.indexOf(value) === index;
         }
 
         function getRandomColor() {
-            var letters = '0123456789ABCDEF';
-            var color = '#';
+            let letters = '0123456789ABCDEF';
+            let color = '#';
             for (var i = 0; i < 6; i++) {
                 color += letters[Math.floor(Math.random() * 16)];
             }
@@ -223,181 +202,178 @@
         function refreshMarkers() {
 
             $.getJSON('/geo/data/', function (data) {
-                var logoMarkerStyle = L.Icon.extend({
+                let sector1;
+                let arc1;
+                let str1;
+                let name1;
+                let dron1;
+                var markers = L.layerGroup().addTo(map);
+
+                let logoMarkerStyle = L.Icon.extend({
                     options: {
                         iconSize: [46, 46],
                         iconAnchor: [23, 23],
-                        popupAnchor: [0, -46]
+                        popupAnchor: [0, -46],
+                        className: 'blinking'
                     }
                 });
-                // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
-                var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
-                // var len_arr = data.features.length;
-                var len_arr = 200;
-                var arr_drones = [];
-                console.log(len_arr)
 
-
-                for (let step = 0; step < len_arr; step++)
-                    // var step = 0;
-                {
-                    arr_drones.push(data.features[step].properties.system_name)
-                    // data.features[step].geometry = {}
-                    // data.features[step].geometry.coordinates = [0, 0]
-                    // data.features[step].geometry.type = "Point"
-                    // data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
-                    // data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
-                    // data.features[step].properties = {}
-
-                    // var azimut = data.features[step].properties.azimuth
-                }
-                var unique_drones = arr_drones.filter(onlyUnique);
-                var n_drones = parseInt(unique_drones.length);
-                console.log('unique_drones', unique_drones);
-
-                for (let step = 0; step < len_arr; step++) {
-                    if (Object.keys(dron_colors).includes(data.features[step].properties.system_name)) {
-                        continue
+                $.getJSON('/geo/strizh_view/', function (strizh_data) {
+                    let len_strizh_data = strizh_data.features.length;
+                    let strizh_map_ip = {}
+                    for (let j = 0; j < len_strizh_data; j++) {
+                        strizh_map_ip[strizh_data.features[j].properties.ip] = [strizh_data.features[j].properties.lat,
+                            strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
                     }
-                    if (Object.keys(dron_colors).length === n_drones){
-                        break
+                    console.log(strizh_map_ip);
+
+
+                    // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
+                    let logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
+
+                    let logoMarkerStyleStrizh = L.Icon.extend({
+                        options: {
+                            iconSize: [85, 90],
+                            iconAnchor: [38, 86],
+                            popupAnchor: [0, -80]
+                        }
+                    });
+                    let logoMarkerStrizh = new logoMarkerStyleStrizh({
+                        iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
+                            'electronics-signal-technology-wifi-radiowaves-6-3098.png'
+                    });
+
+                    // var len_arr = data.features.length;
+                    let len_arr = 20;
+                    let arr_drones = [];
+                    console.log(len_arr)
+
+                    for (let step = 0; step < len_arr; step++) {
+                        arr_drones.push(data.features[step].properties.system_name)
                     }
+                    let unique_drones = arr_drones.filter(onlyUnique);
+                    let n_drones = parseInt(unique_drones.length);
+                    let drawn_drones = new Set()
+                    console.log('unique_drones', unique_drones);
 
-                    // drawn_drones.push(data.features[step].properties.system_name)
-                    dron_colors[data.features[step].properties.system_name] = getRandomColor()
+                    for (let i = 0; i < len_arr; i++) {
+                        if (Object.keys(dron_colors).includes(data.features[i].properties.system_name)) {
+                            if (!drawn_drones.has(data.features[i].properties.system_name)) {
+                                drawn_drones.add(data.features[i].properties.system_name)
+                            } else {
+                                continue
+                            }
+                        } else {
+                            dron_colors[data.features[i].properties.system_name] = getRandomColor()
+                        }
+                        let radius = parseFloat(data.features[i].properties.area_radius_m);
+                        let area_sector_start_grad = parseFloat(data.features[i].properties.area_sector_start_grad);
+                        let area_sector_end_grad = parseFloat(data.features[i].properties.area_sector_end_grad);
+                        let strizh_center = [strizh_map_ip[data.features[i].properties.ip][0],
+                            strizh_map_ip[data.features[i].properties.ip][1]];
+                        let name_strizh = strizh_map_ip[data.features[i].properties.ip][2];
 
-                    console.log('condition', dron_colors[data.features[step].properties.system_name])
-                    // if (dron_colors[data.features[step].properties.system_name]) {
-                    //     dron_colors[data.features[step].properties.system_name] = getRandomColor()
-                    // }
+                        console.log(radius, area_sector_start_grad, area_sector_end_grad)
+                        console.log(name_strizh)
+                        sector1 = L.sector({
+                            center: strizh_center,
+                            innerRadius: 0,
+                            outerRadius: radius,
+                            startBearing: area_sector_start_grad,
+                            endBearing: area_sector_end_grad,
+                            color: dron_colors[data.features[i].properties.system_name]
+                        });
+                        arc1 = L.arc({
+                            // center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                            center: strizh_center,
+                            radius: radius,
+                            color: '#812bb6',
+                            startBearing: 0,
+                            endBearing: 360,
+                        });
+                        str1 = L.marker(strizh_center, {icon: logoMarkerStrizh});
+                        name1 = L.marker(strizh_center, {
+                                icon: L.divIcon({
+                                    className: 'text-labels',   // Set class for CSS styling
+                                    html: name_strizh
+                                })
+                            });
+                        let r_x = 0.004499
+                        // let r_y = 0.008892
+                        let r_y = 0.004499
+                        let d_x = r_x*Math.cos(area_sector_start_grad+30);
+                        let d_y = r_y*Math.sin(area_sector_start_grad+30);
+                        dron1 = L.marker([strizh_center[0]-d_x,
+                            strizh_center[1]-d_y], {icon: logoMarker});
+                        //+0.004499
+                        // map.addLayer(sector1)
+                        // map.addLayer(arc1)
+                        // map.addLayer(str1)
+                        // map.addLayer(name1)
+                        // map.addLayer(dron1)
 
-                    var radius = parseFloat(data.features[step].properties.area_radius_m);
-                    var area_sector_start_grad = parseFloat(data.features[step].properties.area_sector_start_grad);
-                    var area_sector_end_grad = parseFloat(data.features[step].properties.area_sector_end_grad);
-                    console.log(radius, area_sector_start_grad, area_sector_end_grad)
-                    // TODO center coords of strizh
-                    let sector1 = L.sector({
-                        center: [60.016948, 30.447227],
-                        innerRadius: 0,
-                        outerRadius: radius,
-                        startBearing: area_sector_start_grad,
-                        endBearing: area_sector_end_grad,
-                        color: dron_colors[data.features[step].properties.system_name]
-                    });
-                    let arc1 = L.arc({
-                        // center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
-                        center: [60.016948, 30.447227],
-                        radius: radius,
-                        color: '#812bb6',
-                        startBearing: 0,
-                        endBearing: 360,
-                    });
-                    map.addLayer(sector1)
-                    map.addLayer(arc1)
+                        markers.addLayer(sector1)
+                        markers.addLayer(arc1)
+                        markers.addLayer(str1)
+                        markers.addLayer(name1)
+                        markers.addLayer(dron1)
+                    }
+                    map.addLayer(markers)
 
-                }
-                console.log('drawn_drones', drawn_drones)
-                console.log('dron_colors', dron_colors)
+                    map.removeLayer(sector1)
+                    map.removeLayer(arc1)
+                    map.removeLayer(str1)
+                    map.removeLayer(name1)
+                    map.removeLayer(dron1);
 
-
-                // L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
-                //     {icon: logoMarker}).addTo(layerGroup);
-
-                // console.log('DRONE   ', drone_lat, drone_lon, drone_name)
-                // L.marker([drone_lat, drone_lon],
-                //     {icon: logoMarker}).addTo(layerGroup);
-
+                });
+                // map.cleanData();
+                // map.clearLayers()
+                // map.removeLayer(dron1);
+                // markers.clearLayers();
             });
-            // layerGroup.clearLayers();
-            $.getJSON('/geo/strizh_view/', function (data) {
-                var logoMarkerStyle = L.Icon.extend({
-                    options: {
-                        iconSize: [85, 90],
-                        iconAnchor: [38, 86],
-                        popupAnchor: [0, -80]
-                    }
-                });
-                var logoMarker = new logoMarkerStyle({
-                    iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
-                        'electronics-signal-technology-wifi-radiowaves-6-3098.png'
-                });
-                var len_arr = data.features.length
-                console.log('strizh informatiopn')
-                console.log(len_arr)
-                for (let step = 0; step < len_arr; step++) {
-                    data.features[step].geometry = {}
-                    data.features[step].geometry.coordinates = [0, 0]
-                    data.features[step].geometry.type = "Point"
-                    data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
-                    data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
-                    data.features[step].properties = {}
-                    // L.geoJson(data, {icon: logoMarker}).addTo(map);
-                    // let ikonka = L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
-                    let ikonka = L.marker([60.016948, 30.447227],
-                        {icon: logoMarker}).addTo(map);
-                    var name_strizh = "{{ chosen_strizh }}"
-                    L.marker([60.016948, 30.447227],
-                        {
-                            icon: L.divIcon({
-                                className: 'text-labels',   // Set class for CSS styling
-                                html: name_strizh
-                            })
-                        }).addTo(map);
 
-                    // let sector1 = L.sector({
-                    //     center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
-                    //     innerRadius: 0,
-                    //     outerRadius: 500,
-                    //     startBearing: 230,
-                    //     endBearing: 250,
-                    //     color: 'red'
-                    // });
-                    //
-                    // let arc1 = L.arc({
-                    //     center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
-                    //     radius: 500,
-                    //     color: 'pink',
-                    //     startBearing: 0,
-                    //     endBearing: 360,
-                    //
-                    // });
-
-                    // map.addLayer(ikonka)
-                    // map.addLayer(sector1)
-                    // map.addLayer(arc1)
-
-                }
-
-                console.log(data);
-            })
-
-
-            console.log('refreshed')
         }
 
-        refreshMarkers()
 
-
-        setInterval(refreshMarkers, 1000);
-
-        // $.getJSON('/geo/sector_view/', function (data) {
-        //
-        //     var len_arr = data.features.length
-        //     console.log(data)
-        //     console.log(len_arr)
-        //     for (let step = 0; step < len_arr; step++) {
-        //         let sector1 = L.sector({
-        //             center: [data.features[step].properties.center_lat, data.features[step].properties.center_lon],
-        //             innerRadius: data.features[step].properties.innerRadius,
-        //             outerRadius: data.features[step].properties.outerRadius,
-        //             startBearing: data.features[step].properties.startBearing,
-        //             endBearing: data.features[step].properties.endBearing,
-        //             color: data.features[step].properties.color
+        // function refreshStrizhes() {
+        //     // layerGroup.clearLayers();
+        //     $.getJSON('/geo/strizh_view/', function (data) {
+        //         var logoMarkerStyleStrizh = L.Icon.extend({
+        //             options: {
+        //                 iconSize: [85, 90],
+        //                 iconAnchor: [38, 86],
+        //                 popupAnchor: [0, -80]
+        //             }
         //         });
+        //         var logoMarkerStrizh = new logoMarkerStyleStrizh({
+        //             iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
+        //                 'electronics-signal-technology-wifi-radiowaves-6-3098.png'
+        //         });
+        //         var len_arr = data.features.length
+        //         for (let step = 0; step < len_arr; step++) {
+        //             L.marker([data.features[step].properties.lat, data.features[step].properties.lon],
+        //                 {icon: logoMarkerStrizh}).addTo(map);
+        //             // let ikonka = L.marker([60.016948, 30.447227],
         //
-        //         map.addLayer(sector1)
-        //     }
-        // })
+        //             var name_strizh = data.features[step].properties.name
+        //             L.marker([data.features[step].properties.lat,
+        //                     data.features[step].properties.lon],
+        //                 {
+        //                     icon: L.divIcon({
+        //                         className: 'text-labels',   // Set class for CSS styling
+        //                         html: name_strizh
+        //                     })
+        //                 }).addTo(map);
+        //         }
+        //         console.log(data);
+        //     })
+        //     console.log('refreshed')
+        //     // map.clearLayers()
+        // }
+
+        refreshMarkers()
+        setInterval(refreshMarkers, 2000);
 
     }
 
