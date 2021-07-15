@@ -266,6 +266,7 @@
                         } else {
                             dron_colors[data.features[i].properties.system_name] = getRandomColor()
                         }
+                        console.log('drawn_drones', drawn_drones)
                         let radius = parseFloat(data.features[i].properties.area_radius_m);
                         let area_sector_start_grad = parseFloat(data.features[i].properties.area_sector_start_grad);
                         let area_sector_end_grad = parseFloat(data.features[i].properties.area_sector_end_grad);
@@ -293,44 +294,45 @@
                         });
                         str1 = L.marker(strizh_center, {icon: logoMarkerStrizh});
                         name1 = L.marker(strizh_center, {
-                                icon: L.divIcon({
-                                    className: 'text-labels',   // Set class for CSS styling
-                                    html: name_strizh
-                                })
-                            });
-                        let r_x = 0.004499
-                        // let r_y = 0.008892
-                        let r_y = 0.004499
-                        let d_x = r_x*Math.cos(area_sector_start_grad+30);
-                        let d_y = r_y*Math.sin(area_sector_start_grad+30);
-                        dron1 = L.marker([strizh_center[0]-d_x,
-                            strizh_center[1]-d_y], {icon: logoMarker});
+                            icon: L.divIcon({
+                                className: 'text-labels',   // Set class for CSS styling
+                                html: name_strizh
+                            })
+                        });
+                        let r_y = 0.004499 * 2 / 3
+                        let r_x = 0.008892 * 2 / 3
+                        // let r_y = 0.004499
+                        let angle = (90 - (area_sector_start_grad + 30)) / 180 * Math.PI;
+                        let d_y = r_y * Math.sin(angle);
+                        let d_x = r_x * Math.cos(angle);
+                        dron1 = L.marker([strizh_center[0] + d_y,
+                            strizh_center[1] + d_x], {icon: logoMarker});
                         //+0.004499
-                        // map.addLayer(sector1)
-                        // map.addLayer(arc1)
-                        // map.addLayer(str1)
-                        // map.addLayer(name1)
-                        // map.addLayer(dron1)
+                        map.addLayer(sector1)
+                        map.addLayer(arc1)
+                        map.addLayer(str1)
+                        map.addLayer(name1)
+                        map.addLayer(dron1)
 
-                        markers.addLayer(sector1)
-                        markers.addLayer(arc1)
-                        markers.addLayer(str1)
-                        markers.addLayer(name1)
-                        markers.addLayer(dron1)
+                        // markers.addLayer(sector1)
+                        // markers.addLayer(arc1)
+                        // markers.addLayer(str1)
+                        // markers.addLayer(name1)
+                        // markers.addLayer(dron1)
                     }
-                    map.addLayer(markers)
+
 
                     map.removeLayer(sector1)
                     map.removeLayer(arc1)
                     map.removeLayer(str1)
                     map.removeLayer(name1)
-                    map.removeLayer(dron1);
+                    map.removeLayer(dron1)
+                    map.addLayer(markers)
 
                 });
-                // map.cleanData();
+
                 // map.clearLayers()
-                // map.removeLayer(dron1);
-                // markers.clearLayers();
+
             });
 
         }

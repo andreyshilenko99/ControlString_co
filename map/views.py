@@ -75,7 +75,6 @@ c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_dateti
 
 
 def journal(request):
-
     # temperature, humidity, weather_state = return_conditions()
     #
     # c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime,
@@ -125,7 +124,6 @@ def filter_nomer_strizha(request):
     # if c.get("filtered_strizhes"):
     #     c["filtered_strizhes"] = "{}".format(c.get("filtered_strizhes"))
     return render(request, "journal.html", context=c)
-
 
 
 def get_strizhes():
@@ -239,7 +237,9 @@ def choose_nomer_strizha(request):
     return render(request, "main.html", context=c)
     # return HttpResponseRedirect('/main')
 
+
 actual_strizhes = {}
+
 
 def render_main_page(request):
     global c, actual_strizhes
@@ -345,6 +345,7 @@ def apply_period(request):
         # return render(request, "journal.html", context=c)
     return render(request, "journal.html", context=c)
 
+
 def reset_filter(request):
     global c
     c['filtered_strizhes'] = 0
@@ -357,6 +358,69 @@ def reset_filter(request):
     c['form_filter'] = form_filter
 
     c['end_datetime'] = 'Конец'
+    return render(request, "journal.html", context=c)
+
+
+import datetime
+import csv
+
+
+def get_datetime_drone(time_dron):
+    t1 = time_dron.split('-')
+    t2 = t1[-1].split(' ')
+    t3 = t2[-1].split(':')
+    now = datetime.datetime.now()
+    return now.replace(year=int(t1[0]), month=int(t1[1]), day=int(t2[0]), hour=int(t3[0]),
+                       minute=int(t3[1]), second=int(t3[2]))
+
+
+def export_csv(request):
+    global c
+    time_start = c['start_datetime']
+    time_end = c['end_datetime']
+    strizhes = c['filtered_strizhes']
+
+    now = datetime.datetime.now()
+    ts1 = time_start.split('/')
+    ts2 = ts1[-1].split('-')
+    ts3 = ts2[-1].split(':')
+    time_start_datetime = now.replace(year=int(ts2[0]), month=int(ts1[0]), day=int(ts1[1]), hour=int(ts3[0]),
+                                      minute=int(ts3[1]), second=0)
+
+    ts11 = time_end.split('/')
+    ts22 = ts11[-1].split('-')
+    ts33 = ts22[-1].split(':')
+    time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
+                                    minute=int(ts33[1]), second=59)
+    print(time_end_datetime > time_start_datetime)
+    strizhes_map_ip = dict()
+    strizhes_ip = []
+    for strizh in strizhes:
+        strizhes_map_ip[strizh.name] = strizh.ip
+        strizhes_ip.append(strizh.ip)
+    # drones_filtered_strizh = Point.objects.order_by('detection_time').filter(
+    #     reduce(operator.and_, (Q(ip=x) for x in strizhes_ip)))
+    drones_filtered_strizh = Point.objects.order_by('detection_time').filter(ip__in=strizhes_ip)
+    d = datetime.datetime.now()
+    csv_name = "log_{}_{}_{}_{}_{}_{}.csv".format(d.hour, d.minute, d.second, d.day, d.month, d.year)
+    print(csv_name)
+    with open(csv_name, 'w+', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        first_row = 'Имя дрона', 'Несущая частота', 'Пропускная способность', 'Время обнаружения', \
+                    'Комментарии', 'Широта', 'Долгота', 'Азимут', 'Внутренний радиус сектора', 'Внешний радиус сектора', \
+                    'Радиус сектора (м)', 'IP-адрес стрижа'
+        writer.writerow(first_row)
+
+        for dr in drones_filtered_strizh:
+            writer = csv.writer(f)
+
+            if time_start_datetime < get_datetime_drone(dr.detection_time) < time_end_datetime:
+                row = dr.system_name, dr.center_freq, dr.brandwidth, dr.detection_time, \
+                      dr.comment_string, dr.lat, dr.lon, dr.azimuth, \
+                      dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip
+
+                writer.writerow(row)
+
     return render(request, "journal.html", context=c)
 
 
