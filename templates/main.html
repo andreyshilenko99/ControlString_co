@@ -209,13 +209,9 @@
             console.log('REFRESHED')
 
             $.getJSON('/geo/data/', function (data) {
-                    let sector1;
                     let arc1;
                     let str1;
                     let name1;
-                    let dron1;
-                    var markers = L.layerGroup().addTo(map);
-
                     let logoMarkerStyle = L.Icon.extend({
                         options: {
                             iconSize: [46, 46],
@@ -234,7 +230,6 @@
                         }
                         // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
                         let logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
-
                         let logoMarkerStyleStrizh = L.Icon.extend({
                             options: {
                                 iconSize: [85, 90],
@@ -246,8 +241,6 @@
                             iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
                                 'electronics-signal-technology-wifi-radiowaves-6-3098.png'
                         });
-
-                        // var len_arr = data.features.length;
                         let len_arr = 20;
                         let arr_drones = [];
 
@@ -265,7 +258,6 @@
                             let name_dron = data.features[i].properties.system_name;
 
                             console.log(name_strizh)
-
                             // статичная отрисовка радиуса вокруг стрижа, стрижа и его подписи
                             str1 = L.marker(strizh_center, {icon: logoMarkerStrizh});
                             name1 = L.marker(strizh_center, {
@@ -276,17 +268,12 @@
                             });
                             map.addLayer(str1)
                             map.addLayer(name1)
-
                             // дрон нарисован
-                            // if (data_drawn.has(data.features[i].properties.system_name)) {
                             if (ids_drawn.has(data.features[i].properties.pk))
-                                // && data_drawn.has(data.features[i].properties.system_name))
                             {
                                 console.log('old drone')
                                 continue
                             }
-
-                                // }
                             // не нарисован
                             else {
                                 // задан цвет
@@ -309,8 +296,6 @@
 
                             }
                             console.log('initial_draw', initial_draw)
-                            // if (initial_draw > 2) {
-
                                 // Отрисовка сектора с обновлением + layergroup
                                 L.sector({
                                     center: strizh_center,
@@ -349,13 +334,6 @@
 
                                 map.addLayer(layerGroup)
                                 ids_drawn.add(data.features[i].properties.pk);
-                            // }
-
-                            // markers.addLayer(arc1)
-                            // markers.addLayer(str1)
-                            // markers.addLayer(name1)
-                            // map.addLayer(arc1)
-
                         }
                         initial_draw = 1;
                         let unique_drones = arr_drones.filter(onlyUnique);
@@ -364,60 +342,11 @@
                         console.log('unique drones', unique_drones);
                         let n_drones = parseInt(unique_drones.length);
                         var to_draw = 0;
-
-                        // map.removeLayer(sector1)
-                        // if (to_draw === 1) {
-                        //     map.removeLayer(arc1)
-                        //     // map.removeLayer(str1)
-                        //     // map.removeLayer(name1)
-                        // }
-
                     });
-
-
                 }
             )
-
             layerGroup.clearLayers();
         }
-
-
-        // function refreshStrizhes() {
-        //     // layerGroup.clearLayers();
-        //     $.getJSON('/geo/strizh_view/', function (data) {
-        //         var logoMarkerStyleStrizh = L.Icon.extend({
-        //             options: {
-        //                 iconSize: [85, 90],
-        //                 iconAnchor: [38, 86],
-        //                 popupAnchor: [0, -80]
-        //             }
-        //         });
-        //         var logoMarkerStrizh = new logoMarkerStyleStrizh({
-        //             iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
-        //                 'electronics-signal-technology-wifi-radiowaves-6-3098.png'
-        //         });
-        //         var len_arr = data.features.length
-        //         for (let step = 0; step < len_arr; step++) {
-        //             L.marker([data.features[step].properties.lat, data.features[step].properties.lon],
-        //                 {icon: logoMarkerStrizh}).addTo(map);
-        //             // let ikonka = L.marker([60.016948, 30.447227],
-        //
-        //             var name_strizh = data.features[step].properties.name
-        //             L.marker([data.features[step].properties.lat,
-        //                     data.features[step].properties.lon],
-        //                 {
-        //                     icon: L.divIcon({
-        //                         className: 'text-labels',   // Set class for CSS styling
-        //                         html: name_strizh
-        //                     })
-        //                 }).addTo(map);
-        //         }
-        //         console.log(data);
-        //     })
-        //     console.log('refreshed')
-        //     // map.clearLayers()
-        // }
-
         refreshMarkers()
         setInterval(refreshMarkers, 5000);
 
