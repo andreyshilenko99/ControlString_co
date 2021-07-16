@@ -228,6 +228,7 @@
                         let len_strizh_data = strizh_data.features.length;
                         let strizh_map_ip = {}
                         for (let j = 0; j < len_strizh_data; j++) {
+
                             strizh_map_ip[strizh_data.features[j].properties.ip] = [strizh_data.features[j].properties.lat,
                                 strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
                         }
@@ -300,6 +301,18 @@
                             }
                             console.log('initial_draw', initial_draw)
                                 // Отрисовка сектора с обновлением + layergroup
+                            console.log('area_sector_start_grad', area_sector_start_grad)
+                            if (area_sector_start_grad === -1 && area_sector_end_grad === -1){
+                                arc1 = L.arc({
+                                    // center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                                    center: strizh_center,
+                                    radius: radius,
+                                    color: '#812bb6',
+                                    startBearing: 0,
+                                    endBearing: 360,
+                                }).addTo(layerGroup);
+                            }
+                            else {
                                 L.sector({
                                     center: strizh_center,
                                     innerRadius: 0,
@@ -316,6 +329,7 @@
                                     startBearing: 0,
                                     endBearing: 360,
                                 }).addTo(layerGroup);
+                            }
 
                                 let r_y = 0.004499 * 2 / 3
                                 let r_x = 0.008892 * 2 / 3
@@ -351,7 +365,7 @@
             layerGroup.clearLayers();
         }
         refreshMarkers()
-        setInterval(refreshMarkers, 10000);
+        setInterval(refreshMarkers, 5000);
 
     }
 

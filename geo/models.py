@@ -5,18 +5,18 @@ from django.contrib.gis.db import models
 
 
 class Point(models.Model):
-    system_name = models.CharField('Имя дрона', max_length=50)
+    system_name = models.CharField('Имя дрона', max_length=500)
     center_freq = models.FloatField('Несущая частота')
     brandwidth = models.FloatField('Пропускная способность')
-    detection_time = models.CharField('Время обнаружения', max_length=50)
-    comment_string = models.CharField('Комментарии', max_length=50)
+    detection_time = models.CharField('Время обнаружения', max_length=500)
+    comment_string = models.CharField('Комментарии', max_length=500)
     lat = models.FloatField('Широта')
     lon = models.FloatField('Долгота')
-    azimuth = models.CharField('Азимут', max_length=50)
+    azimuth = models.CharField('Азимут', max_length=500)
     area_sector_start_grad = models.FloatField('Внутренний радиус сектора')
     area_sector_end_grad = models.FloatField('Внешний радиус сектора')
     area_radius_m = models.FloatField('Радиус сектора (м)')
-    ip = models.CharField('IP-адрес стрижа', max_length=50)
+    ip = models.CharField('IP-адрес стрижа', max_length=500)
 
     def __str__(self):
         return self.system_name
@@ -27,10 +27,11 @@ class Point(models.Model):
 
 
 class Strizh(models.Model):
-    name = models.CharField('Имя стрижа', max_length=50, default='стриж 0 (по умолчанию)')
+    name = models.CharField('Имя стрижа', max_length=500, default='стриж 0 (по умолчанию)')
     lat = models.FloatField('Широта', blank=True, null=True)
     lon = models.FloatField('Долгота', blank=True, null=True)
-    ip = models.CharField('IP-адрес стрижа', max_length=50, default='')
+    ip1 = models.CharField('IP-адрес стрижа (хост 1)', max_length=500, default='')
+    ip2 = models.CharField('IP-адрес стрижа (хост 2)', max_length=500, default='')
 
     def __str__(self):
         return self.name
@@ -42,7 +43,7 @@ class Strizh(models.Model):
 
 
 class Sector(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=500)
     center_lat = models.FloatField()
     center_lon = models.FloatField()
     innerRadius = models.FloatField(default=0)
