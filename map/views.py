@@ -1,3 +1,4 @@
+import os.path
 import re
 import time
 
@@ -5,15 +6,11 @@ import requests
 from django.core.serializers import serialize
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.views.generic import CreateView
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 
-from geo.models import Strizh
-
+from geo.models import Strizh, Point
 # from .models import MyModel, MyStrizh
 # from .forms import MyModelForm
-from .forms import StrizhForm
+from .forms import StrizhForm, StrizhFilterForm
 
 chosen_strizh = 0
 start_datetime = "Начало"
@@ -29,9 +26,6 @@ auth = ('user', '555')
 message_condition = ''
 
 
-
-
-
 def index(request):
     return render(request, "index.html")
 
@@ -43,7 +37,7 @@ def return_conditions():
     weather_state = 'not ok'
 
     try:
-        temp = requests.get(url + 'thermo.cgi?t1', auth=auth, timeout=0.001)
+        temp = requests.get(url + 'thermo.cgi?t1', auth=auth, timeout=0.05)
         temp_str = temp.content.decode("utf-8")
         temp_list = re.findall('[0-9]+', temp_str)
         if len(temp_list) > 0:
@@ -53,7 +47,7 @@ def return_conditions():
     except:
         temperature = 'error in connection to uniping'
     try:
-        hum = requests.get(url + 'relhum.cgi?h1', auth=auth, timeout=0.001)
+        hum = requests.get(url + 'relhum.cgi?h1', auth=auth, timeout=0.05)
         hum_str = hum.content.decode("utf-8")
         hum_list = re.findall('[0-9]+', hum_str)
         if len(hum_list) > 1:
@@ -66,7 +60,6 @@ def return_conditions():
         humidity = 'error in connection to uniping'
     c['humidity'] = humidity
     c['temperature'] = temperature
-
 
     if 'error' not in temperature and 'error' not in humidity:
         if low_t < float(temperature) < high_t and low_h < float(humidity) < high_h:
@@ -83,12 +76,54 @@ c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_dateti
 
 
 def journal(request):
-    global c
     # temperature, humidity, weather_state = return_conditions()
     #
     # c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime,
     #          available_strizhes=get_strizhes(), temperature=temperature,
     #          humidity=humidity, weather_state=weather_state)
+
+    global c
+    c['filtered_strizhes'] = 0
+    c['start_datetime'] = start_datetime
+    c['end_datetime'] = end_datetime
+    c['available_strizhes'] = get_strizhes()
+
+    temperature, humidity, weather_state = return_conditions()
+    c['temperature'] = temperature
+    c['humidity'] = humidity
+    c['weather_state'] = weather_state
+
+    if request.method == 'POST':
+        form_filter = StrizhFilterForm(request.POST)
+        if form_filter.is_valid():
+            print(form_filter.cleaned_data)
+            filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
+            c['filtered_strizhes'] = filtered_strizhes
+    else:
+        form_filter = StrizhFilterForm()
+    c['form_filter'] = form_filter
+    return render(request, "journal.html", context=c)
+
+
+def filter_nomer_strizha(request):
+    global c
+    temperature, humidity, weather_state = return_conditions()
+    c['temperature'] = temperature
+    c['humidity'] = humidity
+    c['weather_state'] = weather_state
+    if request.method == 'POST':
+        form_filter = StrizhFilterForm(request.POST)
+        if form_filter.is_valid():
+            print(form_filter.cleaned_data)
+            filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
+            c['filtered_strizhes'] = filtered_strizhes
+        # nomer = request.POST['filtered_strizhes']
+        nomer = filtered_strizhes
+        print('got', nomer, '\n')
+        c = {'filtered_strizhes': nomer}
+        # return render(request,"main.html", context=c)
+    # if c.get("filtered_strizhes"):
+    #     c["filtered_strizhes"] = "{}".format(c.get("filtered_strizhes"))
     return render(request, "journal.html", context=c)
 
 
@@ -102,26 +137,26 @@ def get_strizhes():
     return arr_strizh
 
 
-def main(request):
-    temperature, humidity, weather_state = return_conditions()
-
-    c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime,
-             available_strizhes=get_strizhes(), temperature=temperature,
-             humidity=humidity, weather_state=weather_state)
-
-    if request.method == 'POST':
-        form = StrizhForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return
-        else:
-            error = "форма неверная"
-    form = StrizhForm()
-    if c.get('form'):
-        c['form'] = form
-    else:
-        c['form'] = ''
-    return render(request, "main.html", context=c)
+# def main(request):
+#     temperature, humidity, weather_state = return_conditions()
+#
+#     c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime,
+#              available_strizhes=get_strizhes(), temperature=temperature,
+#              humidity=humidity, weather_state=weather_state)
+#
+#     if request.method == 'POST':
+#         form = StrizhForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return
+#         else:
+#             error = "форма неверная"
+#     form = StrizhForm()
+#     if c.get('form'):
+#         c['form'] = form
+#     else:
+#         c['form'] = ''
+#     return render(request, "main.html", context=c)
 
 
 def configuration(request):
@@ -133,6 +168,7 @@ def butt_skan_all(request):
     # nomer_strizha = 0
     print('skanirovanie vseh')
     # TODO action 1 button
+
     # return render(request, "journal.html", context=c)
     c["action_strizh"] = "Сканирование всех"
     return redirect(request.META['HTTP_REFERER'])
@@ -143,6 +179,10 @@ def butt_glush_all(request):
     print('glushenie vseh')
     # TODO action 2 button
     c["action_strizh"] = "Глушение всех"
+    return redirect(request.META['HTTP_REFERER'])
+
+
+def back2main(request):
     return redirect(request.META['HTTP_REFERER'])
 
 
@@ -177,47 +217,61 @@ def choose_nomer_strizha(request):
     # c["available_strizhes"] = arr_strizh
     # print(c["available_strizhes"])
 
+    temperature, humidity, weather_state = return_conditions()
+    c['temperature'] = temperature
+    c['humidity'] = humidity
+    c['weather_state'] = weather_state
+
     if request.method == 'POST':
-        forma = StrizhForm(request.POST)
-        if forma.is_valid():
-            print(forma.cleaned_data)
-            chosen_strizh = forma.cleaned_data.get('chosen_strizh')
+        form = StrizhForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            chosen_strizh = form.cleaned_data.get('chosen_strizh')
             c['chosen_strizh'] = chosen_strizh
 
         nomer = request.POST['chosen_strizh']
         print('send', nomer, '\n')
-        c = {'chosen_strizh': nomer}
+        c['chosen_strizh'] = nomer
         # return render(request,"main.html", context=c)
     if c.get("chosen_strizh"):
         c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
-    xx = c
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
     # return HttpResponseRedirect('/main')
 
+
+actual_strizhes = {}
+
+
 def render_main_page(request):
-    c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime,
-             available_strizhes=get_strizhes())
+    global c, actual_strizhes
+    c['chosen_strizh'] = 0
+    c['start_datetime'] = start_datetime
+    c['end_datetime'] = end_datetime
+    c['available_strizhes'] = get_strizhes()
 
     temperature, humidity, weather_state = return_conditions()
-    strizhes = Strizh.objects.order_by('-name')
-    if request.method == 'POST':
-        forma = StrizhForm(request.POST)
-        if forma.is_valid():
-            print(forma.cleaned_data)
-            chosen_strizh = forma.cleaned_data.get('chosen_strizh')
-            c['chosen_strizh'] = chosen_strizh
-        forma.save()
-    else:
-        forma = StrizhForm()
-
     c['temperature'] = temperature
     c['humidity'] = humidity
     c['weather_state'] = weather_state
-    c['strizhes'] = strizhes
-    c['forma'] = forma
 
+    if request.method == 'POST':
+        form = StrizhForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            chosen_strizh = form.cleaned_data.get('chosen_strizh')
+            c['chosen_strizh'] = chosen_strizh
+    else:
+        form = StrizhForm()
+    c['form'] = form
+    # filter(id=id)
+    strizhes = Strizh.objects.order_by('-lon').all()
+    drones = Point.objects.order_by('-lon').all()
 
+    c['actual_strizhes'] = strizhes
+    c['drone_lat'] = drones[0].lat
+    c['drone_lon'] = drones[0].lon
+    c['drone_name'] = drones[0].system_name
     return render(request, "main.html", context=c)
 
 
@@ -288,9 +342,87 @@ def apply_period(request):
             end_arr = end.split(' ')
             end_datetime = "-".join(end_arr)
 
-        c = {'start_datetime': start_datetime,
-             'end_datetime': end_datetime}
+        c['start_datetime'] = start_datetime
+        c['end_datetime'] = end_datetime
         # return render(request, "journal.html", context=c)
+    return render(request, "journal.html", context=c)
+
+
+def reset_filter(request):
+    global c
+    c['filtered_strizhes'] = 0
+    c['start_datetime'] = 'Начало'
+
+    if request.method == 'POST':
+        form_filter = StrizhFilterForm(request.POST)
+    else:
+        form_filter = StrizhFilterForm()
+    c['form_filter'] = form_filter
+
+    c['end_datetime'] = 'Конец'
+    return render(request, "journal.html", context=c)
+
+
+import datetime
+import csv
+
+
+def get_datetime_drone(time_dron):
+    t1 = time_dron.split('-')
+    t2 = t1[-1].split(' ')
+    t3 = t2[-1].split(':')
+    now = datetime.datetime.now()
+    return now.replace(year=int(t1[0]), month=int(t1[1]), day=int(t2[0]), hour=int(t3[0]),
+                       minute=int(t3[1]), second=int(t3[2]))
+
+
+def export_csv(request):
+    global c
+    time_start = c['start_datetime']
+    time_end = c['end_datetime']
+    strizhes = c['filtered_strizhes']
+
+    now = datetime.datetime.now()
+    ts1 = time_start.split('/')
+    ts2 = ts1[-1].split('-')
+    ts3 = ts2[-1].split(':')
+    time_start_datetime = now.replace(year=int(ts2[0]), month=int(ts1[0]), day=int(ts1[1]), hour=int(ts3[0]),
+                                      minute=int(ts3[1]), second=0)
+
+    ts11 = time_end.split('/')
+    ts22 = ts11[-1].split('-')
+    ts33 = ts22[-1].split(':')
+    time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
+                                    minute=int(ts33[1]), second=59)
+    print(time_end_datetime > time_start_datetime)
+    strizhes_map_ip = dict()
+    strizhes_ip = []
+    for strizh in strizhes:
+        strizhes_map_ip[strizh.name] = strizh.ip
+        strizhes_ip.append(strizh.ip)
+    # drones_filtered_strizh = Point.objects.order_by('detection_time').filter(
+    #     reduce(operator.and_, (Q(ip=x) for x in strizhes_ip)))
+    drones_filtered_strizh = Point.objects.order_by('detection_time').filter(ip__in=strizhes_ip)
+    d = datetime.datetime.now()
+    csv_name = "log_{}_{}_{}_{}_{}_{}.csv".format(d.hour, d.minute, d.second, d.day, d.month, d.year)
+    print(csv_name)
+    with open(os.path.join('saved_logs_csv', csv_name), 'w+', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        first_row = 'Имя дрона', 'Несущая частота', 'Пропускная способность', 'Время обнаружения', \
+                    'Комментарии', 'Широта', 'Долгота', 'Азимут', 'Внутренний радиус сектора', 'Внешний радиус сектора', \
+                    'Радиус сектора (м)', 'IP-адрес стрижа'
+        writer.writerow(first_row)
+
+        for dr in drones_filtered_strizh:
+            writer = csv.writer(f)
+
+            if time_start_datetime < get_datetime_drone(dr.detection_time) < time_end_datetime:
+                row = dr.system_name, dr.center_freq, dr.brandwidth, dr.detection_time, \
+                      dr.comment_string, dr.lat, dr.lon, dr.azimuth, \
+                      dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip
+
+                writer.writerow(row)
+
     return render(request, "journal.html", context=c)
 
 
@@ -359,7 +491,7 @@ def send_line_command(line_name, arg):
     log_str = '{} {}ючен'.format(line_name, state)
     line = lines_map.get(line_name)
     try:
-        result_get = requests.get(url + 'io.cgi?io{}={}'.format(line, arg), auth=auth, timeout=0.001) \
+        result_get = requests.get(url + 'io.cgi?io{}={}'.format(line, arg), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         result_get = 'err in connection to uniping'
@@ -373,7 +505,7 @@ def send_impulse(line_name, time_pulse=3, action=''):
     global url, auth, lines_map
     line = lines_map.get(line_name)
     try:
-        result_get = requests.get(url + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth, timeout=0.001) \
+        result_get = requests.get(url + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         result_get = 'err in connection to uniping'
@@ -385,18 +517,12 @@ def send_impulse(line_name, time_pulse=3, action=''):
     time.sleep(time_pulse + 1)
 
 
-
-def do_nothing():
-    print('do nothing, all is good')
-    #     TODO check ventilator state
-
-
 def obtain_state(line_name, to_collect_logs=False):
     global lines_control_map
     result_state = 0
     line = lines_control_map.get(line_name)
     try:
-        stroka = requests.get(url + 'io.cgi?io{}'.format(line), auth=auth, timeout=0.001) \
+        stroka = requests.get(url + 'io.cgi?io{}'.format(line), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         stroka = 'err in connection to uniping'
@@ -416,7 +542,7 @@ def set_correct_temperature(temperature_state):
     global temperature
     if temperature_state != 0:
         while temperature_state != 0:
-            temperature_state = check_condition(temperature, low_border=low_t, high_border=high_t)
+            temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
             if temperature_state == 1:
                 send_line_command('вентилятор', 1)
                 state0 = obtain_state('датчик потока')
@@ -433,7 +559,7 @@ complex_state = ''
 def check_states_on():
     # global complex_state
     # if complex_state == 'вкл':
-    temperature_state = check_condition(temperature, low_border=low_t, high_border=high_t)
+    temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
     if temperature_state != 0:
         collect_logs('температура не в порядке')
         set_correct_temperature(temperature_state)
@@ -469,7 +595,7 @@ def check_states_on():
 
 def turn_on_bp(request):
     global comlex_state, logs
-    temperature_state = check_condition(temperature, low_border=low_t, high_border=high_t)
+    temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
     if temperature_state != 0:
         print('температура не в порядке')
         set_correct_temperature(temperature_state)

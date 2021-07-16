@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,6 +26,14 @@ SECRET_KEY = 'django-insecure-g*kuum+*d!@-s(h8&0*#ald#4rsf-6r3z=d@fwai2a29xlhbx(
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+# SECRET_KEY = os.environ.get("SECRET_KEY")
+#
+# DEBUG = int(os.environ.get("DEBUG", default=0))
+#
+# # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
+# # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
+# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 # Application definition
 
@@ -79,20 +88,13 @@ CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 CELERY_TIMEZONE = 'Europe/Moscow'
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'stuff',
         'USER': 'dron',
         'PASSWORD': '555',
-        'HOST': '127.0.0.1',
+        'HOST': '192.168.1.66',
         'PORT': '5432', }
 }
 # DATABASES = {
@@ -127,7 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -161,13 +163,17 @@ LEAFLET_CONFIG = {
     'PLUGINS': {
         'draw': {
             'css': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.css',
-                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css'],
+                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css',
+                    '/static/src/L.Icon.Pulse.css',
+                    '/static/styles.css',
+                    ],
             'js': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.js',
                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js',
                    '/static/src/leaflet.sector.js',
                    '/static/src/leaflet.arc.js',
                    '/static/src/L.Realtime.js',
                    '/static/src/leaflet-realtime.js',
+                   '/static/src/L.Icon.Pulse.js',
                    ],
             'auto-include': True
         },

@@ -4,6 +4,7 @@ import time
 from Trace import trace_remote_pb2 as con
 
 
+
 def scan_on_off(host):
     # TODO Исключения
     message = con.TraceRemoteMessage()

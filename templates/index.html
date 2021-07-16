@@ -7,27 +7,57 @@
     <link rel="stylesheet" href="/static/styles.css"/>
 </head>
 <body>
-<h1 style="margin: 1%">Main page</h1>
+<h1 style="font-family:'Calibri'; margin: 1%">Вы находитесь в меню. Наведите на кнопки, чтобы увидеть подробную
+    информацию</h1>
 
 <div class="row" style="margin: 1%">
     <form action="main" method='GET'>
-        <button class="button-blue-big"> Главная</button>
+        <div class="tooltip">
+            <button class="button-blue-big">
+
+                Главная страница
+                <span class="tooltiptext">
+                        Просмотр карты. Вывод засечённых дронов. <br>
+                    Управление всеми стрижами, а также каждым по отдельности. <br>
+            Включение/выключение комплекса. <br>
+                    Вывод логов и служебной информации.
+                    </span>
+            </button>
+        </div>
+
+
     </form>
     <form action="journal" method='GET'>
-        <button class="button-blue-big"> Журнал</button>
+        <div class="row">
+            <div class="tooltip">
+                <button class="button-blue-big">
+                    Журнал
+
+                    <span class="tooltiptext">Фильтрование информации о засечках по выбранным стрижам и по времени.<br>
+                        Экспорт информации в формате csv.</span>
+                </button>
+            </div>
+        </div>
     </form>
-    <form action="configuration" method='GET'>
-        <button class="button-blue-big"> Конфигуратор</button>
-    </form>
-    <form action="admin" method='GET'>
-        <button class="button-blue-big"> Администратор</button>
-    </form>
+    <!--    <form action="configuration" method='GET'>-->
+    <!--        <button class="button-blue-big"> Конфигуратор</button>-->
+    <!--    </form>-->
+    <div class="row">
+        <form action="admin" method='GET'>
+
+            <div class="tooltip">
+                <button class="button-blue-big">
+                    Администратор
+                    <span class="tooltiptext">
+                        Внесение и изменение информации о расположении стрижей
+                    </span>
+
+                </button>
+            </div>
+        </form>
+    </div>
 
 
-
-</div>
-<div class="row">
-    Информация что где и как этим пользоваться?
 </div>
 
 </body>
