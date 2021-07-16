@@ -1,3 +1,4 @@
+import os.path
 import re
 import time
 
@@ -167,6 +168,7 @@ def butt_skan_all(request):
     # nomer_strizha = 0
     print('skanirovanie vseh')
     # TODO action 1 button
+
     # return render(request, "journal.html", context=c)
     c["action_strizh"] = "Сканирование всех"
     return redirect(request.META['HTTP_REFERER'])
@@ -404,7 +406,7 @@ def export_csv(request):
     d = datetime.datetime.now()
     csv_name = "log_{}_{}_{}_{}_{}_{}.csv".format(d.hour, d.minute, d.second, d.day, d.month, d.year)
     print(csv_name)
-    with open(csv_name, 'w+', encoding='UTF8', newline='') as f:
+    with open(os.path.join('saved_logs_csv', csv_name), 'w+', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
         first_row = 'Имя дрона', 'Несущая частота', 'Пропускная способность', 'Время обнаружения', \
                     'Комментарии', 'Широта', 'Долгота', 'Азимут', 'Внутренний радиус сектора', 'Внешний радиус сектора', \
