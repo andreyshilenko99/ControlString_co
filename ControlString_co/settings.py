@@ -86,24 +86,24 @@ CELERY_TIMEZONE = 'Europe/Moscow'
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'stuff',
-#         'USER': 'dron',
-#         'PASSWORD': '555',
-#         'HOST': '127.0.0.1',
-#         'PORT': '5432', }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': 'stuff',
+        'USER': 'dron',
         'PASSWORD': '555',
         'HOST': '127.0.0.1',
         'PORT': '5432', }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': '555',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432', }
+# }
 
 
 # Password validation
