@@ -29,10 +29,11 @@ class Point(models.Model):
 
 
 class Strizh(models.Model):
-    name = models.CharField('Имя стрижа', max_length=50, default='стриж 0 (по умолчанию)')
+    name = models.CharField('Имя стрижа', max_length=500, default='стриж 0 (по умолчанию)')
     lat = models.FloatField('Широта', blank=True, null=True)
     lon = models.FloatField('Долгота', blank=True, null=True)
-    ip = models.CharField('IP-адрес стрижа', max_length=50, default='')
+    ip1 = models.CharField('IP-адрес стрижа (хост 1)', max_length=500, default='')
+    ip2 = models.CharField('IP-адрес стрижа (хост 2)', max_length=500, default='')
 
     def __str__(self):
         return self.name
@@ -44,7 +45,7 @@ class Strizh(models.Model):
 
 
 class Sector(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=500)
     center_lat = models.FloatField()
     center_lon = models.FloatField()
     innerRadius = models.FloatField(default=0)
