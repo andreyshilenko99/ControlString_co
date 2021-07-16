@@ -166,18 +166,30 @@ def configuration(request):
 def butt_skan_all(request):
     global c
     # nomer_strizha = 0
-    print('skanirovanie vseh')
-    # TODO action 1 button
+    strizh_names = Strizh.objects.all()
+    print(strizh_names)
+    for strizh in strizh_names:
+        # TODO action 1 button
+        print('skanirovanie vseh: ', strizh.ip)
+
 
     # return render(request, "journal.html", context=c)
     c["action_strizh"] = "Сканирование всех"
     return redirect(request.META['HTTP_REFERER'])
 
+from control_trace import jammer_on_off
 
 def butt_glush_all(request):
     global c
-    print('glushenie vseh')
-    # TODO action 2 button
+    strizh_names = Strizh.objects.all()
+    print(strizh_names)
+    for strizh in strizh_names:
+        print('skanirovanie vseh: ', strizh.ip)
+        jammer_on_off(strizh.ip)
+
+    # TODO trace pomenyat
+
+
     c["action_strizh"] = "Глушение всех"
     return redirect(request.META['HTTP_REFERER'])
 
