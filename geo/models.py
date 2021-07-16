@@ -1,22 +1,24 @@
 import json
 
 from django.contrib.gis.db import models
-
+import datetime
 
 
 class Point(models.Model):
-    system_name = models.CharField('Имя дрона', max_length=50)
+    system_name = models.CharField('Имя дрона', max_length=500)
     center_freq = models.FloatField('Несущая частота')
     brandwidth = models.FloatField('Пропускная способность')
-    detection_time = models.CharField('Время обнаружения', max_length=50)
-    comment_string = models.CharField('Комментарии', max_length=50)
+    detection_time = models.CharField('Время обнаружения', max_length=500)
+    comment_string = models.CharField('Комментарии', max_length=500)
     lat = models.FloatField('Широта')
     lon = models.FloatField('Долгота')
-    azimuth = models.CharField('Азимут', max_length=50)
+    azimuth = models.CharField('Азимут', max_length=500)
     area_sector_start_grad = models.FloatField('Внутренний радиус сектора')
     area_sector_end_grad = models.FloatField('Внешний радиус сектора')
     area_radius_m = models.FloatField('Радиус сектора (м)')
-    ip = models.CharField('IP-адрес стрижа', max_length=50)
+    ip = models.CharField('IP-адрес стрижа', max_length=500)
+    current_time = models.CharField('Текущее время', max_length=500)
+    strig_name = models.CharField('Имя стрижа', max_length=500)
 
     def __str__(self):
         return self.system_name
