@@ -18,6 +18,8 @@ from django.urls import path
 from django.urls import path, include
 from geo.views import geojson_view
 from map import views
+from django.http import HttpResponseRedirect
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,16 +31,24 @@ urlpatterns = [
     path('menu', views.index),
     # path('main', views.CreateMyModelView.as_view()),
     path('main', views.render_main_page),
+    path('back2main', views.back2main),
+
 
 
     path('journal', views.journal),
+    path('filter_nomer_strizha', views.filter_nomer_strizha),
+    path('reset_filter', views.reset_filter),
+    path('export_csv', views.export_csv),
+
     path('configuration', views.configuration),
     path('butt_skan_all', views.butt_skan_all),
     path('butt_glush_all', views.butt_glush_all),
     path('butt_gps_all', views.butt_gps_all),
     path('butt_ku_all', views.butt_ku_all),
     path('choose_nomer_strizha', views.choose_nomer_strizha),
-    # path(r'strizh_view', views.strizh_view),
+
+
+    path(r'strizh_view', geojson_view),
 
     # path(r'update_nomer_strizha', views.update_nomer_strizha),
     path('butt_skan', views.butt_skan),

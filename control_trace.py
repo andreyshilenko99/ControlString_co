@@ -4,6 +4,7 @@ import time
 from Trace import trace_remote_pb2 as con
 
 
+
 def scan_on_off(host):
     # TODO Исключения
     message = con.TraceRemoteMessage()
@@ -108,6 +109,7 @@ def check_state(host):
         return "scan_on"
     elif data == b'\x00\x10\x01':
         return "jammer_on"
+
 
 # Примеры ответов Trace
 # all_stop = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x00\x10\x00\x18\x01"\x04\x08\x00\x10\x00'

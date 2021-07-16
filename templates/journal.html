@@ -81,102 +81,142 @@
 
             </div>
             <div class="col-4">
-                <div class="filters-all" style="height: 60vh; border: 0.5vh solid #dfee99">
+                <div class="filters-all" style="height: 54%; border: 0.5vh solid #dfee99">
                     <div class="export-csv" style="margin-left: 5%;margin-top: 1%">
-                        <form action="main" method='GET'>
-                            <button class="button-blue"> Экспортировать csv</button>
+                        <div class="functions-cont" style="margin-top: 2%; ">
+
+                            {% csrf_token %}
+                            <div class="row" style="margin-top: 2%; width: 100vh">
+                                {% if filtered_strizhes == 0 %}
+                                <form action="filter_nomer_strizha" method="post">
+                                    {% csrf_token %}
+                                    <div class="row" style="margin-left: 2%; align-items:center; width: 100vh">
+                                        <h3>
+                                            Выбор стрижей
+                                        </h3>
+                                    </div>
+                                    <!--                                    </div>-->
+                                    <div class="row" style="margin-left: 2%">
+
+                                        <!--                                    <h5>-->
+                                        {{ form_filter }}
+                                        <button class="button-green-small" style="margin: 0px 20px">
+                                            выбор
+                                        </button>
+                                        <!--                                    </h5>-->
+                                    </div>
+                                </form>
+                                {% endif %}
+                            </div>
+                            <div class="row">
+                                {% if filtered_strizhes != 0%}
+                                <h3 style="text-align: center">
+                                    Выбрано:
+                                </h3>
+                                <h5 style="text-align: center">
+                                    {% for f_str in filtered_strizhes %}
+                                    <p style="text-align: center">
+                                        {{f_str}}
+                                    </p>
+                                    {% endfor %}
+                                </h5>
+                                <h5>
+                                    <form action="journal" method="get">
+                                        {% csrf_token %}
+                                        <button class="button-blue-small">
+                                            выбрать другой
+                                        </button>
+                                    </form>
+                                </h5>
+                                {% endif %}
+                            </div>
+
+                            <!--                            <form action='apply_numbers_strizhes' method='GET'>-->
+                            <!--                                <button class="button-green-small" type='submit'> Фильтр</button>-->
+                            <!--                            </form>-->
+                        </div>
+
+
+                        <form action="apply_period" method="post">
+                            {% csrf_token %}
+                            <h3> Период </h3>
+                            <h4 style="color: #72849e">
+                                <div class="form-group">
+                                    <label for="id_start_datetime">Начало</label>
+                                    <div class="input-group date" style="height: 48px; width: 90%">
+                                        <input type="text" name="start_datetime" value="Начало"
+                                               class="form-control" placeholder="{{start_datetime}}"
+                                               required="" id="id_start_datetime"
+                                               dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
+                                        <div class="input-group-addon input-group-append"
+                                             data-target="#datetimepicker1" data-toggle="datetimepickerv">
+                                            <div class="input-group-text">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </div>
+                                        </div>
+                                        <button class="button-green-small" type='submit'> Применить</button>
+                                    </div>
+                                </div>
+                            </h4>
+                            <!--                                <input type="submit" value="применить">-->
+
                         </form>
 
-                        <div class="functions-cont" style="margin-top: 2%; ">
-                            <form action="choose_numbers_strizhes" method="post">
-                                {% csrf_token %}
-                                <h3>Введите номера стрижей</h3>
-
-                                <input type="number" style="height: 48px; width: 60%" name="nomer_strizha"
-                                       placeholder="1,2,3">
-                                <form action='apply_numbers_strizhes' method='GET'>
-                                    <button class="button-green-small" type='submit'> Фильтр</button>
-                                </form>
-                            </form>
-
-
-                            <form action="apply_period" method="post">
-                                {% csrf_token %}
-                                <h3> Период </h3>
-                                <h4 style="color: #72849e">
-                                    <div class="form-group">
-                                        <label for="id_start_datetime">Начало</label>
-                                        <div class="input-group date" style="height: 48px; width: 90%">
-                                            <input type="text" name="start_datetime" value="Начало"
-                                                   class="form-control" placeholder={{start_datetime}} title=""
-                                                   required="" id="id_start_datetime"
-                                                   dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
-                                            <div class="input-group-addon input-group-append"
-                                                 data-target="#datetimepicker1" data-toggle="datetimepickerv">
-                                                <div class="input-group-text">
-                                                    <i class="glyphicon glyphicon-calendar"></i>
-                                                </div>
+                        <form action="apply_period" method="post">
+                            {% csrf_token %}
+                            <h4 style="color: #72849e">
+                                <div class="form-group">
+                                    <label for="id_end_datetime">Конец</label>
+                                    <div class="input-group date" style="height: 48px; width: 90%">
+                                        <input type="text" name="end_datetime" value="Конец"
+                                               class="form-control" placeholder="{{end_datetime}}"
+                                               required="" id="id_end_datetime"
+                                               dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
+                                        <div class="input-group-addon input-group-append"
+                                             data-target="#datetimepicker1" data-toggle="datetimepickerv">
+                                            <div class="input-group-text">
+                                                <i class="glyphicon glyphicon-calendar"></i>
                                             </div>
-                                            <button class="button-green-small" type='submit'> Применить</button>
                                         </div>
+                                        <button class="button-green-small" type='submit'> Применить</button>
                                     </div>
-                                </h4>
-                                <!--                                <input type="submit" value="применить">-->
+                                </div>
+                            </h4>
 
-                            </form>
+                            <!--                            <input type="submit" value="применить">-->
+                        </form>
 
-                            <form action="apply_period" method="post">
-                                {% csrf_token %}
-                                <h4 style="color: #72849e">
-                                    <div class="form-group">
-                                        <label for="id_end_datetime">Конец</label>
-                                        <div class="input-group date" style="height: 48px; width: 90%">
-                                            <input type="text" name="end_datetime" value="Конец"
-                                                   class="form-control" placeholder={{end_datetime}} title=""
-                                                   required="" id="id_end_datetime"
-                                                   dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
-                                            <div class="input-group-addon input-group-append"
-                                                 data-target="#datetimepicker1" data-toggle="datetimepickerv">
-                                                <div class="input-group-text">
-                                                    <i class="glyphicon glyphicon-calendar"></i>
-                                                </div>
-                                            </div>
-                                            <button class="button-green-small" type='submit'> Применить</button>
-                                        </div>
-                                    </div>
-                                </h4>
-
-                                <!--                            <input type="submit" value="применить">-->
-                            </form>
-
-                            <script>
-                                $(function () {
-                                    $("#datetimepicker1").datetimepicker({
-                                        format: 'DD/MM/YYYY HH:mm',
-                                    });
+                        <script>
+                            $(function () {
+                                $("#datetimepicker1").datetimepicker({
+                                    format: 'DD/MM/YYYY HH:mm',
                                 });
-                            </script>
+                            });
+                        </script>
 
 
-                            <form action="choose_period" method="post">
+                        <div class="row" style="align-items: center; margin-left: 2%">
+                            <form action='reset_filter' method='post'>
                                 {% csrf_token %}
-                                <form action='apply_period' method='GET'>
-                                    <button class="button-red" type='submit'> Сбросить фильтры</button>
-                                </form>
+                                <button class="button-red" type='submit'> Сбросить фильтры</button>
                             </form>
-
+                            <form action="export_csv" method='GET'>
+                                <button class="button-csv"> Экспортировать csv</button>
+                            </form>
                         </div>
+
                     </div>
 
                 </div>
-                <div class="information-bottom" style="height: 37vh; margin-top: 1%; border: 0.5vh solid #dfee99">
-                    Служебка, Uniping, АГМ, логи
+
+
+                <div class="information-bottom" style="height: 42%; margin-top: 1%; border: 0.5vh solid #dfee99">
                     <!--                    <a href="http://192.168.2.51/termo.html"> Термодатчики</a>-->
                     <!--                    <a href="http://192.168.2.51/curdet.html"> Датчик дыма </a>-->
                     <!--                    <a href="http://192.168.2.51/rh.html"> Датчик влажности </a>-->
                     <!--                    <a href="http://192.168.2.51/log.html"> Журнал </a>-->
 
-                    <form action='functioning_loop' method='GET'>
+                    <form action='functioning_loop' style="margin-left: 3%" method='GET'>
                         <h5> Температура: {{ temperature }}&deg,</h5>
                         <h5> Влажность: {{ humidity }}%,</h5>
                         <!--                        <h5>Температура датчика влажности: {{humidity_temp}}&deg</h5>-->
@@ -209,157 +249,180 @@
             </div>
         </div>
     </div>
+</div>
 
 
 </div>
 
 <script>
-function map_init_basic(map, options) {
-        var geojsonMarker = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            30.45331835746765,
-                            60.014732785555395
-                        ]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            30.453994274139404,
-                            60.01450757958334
-                        ]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            30.453983545303345,
-                            60.01494726600732
-                        ]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            30.452492237091064,
-                            60.0143359930511
-                        ]
-                    }
-                }
-            ]
-        };
+    function map_init_basic(map, options) {
 
-        $.getJSON('/geo/data/', function (data) {
-            var logoMarkerStyle = L.Icon.extend({
-                options: {
-                    iconSize: [65, 65],
-                    iconAnchor: [38, 86],
-                    popupAnchor: [0, -80]
-                }
-            });
-            // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
-            var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
-            var len_arr = data.features.length
-            console.log(geojsonMarker)
-            console.log(data)
-            console.log(len_arr)
-            for (let step = 0; step < len_arr; step++) {
-                data.features[step].geometry = {}
-                data.features[step].geometry.coordinates = [0, 0]
-                data.features[step].geometry.type = "Point"
-                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
-                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
-                data.features[step].properties = {}
-                // L.geoJson(data, {icon: logoMarker}).addTo(map);
-                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
+        function onlyUnique(value, index, self) {
+            return self.indexOf(value) === index;
+        }
+
+        function getRandomColor() {
+            let letters = '0123456789ABCDEF';
+            let color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
             }
-            console.log(data);
+            return color;
+        }
 
-        });
+        var dron_colors = {};
 
-        $.getJSON('/geo/strizh_view/', function (data) {
-            var logoMarkerStyle = L.Icon.extend({
-                options: {
-                    iconSize: [85, 90],
-                    iconAnchor: [38, 86],
-                    popupAnchor: [0, -80]
+        var layerGroup = L.layerGroup().addTo(map);
+        var max_frames = 50;
+        var data_drawn = new Set();
+        var ids_drawn = new Set();
+        var initial_draw = 0;
+
+
+        function refreshMarkers() {
+            console.log('REFRESHED')
+
+            $.getJSON('/geo/data/', function (data) {
+                    let arc1;
+                    let str1;
+                    let name1;
+                    let logoMarkerStyle = L.Icon.extend({
+                        options: {
+                            iconSize: [46, 46],
+                            iconAnchor: [23, 23],
+                            popupAnchor: [0, -46],
+                            className: 'blinking'
+                        }
+                    });
+
+                    $.getJSON('/geo/strizh_view/', function (strizh_data) {
+                        let len_strizh_data = strizh_data.features.length;
+                        let strizh_map_ip = {}
+                        for (let j = 0; j < len_strizh_data; j++) {
+                            strizh_map_ip[strizh_data.features[j].properties.ip] = [strizh_data.features[j].properties.lat,
+                                strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
+                        }
+                        // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
+                        let logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
+                        let logoMarkerStyleStrizh = L.Icon.extend({
+                            options: {
+                                iconSize: [85, 90],
+                                iconAnchor: [38, 86],
+                                popupAnchor: [0, -80]
+                            }
+                        });
+                        let logoMarkerStrizh = new logoMarkerStyleStrizh({
+                            iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
+                                'electronics-signal-technology-wifi-radiowaves-6-3098.png'
+                        });
+                        let len_arr = 20;
+                        let arr_drones = [];
+
+                        for (let step = 0; step < len_arr; step++) {
+                            arr_drones.push(data.features[step].properties.system_name)
+                        }
+                        for (let i = 0; i < len_arr; i++) {
+
+                            let radius = parseFloat(data.features[i].properties.area_radius_m);
+                            let area_sector_start_grad = parseFloat(data.features[i].properties.area_sector_start_grad);
+                            let area_sector_end_grad = parseFloat(data.features[i].properties.area_sector_end_grad);
+                            let strizh_center = [strizh_map_ip[data.features[i].properties.ip][0],
+                                strizh_map_ip[data.features[i].properties.ip][1]];
+                            let name_strizh = strizh_map_ip[data.features[i].properties.ip][2];
+                            let name_dron = data.features[i].properties.system_name;
+
+                            console.log(name_strizh)
+                            // статичная отрисовка радиуса вокруг стрижа, стрижа и его подписи
+                            str1 = L.marker(strizh_center, {icon: logoMarkerStrizh});
+                            name1 = L.marker(strizh_center, {
+                                icon: L.divIcon({
+                                    className: 'text-labels',   // Set class for CSS styling
+                                    html: name_strizh
+                                })
+                            });
+                            map.addLayer(str1)
+                            map.addLayer(name1)
+                            // дрон нарисован
+                            if (ids_drawn.has(data.features[i].properties.pk))
+                            {
+                                console.log('old drone')
+                                continue
+                            }
+                            // не нарисован
+                            else {
+                                // задан цвет
+                                if (Object.keys(dron_colors).includes(data.features[i].properties.system_name)) {
+                                    if (data_drawn.has(data.features[i].properties.system_name) ) {
+                                        console.log('DRAWING NEW')
+                                        if (initial_draw === 0) {
+                                            data_drawn.add(data.features[i].properties.system_name);
+                                            ids_drawn.add(data.features[i].properties.pk);
+                                            continue
+                                        }
+                                    }
+                                }
+                                // не задан цвет
+                                else if (!Object.keys(dron_colors).includes(data.features[i].properties.system_name)) {
+                                    console.log('give color')
+                                    dron_colors[data.features[i].properties.system_name] = getRandomColor();
+                                    data_drawn.add(data.features[i].properties.system_name);
+                                }
+
+                            }
+                            console.log('initial_draw', initial_draw)
+                                // Отрисовка сектора с обновлением + layergroup
+                                L.sector({
+                                    center: strizh_center,
+                                    innerRadius: 0,
+                                    outerRadius: radius,
+                                    startBearing: area_sector_start_grad,
+                                    endBearing: area_sector_end_grad,
+                                    color: dron_colors[data.features[i].properties.system_name]
+                                }).addTo(layerGroup);
+                                arc1 = L.arc({
+                                    // center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
+                                    center: strizh_center,
+                                    radius: radius,
+                                    color: '#812bb6',
+                                    startBearing: 0,
+                                    endBearing: 360,
+                                }).addTo(layerGroup);
+
+                                let r_y = 0.004499 * 2 / 3
+                                let r_x = 0.008892 * 2 / 3
+                                let angle = (90 - (area_sector_start_grad + 30)) / 180 * Math.PI;
+                                let d_y = r_y * Math.sin(angle);
+                                let d_x = r_x * Math.cos(angle);
+
+                                // Отрисовка дрона в секторе + layergroup
+                                L.marker([strizh_center[0] + d_y,
+                                    strizh_center[1] + d_x], {icon: logoMarker}).addTo(layerGroup);
+                                // Отрисовка подписи к дрону в секторе + layergroup
+                                L.marker([strizh_center[0] + d_y,
+                                    strizh_center[1] + d_x], {
+                                    icon: L.divIcon({
+                                        className: 'text-labels',   // Set class for CSS styling
+                                        html: name_dron
+                                    })
+                                }).addTo(layerGroup);
+
+                                map.addLayer(layerGroup)
+                                ids_drawn.add(data.features[i].properties.pk);
+                        }
+                        initial_draw = 1;
+                        let unique_drones = arr_drones.filter(onlyUnique);
+                        console.log('data_drawn: ', data_drawn);
+                        console.log('ids_drawn: ', ids_drawn);
+                        console.log('unique drones', unique_drones);
+                        let n_drones = parseInt(unique_drones.length);
+                        var to_draw = 0;
+                    });
                 }
-            });
-            var logoMarker = new logoMarkerStyle({
-                iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
-                    'electronics-signal-technology-wifi-radiowaves-6-3098.png'
-            });
-            var len_arr = data.features.length
-            console.log(data)
-            console.log(len_arr)
-            for (let step = 0; step < len_arr; step++) {
-                data.features[step].geometry = {}
-                data.features[step].geometry.coordinates = [0, 0]
-                data.features[step].geometry.type = "Point"
-                data.features[step].geometry.coordinates[0] = data.features[step].properties.lon
-                data.features[step].geometry.coordinates[1] = data.features[step].properties.lat
-                data.features[step].properties = {}
-                // L.geoJson(data, {icon: logoMarker}).addTo(map);
-                L.marker([data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]], {icon: logoMarker}).addTo(map);
-                let sector1 = L.sector({
-                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
-                    innerRadius: 0,
-                    outerRadius: 500,
-                    startBearing: 230,
-                    endBearing: 250,
-                    color: 'red'
-                });
-
-                let arc1 = L.arc({
-                    center: [data.features[step].geometry.coordinates[1], data.features[step].geometry.coordinates[0]],
-                    radius: 500,
-                    color: 'pink',
-                    startBearing: 0,
-                    endBearing: 360,
-
-                });
-
-                map.addLayer(sector1)
-                map.addLayer(arc1)
-            }
-
-            console.log(data);
-
-        })
-
-        $.getJSON('/geo/sector_view/', function (data) {
-
-            var len_arr = data.features.length
-            console.log(data)
-            console.log(len_arr)
-            for (let step = 0; step < len_arr; step++) {
-                let sector1 = L.sector({
-                    center: [data.features[step].properties.center_lat, data.features[step].properties.center_lon],
-                    innerRadius: data.features[step].properties.innerRadius,
-                    outerRadius: data.features[step].properties.outerRadius,
-                    startBearing: data.features[step].properties.startBearing,
-                    endBearing: data.features[step].properties.endBearing,
-                    color: data.features[step].properties.color
-                });
-                map.addLayer(sector1)
-            }
-        })
+            )
+            layerGroup.clearLayers();
+        }
+        refreshMarkers()
+        setInterval(refreshMarkers, 5000);
 
     }
 
