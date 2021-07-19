@@ -159,7 +159,7 @@ LEAFLET_CONFIG = {
     'DEFAULT_ZOOM': 16,
     'MIN_ZOOM': 10,
     'MAX_ZOOM': 18,
-    'TILES': [('lol', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; IGN'})],
+    'TILES': [('lol', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; ASB Production'})],
     'PLUGINS': {
         'draw': {
             'css': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.css',

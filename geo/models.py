@@ -1,7 +1,4 @@
-import json
-
 from django.contrib.gis.db import models
-
 
 
 class Point(models.Model):
@@ -17,6 +14,8 @@ class Point(models.Model):
     area_sector_end_grad = models.FloatField('Внешний радиус сектора')
     area_radius_m = models.FloatField('Радиус сектора (м)')
     ip = models.CharField('IP-адрес стрижа', max_length=500)
+    current_time = models.CharField('Время засечки', max_length=500, default='')
+    strig_name = models.CharField('Имя стрижа', max_length=500, default='')
 
     def __str__(self):
         return self.system_name
@@ -59,4 +58,11 @@ class Sector(models.Model):
         verbose_name_plural = 'Sector'
 
 
+class TestModel(models.Model):
+    name = models.CharField('Имя модели', max_length=500, default='стриж 0 (по умолчанию)')
 
+    def __str__(self):
+        return self.name
+    class Meta:
+        verbose_name = 'Стриж'
+        verbose_name_plural = 'Стрижи'
