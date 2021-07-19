@@ -172,12 +172,13 @@ def butt_skan_all(request):
         # TODO action 1 button
         print('skanirovanie vseh: ', strizh.ip)
 
-
     # return render(request, "journal.html", context=c)
     c["action_strizh"] = "Сканирование всех"
     return redirect(request.META['HTTP_REFERER'])
 
+
 from control_trace import jammer_on_off
+
 
 def butt_glush_all(request):
     global c
@@ -188,7 +189,6 @@ def butt_glush_all(request):
         jammer_on_off(strizh.ip)
 
     # TODO trace pomenyat
-
 
     c["action_strizh"] = "Глушение всех"
     return redirect(request.META['HTTP_REFERER'])
@@ -407,11 +407,10 @@ def export_csv(request):
     time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
                                     minute=int(ts33[1]), second=59)
     print(time_end_datetime > time_start_datetime)
-    strizhes_map_ip = dict()
     strizhes_ip = []
     for strizh in strizhes:
-        strizhes_map_ip[strizh.name] = strizh.ip
-        strizhes_ip.append(strizh.ip)
+        for ip in [strizh.ip1, strizh.ip2]:
+            strizhes_ip.append(ip)
     # drones_filtered_strizh = Point.objects.order_by('detection_time').filter(
     #     reduce(operator.and_, (Q(ip=x) for x in strizhes_ip)))
     drones_filtered_strizh = Point.objects.order_by('detection_time').filter(ip__in=strizhes_ip)
