@@ -3,8 +3,7 @@ version: '3.7'
 services:
   app:
     build:
-      context: .
-#      /ControlString_co
+      context: ./ControlString_co
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./ControlString_co/:/usr/src/ControlString_co/

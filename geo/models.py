@@ -31,6 +31,7 @@ class Strizh(models.Model):
     lon = models.FloatField('Долгота', blank=True, null=True)
     ip1 = models.CharField('IP-адрес стрижа (хост 1)', max_length=500, default='')
     ip2 = models.CharField('IP-адрес стрижа (хост 2)', max_length=500, default='')
+    uniping_ip = models.CharField('IP-адрес Uniping', max_length=500, default='')
 
     def __str__(self):
         return self.name
