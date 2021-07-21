@@ -4,6 +4,7 @@ import time
 from Trace import trace_remote_pb2 as con
 
 
+
 def scan_on_off(host):
     # TODO Исключения
     message = con.TraceRemoteMessage()
@@ -114,3 +115,4 @@ def check_state(host):
 # scan_on = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x01\x10\x00\x18\x01"\x04\x08\x00\x10\x00'
 # jammer_on = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x00\x10\x01\x18\x01"\x04\x08\x00\x10\x00'
 
+# scan_on_off('192.168.2.241')

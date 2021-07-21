@@ -24,7 +24,6 @@ low_t = 10
 high_t = 60
 low_h = 5
 high_h = 85
-url = "http://192.168.2.51/"
 auth = ('user', '555')
 message_condition = ''
 
@@ -33,12 +32,12 @@ def index(request):
     return render(request, "index.html")
 
 
-def return_conditions():
-    global low_t, high_t, low_h, high_h, humidity
-    global url
+def return_conditions(url):
+    global low_t, high_t, low_h, high_h, humidity, c
+    # url_uniping
     global auth
     weather_state = 'not ok'
-
+    url_uni = c['url_uniping']
     try:
         temp = requests.get(url + 'thermo.cgi?t1', auth=auth, timeout=0.05)
         temp_str = temp.content.decode("utf-8")
@@ -91,7 +90,7 @@ def journal(request):
     c['end_datetime'] = end_datetime
     c['available_strizhes'] = get_strizhes()
 
-    temperature, humidity, weather_state = return_conditions()
+    temperature, humidity, weather_state = return_conditions(c['url_uniping'])
     c['temperature'] = temperature
     c['humidity'] = humidity
     c['weather_state'] = weather_state
@@ -110,7 +109,8 @@ def journal(request):
 
 def filter_nomer_strizha(request):
     global c
-    temperature, humidity, weather_state = return_conditions()
+
+    temperature, humidity, weather_state = return_conditions(c['url_uniping'])
     c['temperature'] = temperature
     c['humidity'] = humidity
     c['weather_state'] = weather_state
@@ -175,6 +175,7 @@ def get_strizhes():
 def configuration(request):
     return render(request, "configuration.html", context=c)
 
+from ControlString_co.control_trace import jammer_on_off, scan_on_off
 
 def butt_skan_all(request):
     global c
@@ -184,13 +185,13 @@ def butt_skan_all(request):
     for strizh in strizh_names:
         # TODO action 1 button
         print('skanirovanie vseh: ', strizh.ip1, strizh.ip2)
+        scan_on_off(strizh.ip1)
+        scan_on_off(strizh.ip2)
 
-    # return render(request, "journal.html", context=c)
     c["action_strizh"] = "Сканирование всех"
-    return redirect(request.META['HTTP_REFERER'])
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
 
-
-from control_trace import jammer_on_off
 
 
 def butt_glush_all(request):
@@ -201,12 +202,11 @@ def butt_glush_all(request):
         print('glushenie vseh: ', strizh.ip1, strizh.ip2)
         # jammer_on_off(strizh.ip)
 
-
     # TODO trace pomenyat
 
     c["action_strizh"] = "Глушение всех"
-    return redirect(request.META['HTTP_REFERER'])
-
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
 
 def back2main(request):
     return redirect(request.META['HTTP_REFERER'])
@@ -217,7 +217,8 @@ def butt_gps_all(request):
     print('gps vseh')
     # TODO action 3 button
     c["action_strizh"] = "GPS для всех"
-    return redirect(request.META['HTTP_REFERER'])
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
 
 
 def butt_ku_all(request):
@@ -226,8 +227,8 @@ def butt_ku_all(request):
     print('KU vseh #')
     # TODO action 4 button
     c["action_strizh"] = "КУ всех"
-    return redirect(request.META['HTTP_REFERER'])
-
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
 
 import json
 
@@ -243,11 +244,9 @@ def choose_nomer_strizha(request):
     # c["available_strizhes"] = arr_strizh
     # print(c["available_strizhes"])
 
-    temperature, humidity, weather_state = return_conditions()
-    c['temperature'] = temperature
-    c['humidity'] = humidity
-    c['weather_state'] = weather_state
 
+
+    strizhes = Strizh.objects.order_by('-lon').all()
     if request.method == 'POST':
         form = StrizhForm(request.POST)
         if form.is_valid():
@@ -255,48 +254,61 @@ def choose_nomer_strizha(request):
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
             c['chosen_strizh'] = chosen_strizh
 
+            for strizh in strizhes:
+                if c['chosen_strizh'] == strizh:
+                    c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
+                    print('url_uniping', strizh.uniping_ip)
+
         nomer = request.POST['chosen_strizh']
         print('send', nomer, '\n')
         c['chosen_strizh'] = nomer
-        # return render(request,"main.html", context=c)
     if c.get("chosen_strizh"):
-        c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
+        # c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
+        temperature, humidity, weather_state = return_conditions(c['url_uniping'])
+        c['temperature'] = temperature
+        c['humidity'] = humidity
+        c['weather_state'] = weather_state
     # return redirect(request.META['HTTP_REFERER'])
-    return render(request, "main.html", context=c)
     # return HttpResponseRedirect('/main')
+    return render(request, "main.html", context=c)
 
 
 actual_strizhes = {}
 
 
-
 def render_main_page(request):
     global c, actual_strizhes
     complex_state = ''
-    c['chosen_strizh'] = 0
+    if not c.get('chosen_strizh'):
+        c['chosen_strizh'] = 0
+    if not c.get('url_uniping'):
+        c['url_uniping'] = ''
+
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
     c['available_strizhes'] = get_strizhes()
 
-    temperature, humidity, weather_state = return_conditions()
+    temperature, humidity, weather_state = return_conditions(c['url_uniping'])
     c['temperature'] = temperature
     c['humidity'] = humidity
     c['weather_state'] = weather_state
 
+    strizhes = Strizh.objects.order_by('-lon').all()
     if request.method == 'POST':
         form = StrizhForm(request.POST)
         if form.is_valid():
             print(form.cleaned_data)
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
             c['chosen_strizh'] = chosen_strizh
+
+
     else:
         form = StrizhForm()
     c['form'] = form
     # filter(id=id)
-    strizhes = Strizh.objects.order_by('-lon').all()
+
     # TODO current_time
     drones = Point.objects.order_by('-detection_time').all()
-
 
     c['actual_strizhes'] = strizhes
     c['info_drones'] = drones
@@ -325,11 +337,21 @@ def render_main_page(request):
 
 def butt_skan(request):
     global c
+    strizh_names = Strizh.objects.all()
+
     if c.get("chosen_strizh") != 0:
-        print('skanirovanie dlya strizha #', c.get('chosen_strizh'))
-        # TODO action 1 button
-    c["action_strizh"] = "Сканирование для стрижа №{}".format(c.get('chosen_strizh'))
-    return redirect(request.META['HTTP_REFERER'])
+
+        c["action_strizh"] = "Сканирование: {}".format(c.get('chosen_strizh'))
+
+        for strizh in strizh_names:
+            if strizh.name == c.get("chosen_strizh"):
+                scan_on_off(strizh.ip1)
+                scan_on_off(strizh.ip2)
+                print('skanirovanie dlya strizha #', strizh.name)
+
+
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
 
 
 def butt_glush(request):
@@ -337,27 +359,27 @@ def butt_glush(request):
     if c.get("chosen_strizh") != 0:
         print('glushenie dlya strizha #', c.get('chosen_strizh'))
         # TODO action 2 button
-    c["action_strizh"] = "Глушение для стрижа №{}".format(c.get('chosen_strizh'))
-    return redirect(request.META['HTTP_REFERER'])
-
+    c["action_strizh"] = "Глушение: {}".format(c.get('chosen_strizh'))
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
 
 def butt_gps(request):
     global c
     if c.get("chosen_strizh") != 0:
         print('gps dlya strizha #', c.get('chosen_strizh'))
         # TODO action 3 button
-    c["action_strizh"] = "GPS для стрижа №{}".format(c.get('chosen_strizh'))
-    return redirect(request.META['HTTP_REFERER'])
-
+    c["action_strizh"] = "GPS: {}".format(c.get('chosen_strizh'))
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
 
 def butt_ku(request):
     global c
     if c.get("chosen_strizh") != 0:
         print('KU dlya strizha #', c.get('chosen_strizh'))
         # TODO action 4 button
-    c["action_strizh"] = "КУ для стрижа №{}".format(c.get('chosen_strizh'))
-    return redirect(request.META['HTTP_REFERER'])
-
+    c["action_strizh"] = "КУ: {}".format(c.get('chosen_strizh'))
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
 
 def apply_period(request):
     global c, start_datetime, end_datetime
@@ -455,7 +477,7 @@ def export_csv(request):
 
 def get_conditions(request):
     # global temperature, humidity, humidity_temp, weather_state
-    temperature, humidity, weather_state = return_conditions()
+    temperature, humidity, weather_state = return_conditions(c['url_uniping'])
     c['temperature'] = temperature
     c['humidity'] = humidity
     c["weather_state"] = weather_state
@@ -466,16 +488,17 @@ def check_condition(value, low_border, high_border, condition="температ�
     assert low_border < high_border, 'error in defining low or high border'
     try:
         value = float(value)
+        if low_border < value < high_border:
+            return 0
+        elif value > high_border:
+            print("{} выше разрешенной ({} > {})".format(condition, value, high_border))
+            return 1
+        elif value < low_border:
+            print("{} ниже разрешенной ({} < {})".format(condition, value, low_border))
+            return -1
     except:
         print('value is not ok')
-    if low_border < value < high_border:
-        return 0
-    elif value > high_border:
-        print("{} выше разрешенной ({} > {})".format(condition, value, high_border))
-        return 1
-    elif value < low_border:
-        print("{} ниже разрешенной ({} < {})".format(condition, value, low_border))
-        return -1
+        print('error')
 
 
 lines_map = {'обогрев': 1,
@@ -513,15 +536,16 @@ def collect_logs(log_string):
 
 def send_line_command(line_name, arg):
     # arg = 0 or 1
-    global url, auth, lines_map
+    global auth, lines_map, c
+
     state = "вкл" if arg == 1 else "выкл"
     log_str = '{} {}ючен'.format(line_name, state)
     line = lines_map.get(line_name)
     try:
-        result_get = requests.get(url + 'io.cgi?io{}={}'.format(line, arg), auth=auth, timeout=0.05) \
+        result_get = requests.get(c['url_uniping'] + 'io.cgi?io{}={}'.format(line, arg), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
-        result_get = 'err in connection to uniping'
+        result_get = 'ошибка соединения с uniping'
     if 'ok' in result_get:
         collect_logs("{}".format(log_str))
     else:
@@ -529,10 +553,10 @@ def send_line_command(line_name, arg):
 
 
 def send_impulse(line_name, time_pulse=3, action=''):
-    global url, auth, lines_map
+    global auth, lines_map, c
     line = lines_map.get(line_name)
     try:
-        result_get = requests.get(url + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth, timeout=0.05) \
+        result_get = requests.get(c['url_uniping'] + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         result_get = 'err in connection to uniping'
@@ -545,11 +569,11 @@ def send_impulse(line_name, time_pulse=3, action=''):
 
 
 def obtain_state(line_name, to_collect_logs=False):
-    global lines_control_map
+    global lines_control_map, c
     result_state = 0
     line = lines_control_map.get(line_name)
     try:
-        stroka = requests.get(url + 'io.cgi?io{}'.format(line), auth=auth, timeout=0.05) \
+        stroka = requests.get(c['url_uniping'] + 'io.cgi?io{}'.format(line), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         stroka = 'err in connection to uniping'
@@ -578,9 +602,6 @@ def set_correct_temperature(temperature_state):
             elif temperature_state == -1:
                 send_line_command('обогрев', 1)
             time.sleep(60)
-
-
-
 
 
 def check_states_on():
@@ -629,13 +650,12 @@ def turn_on_bp(request):
     elif temperature_state == 0:
         # turn everything on
         send_line_command('вентилятор', 1)
-
         state1 = obtain_state('БП ПЭВМ')
         if state1 != 'вкл':
             # collect_logs('БП ПЭВМ выключен')
             send_line_command('БП ПЭВМ', 1)
-
         state2 = obtain_state('БП Шелест')
+
         if state2 != 'вкл':
             # collect_logs('БП Шелест выключен')
             send_line_command('БП Шелест', 1)
@@ -656,12 +676,22 @@ def turn_on_bp(request):
         c['logs'] = logs
         c['logs_list'] = logs_list
         render(request, "main.html", context=c)
-        functioning_loop(request)
+        # functioning_loop(request)
     return render(request, "main.html", context=c)
 
 
 def turn_off_bp(request):
     global complex_state
+
+    state4 = obtain_state('ЭВМ1')
+    state5 = obtain_state('ЭВМ2')
+    if state4 != 'выкл':
+        send_impulse('ЭВМ1', time_pulse=3, action='выкл')
+    if state5 != 'выкл':
+        send_impulse('ЭВМ2', time_pulse=3, action='выкл')
+
+    time.sleep(5)
+
     state1 = obtain_state('БП ПЭВМ')
     if state1 != 'выкл':
         # collect_logs('БП ПЭВМ включен')
@@ -675,14 +705,8 @@ def turn_off_bp(request):
         # collect_logs('БП АПЕМ включен')
         send_line_command('БП АПЕМ', 0)
 
-    state4 = obtain_state('ЭВМ1')
-    state5 = obtain_state('ЭВМ2')
-    if state4 != 'выкл':
-        send_impulse('ЭВМ1', time_pulse=3, action='выкл')
-    if state5 != 'выкл':
-        send_impulse('ЭВМ2', time_pulse=3, action='выкл')
-
     send_line_command('вентилятор', 0)
+    time.sleep(1)
     send_impulse('РЕЗЕТ', time_pulse=6, action='выкл')
 
     complex_state = 'выкл'

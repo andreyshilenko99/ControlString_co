@@ -18,7 +18,6 @@ class StrizhForm(ModelForm):
         model = Strizh
         # model = MyStrizh
         fields = ['chosen_strizh']
-
         widgets = {
             'chosen_strizh': Select(attrs={'id': 'name'}),
             # 'chosen_strizh': ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
