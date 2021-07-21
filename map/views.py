@@ -175,7 +175,7 @@ def get_strizhes():
 def configuration(request):
     return render(request, "configuration.html", context=c)
 
-from control_trace import jammer_on_off, scan_on_off
+from ControlString_co.control_trace import jammer_on_off, scan_on_off
 
 def butt_skan_all(request):
     global c
