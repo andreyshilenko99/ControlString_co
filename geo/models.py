@@ -3,7 +3,6 @@ import json
 from django.contrib.gis.db import models
 
 
-
 class Point(models.Model):
     system_name = models.CharField('Имя дрона', max_length=500)
     center_freq = models.FloatField('Несущая частота')
@@ -32,6 +31,7 @@ class Strizh(models.Model):
     lon = models.FloatField('Долгота', blank=True, null=True)
     ip1 = models.CharField('IP-адрес стрижа (хост 1)', max_length=500, default='')
     ip2 = models.CharField('IP-адрес стрижа (хост 2)', max_length=500, default='')
+    uniping = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
@@ -59,4 +59,13 @@ class Sector(models.Model):
         verbose_name_plural = 'Sector'
 
 
+class UniPingInfo(models.Model):
+    temp = models.FloatField()
+    wetness = models.FloatField()
+    state = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.state
+
+    class Meta:
+        verbose_name = 'Temp'

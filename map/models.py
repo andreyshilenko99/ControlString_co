@@ -18,13 +18,5 @@ class MyModel(models.Model):
 
 
 
-# class MyStrizh(Strizh):
-    # geojson_strizhes = serialize('geojson', Strizh.objects.all())
-    # parsed_json = (json.loads(geojson_strizhes))
-    # arr_strizh = []
-    # for i in range(len(parsed_json.get("features"))):
-    #     strizh_name = parsed_json.get("features")[i].get("properties").get("name")
-    #     arr_strizh.append([i, strizh_name])
 
-    # choice_strizh = models.CharField(max_length=20, choices=arr_strizh, default='5')
-    # choice_strizh = models.CharField(max_length=20)
+

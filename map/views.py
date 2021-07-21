@@ -13,6 +13,7 @@ from geo.models import Strizh, Point
 # from .models import MyModel, MyStrizh
 # from .forms import MyModelForm
 from .forms import StrizhForm, StrizhFilterForm
+from ControlString_co.control_trace import scan_on_off
 
 chosen_strizh = 0
 start_datetime = "Начало"
