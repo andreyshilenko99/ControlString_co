@@ -1,6 +1,8 @@
 import os.path
 import re
 import time
+import datetime
+import csv
 
 import requests
 from django.core.serializers import serialize
@@ -137,6 +139,16 @@ def get_strizhes():
     return arr_strizh
 
 
+# def get_drones(request):
+#     global c
+#     # nomer_strizha = 0
+#     drone_names = Point.objects.all()
+#
+#     c["drone_names"] = "drone_names asdqawd"
+#     # return redirect(request.META['HTTP_REFERER'])
+#     return render(request, "main.html", context=c)
+
+
 # def main(request):
 #     temperature, humidity, weather_state = return_conditions()
 #
@@ -170,7 +182,7 @@ def butt_skan_all(request):
     print(strizh_names)
     for strizh in strizh_names:
         # TODO action 1 button
-        print('skanirovanie vseh: ', strizh.ip)
+        print('skanirovanie vseh: ', strizh.ip1, strizh.ip2)
 
     # return render(request, "journal.html", context=c)
     c["action_strizh"] = "Сканирование всех"
@@ -185,8 +197,9 @@ def butt_glush_all(request):
     strizh_names = Strizh.objects.all()
     print(strizh_names)
     for strizh in strizh_names:
-        print('skanirovanie vseh: ', strizh.ip)
-        jammer_on_off(strizh.ip)
+        print('glushenie vseh: ', strizh.ip1, strizh.ip2)
+        # jammer_on_off(strizh.ip)
+
 
     # TODO trace pomenyat
 
@@ -255,8 +268,10 @@ def choose_nomer_strizha(request):
 actual_strizhes = {}
 
 
+
 def render_main_page(request):
     global c, actual_strizhes
+    complex_state = ''
     c['chosen_strizh'] = 0
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
@@ -278,9 +293,13 @@ def render_main_page(request):
     c['form'] = form
     # filter(id=id)
     strizhes = Strizh.objects.order_by('-lon').all()
-    drones = Point.objects.order_by('-lon').all()
+    # TODO current_time
+    drones = Point.objects.order_by('-detection_time').all()
+
 
     c['actual_strizhes'] = strizhes
+    c['info_drones'] = drones
+
     c['drone_lat'] = drones[0].lat
     c['drone_lon'] = drones[0].lon
     c['drone_name'] = drones[0].system_name
@@ -373,10 +392,6 @@ def reset_filter(request):
 
     c['end_datetime'] = 'Конец'
     return render(request, "journal.html", context=c)
-
-
-import datetime
-import csv
 
 
 def get_datetime_drone(time_dron):
@@ -564,7 +579,7 @@ def set_correct_temperature(temperature_state):
             time.sleep(60)
 
 
-complex_state = ''
+
 
 
 def check_states_on():

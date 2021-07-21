@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'map',
     'django.contrib.gis',
     'geo',
-    'djgeojson'
+    'djgeojson',
 
 ]
 

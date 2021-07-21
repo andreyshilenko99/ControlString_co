@@ -50,9 +50,41 @@
 
 
                 </div>
-                <div class="information-bottom" style="height: 25vh; margin-top: 3%; border: 0.5vh solid #ffffff">
+                <div class="information-bottom-right" style="height: 25vh; margin-top: 3%; border: 0.5vh solid #ffffff">
 
-                    Инфо по последним засечкам
+                    <h3 style="margin-top: 1%"> Информация о засечках </h3>
+
+                    <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255); margin: 2% 0;
+                    width: 100%">
+                        {% load mytags %}
+                        <!--                        <form action="get_drones" method='POST'>-->
+                        {% for dron in info_drones%}
+                        <div class="mx-auto">
+                            <!--                            <span style="font-weight: 600; color: #2b570e; margin-left: 1%">{{ dron.pk }}. </span>-->
+                            <span style="font-weight: 600; color: #488423; margin-left: 1%">{{ dron.detection_time }}, </span>
+                            <span style="font-weight: 600; color: #c1802e">{{ dron.system_name}}, </span>
+                            {% if dron.area_sector_start_grad == -1 %}
+                            <span style="font-weight: 600; color: #0059b6">
+                                РАДИУС,
+                            </span>
+                            {% else %}
+                            <span style="font-weight: 600; color: #0059b6">
+                                {% widthratio dron.area_sector_start_grad 1 1 %}&deg; &ndash;
+                                {% widthratio dron.area_sector_end_grad 1 1 %}&deg;,
+                                {{ dron.azimuth}},
+                            </span>
+                            {% endif %}
+                            <span style="font-weight: 600; color: #872525"> host:{{ dron.ip}}, </span>
+                            <span style="font-weight: 600; color: #872525"> {{dron.strig_name}}, </span>
+                            <span style="font-weight: 600; color: #872525">
+                                {{ dron.brandwidth|division:1000000 }} МГц,
+                            </span>
+                            <span style="font-weight: 600; color: 	#872525"> {{ dron.comment_string}}, </span>
+                            <span style="font-weight: 600; color: #872525"> {% widthratio dron.area_radius_m 1 1 %} м. </span>
+                        </div>
+
+                        {% endfor %}
+                    </div>
 
 
                 </div>
@@ -187,6 +219,18 @@
 
 <script>
 
+    function refresh() {
+        $.ajax({
+            url: "main",
+            success: function (data) {
+                $('#detections').replaceWith($('#detections', data)); // NOTE this
+            }
+        });
+    }
+
+    var seconds = 3; // seconds, edit here
+    setInterval(refresh, seconds * 1000);
+
     function map_init_basic(map, options) {
 
         function onlyUnique(value, index, self) {
@@ -212,8 +256,23 @@
         var counter_periodic = -1;
         var counter_drone_period = 0
 
+        function refresh() {
+            $.ajax({
+                url: "main",
+                success: function (data) {
+                    $('#detections').replaceWith($('#detections', data)); // NOTE this
+                }
+            });
+        }
+
         function refreshMarkers() {
             // var to_clear = 0
+            $.ajax({
+                url: "main",
+                success: function (data) {
+                    $('#detections').replaceWith($('#detections', data)); // NOTE this
+                }
+            });
 
             counter_periodic = counter_periodic + 1;
 
@@ -413,13 +472,11 @@
                 counter_drone_period = 0;
                 layerDrones.clearLayers();
 
-            }
-            else if (counter_drone_period === 0){
+            } else if (counter_drone_period === 0) {
                 // console.log('podpis', podpis)
                 counter_drone_period += 1;
                 map.addLayer(layerDrones)
-            }
-            else {
+            } else {
                 counter_drone_period += 1;
                 map.addLayer(layerDrones)
                 // layerDrones.clearLayers();
