@@ -50,6 +50,8 @@ urlpatterns = [
 
     path(r'strizh_view', geojson_view),
 
+    # path(r'get_drones', views.get_drones),
+
     # path(r'update_nomer_strizha', views.update_nomer_strizha),
     path('butt_skan', views.butt_skan),
     path('butt_glush', views.butt_glush),

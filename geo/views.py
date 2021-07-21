@@ -8,7 +8,8 @@ from .models import Point, Strizh, Sector
 
 
 def geojson_view(request):
-    geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-pk'))
+    # geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-pk'))
+    geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-detection_time'))
     return HttpResponse(geom_as_geojson, content_type='geojson')
 
 
