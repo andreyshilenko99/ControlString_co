@@ -88,24 +88,24 @@ CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 CELERY_TIMEZONE = 'Europe/Moscow'
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'stuff',
-        'USER': 'dron',
-        'PASSWORD': '555',
-        'HOST': '192.168.1.66',
-        'PORT': '5432', }
-}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'test_bd',
+#         'NAME': 'stuff',
 #         'USER': 'dron',
 #         'PASSWORD': '555',
-#         'HOST': '127.0.0.1',
+#         'HOST': '192.168.1.66',
 #         'PORT': '5432', }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': '555',
+        'HOST': '127.0.0.1',
+        'PORT': '5432', }
+}
 
 
 # Password validation
@@ -166,6 +166,7 @@ LEAFLET_CONFIG = {
                     '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css',
                     '/static/src/L.Icon.Pulse.css',
                     '/static/styles.css',
+                    '/static/datepicker-widget.css',
                     ],
             'js': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.js',
                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js',

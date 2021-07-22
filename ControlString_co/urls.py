@@ -37,6 +37,7 @@ urlpatterns = [
 
     path('journal', views.journal),
     path('filter_nomer_strizha', views.filter_nomer_strizha),
+    path('choose_drone_toshow', views.choose_drone_toshow),
     path('reset_filter', views.reset_filter),
     path('export_csv', views.export_csv),
 

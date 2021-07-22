@@ -7,9 +7,15 @@
 
 
     <title>Main page</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>-->
+
+    <script src="static/src/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
+    <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
+
+    <!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"-->
+    <!--          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
+
     <meta charset=utf-8>
 
     {% leaflet_js plugins="ALL" %}
@@ -177,7 +183,7 @@
                      style="height: 55vh; margin-top: 1%; border: 0.5vh solid rgb(255,255,255)">
 
                     <form action='main' style="margin: 3% 3%" method='GET'>
-<!--                        {% if url_uniping %}-->
+                        <!--                        {% if url_uniping %}-->
                         <h5> Температура: {{ temperature }}&deg,</h5>
                         <h5> Влажность: {{ humidity }}%,</h5>
                         <!--                        <h5>Температура датчика влажности: {{humidity_temp}}&deg</h5>-->
@@ -186,7 +192,7 @@
 
                         <h5>
                         </h5>
-<!--                        {% endif %}-->
+                        <!--                        {% endif %}-->
                     </form>
 
 
@@ -256,23 +262,8 @@
         var counter_periodic = -1;
         var counter_drone_period = 0
 
-        function refresh() {
-            $.ajax({
-                url: "main",
-                success: function (data) {
-                    $('#detections').replaceWith($('#detections', data)); // NOTE this
-                }
-            });
-        }
 
         function refreshMarkers() {
-            // var to_clear = 0
-            $.ajax({
-                url: "main",
-                success: function (data) {
-                    $('#detections').replaceWith($('#detections', data)); // NOTE this
-                }
-            });
 
             counter_periodic = counter_periodic + 1;
 
@@ -349,7 +340,13 @@
                         }
                         // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
                         let logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
-                        let len_arr = 20;
+
+                        if (data.features.length < 20) {
+                            var len_arr = data.features.length;
+                        } else {
+                            var len_arr = 20;
+                        }
+
                         let arr_drones = [];
 
                         for (let step = 0; step < len_arr; step++) {
@@ -402,19 +399,20 @@
                                 let angle = (90 - (area_sector_start_grad)) / 180 * Math.PI;
                                 var d_y = 0.004499 * Math.sin(angle);
                                 var d_x = 0.008892 * Math.cos(angle);
-                                arc1 = L.sector({
-                                    center: strizh_center,
-                                    innerRadius: 0,
-                                    outerRadius: radius,
-                                    startBearing: 0,
-                                    endBearing: 360,
-                                    color: '#c6d498'
-                                }).addTo(layerDrones);
-                                // arc1 = L.circle({
+                                // arc1 = L.sector({
                                 //     center: strizh_center,
-                                //     radius: radius,
+                                //     innerRadius: 0,
+                                //     outerRadius: radius,
+                                //     startBearing: 0,
+                                //     endBearing: 360,
                                 //     color: '#c6d498'
                                 // }).addTo(layerDrones);
+                                arc1 = L.circle(strizh_center, {
+                                    color: '#f03',
+                                    fillColor: "#f1b44e",
+                                    fillOpacity: 0.1,
+                                    radius: radius
+                                }).addTo(layerDrones);
                             } else {
                                 let angle = (90 - (area_sector_start_grad + 30)) / 180 * Math.PI;
                                 var d_y = r_y * Math.sin(angle);

@@ -9,10 +9,10 @@ from django.core.serializers import serialize
 from django.shortcuts import redirect
 from django.shortcuts import render
 
-from geo.models import Strizh, Point
+from geo.models import Strizh, Point, DroneJournal
 # from .models import MyModel, MyStrizh
 # from .forms import MyModelForm
-from .forms import StrizhForm, StrizhFilterForm
+from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm
 from ControlString_co.control_trace import scan_on_off
 
 chosen_strizh = 0
@@ -78,55 +78,69 @@ c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_dateti
 
 
 def journal(request):
-    # temperature, humidity, weather_state = return_conditions()
-    #
-    # c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime,
-    #          available_strizhes=get_strizhes(), temperature=temperature,
-    #          humidity=humidity, weather_state=weather_state)
-
     global c
     c['filtered_strizhes'] = 0
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
     c['available_strizhes'] = get_strizhes()
 
-    temperature, humidity, weather_state = return_conditions(c['url_uniping'])
-    c['temperature'] = temperature
-    c['humidity'] = humidity
-    c['weather_state'] = weather_state
-
     if request.method == 'POST':
+        form_drone = DroneFilterForm(request.POST)
         form_filter = StrizhFilterForm(request.POST)
+        if form_drone.is_valid():
+            drone_toshow = form_drone.cleaned_data.get('drone_toshow')
+            c['drone_toshow'] = drone_toshow
         if form_filter.is_valid():
-            print(form_filter.cleaned_data)
             filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
             c['filtered_strizhes'] = filtered_strizhes
     else:
+        form_drone = DroneFilterForm()
         form_filter = StrizhFilterForm()
+    c['form_drone'] = form_drone
     c['form_filter'] = form_filter
+
     return render(request, "journal.html", context=c)
 
 
 def filter_nomer_strizha(request):
     global c
-
-    temperature, humidity, weather_state = return_conditions(c['url_uniping'])
-    c['temperature'] = temperature
-    c['humidity'] = humidity
-    c['weather_state'] = weather_state
     if request.method == 'POST':
         form_filter = StrizhFilterForm(request.POST)
         if form_filter.is_valid():
-            print(form_filter.cleaned_data)
             filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
             c['filtered_strizhes'] = filtered_strizhes
         # nomer = request.POST['filtered_strizhes']
         nomer = filtered_strizhes
-        print('got', nomer, '\n')
         c = {'filtered_strizhes': nomer}
-        # return render(request,"main.html", context=c)
-    # if c.get("filtered_strizhes"):
-    #     c["filtered_strizhes"] = "{}".format(c.get("filtered_strizhes"))
+
+    return render(request, "journal.html", context=c)
+
+
+def choose_drone_toshow(request):
+    global c
+    if request.method == 'POST':
+        form_drone = DroneFilterForm(request.POST)
+        if form_drone.is_valid():
+            drone_toshow = form_drone.cleaned_data.get('drone_toshow')
+            c['drone_toshow'] = drone_toshow
+            DP = drone_toshow[0]
+            drone_value = DroneJournal(system_name=DP.system_name,
+                                       center_freq=DP.center_freq,
+                                       brandwidth=DP.brandwidth,
+                                       detection_time=DP.detection_time,
+                                       comment_string=DP.comment_string,
+                                       lat=DP.lat,
+                                       lon=DP.lon,
+                                       azimuth=DP.azimuth,
+                                       area_sector_start_grad=DP.area_sector_start_grad,
+                                       area_sector_end_grad=DP.area_sector_end_grad,
+                                       area_radius_m=DP.area_radius_m,
+                                       ip=DP.ip,
+                                       current_time=DP.current_time,
+                                       strig_name=DP.strig_name)
+
+            drone_value.save()
+
     return render(request, "journal.html", context=c)
 
 
@@ -140,48 +154,17 @@ def get_strizhes():
     return arr_strizh
 
 
-# def get_drones(request):
-#     global c
-#     # nomer_strizha = 0
-#     drone_names = Point.objects.all()
-#
-#     c["drone_names"] = "drone_names asdqawd"
-#     # return redirect(request.META['HTTP_REFERER'])
-#     return render(request, "main.html", context=c)
-
-
-# def main(request):
-#     temperature, humidity, weather_state = return_conditions()
-#
-#     c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime,
-#              available_strizhes=get_strizhes(), temperature=temperature,
-#              humidity=humidity, weather_state=weather_state)
-#
-#     if request.method == 'POST':
-#         form = StrizhForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return
-#         else:
-#             error = "форма неверная"
-#     form = StrizhForm()
-#     if c.get('form'):
-#         c['form'] = form
-#     else:
-#         c['form'] = ''
-#     return render(request, "main.html", context=c)
-
-
 def configuration(request):
     return render(request, "configuration.html", context=c)
 
+
 from ControlString_co.control_trace import jammer_on_off, scan_on_off
+
 
 def butt_skan_all(request):
     global c
     # nomer_strizha = 0
     strizh_names = Strizh.objects.all()
-    print(strizh_names)
     for strizh in strizh_names:
         # TODO action 1 button
         print('skanirovanie vseh: ', strizh.ip1, strizh.ip2)
@@ -191,7 +174,6 @@ def butt_skan_all(request):
     c["action_strizh"] = "Сканирование всех"
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
-
 
 
 def butt_glush_all(request):
@@ -208,6 +190,7 @@ def butt_glush_all(request):
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 
+
 def back2main(request):
     return redirect(request.META['HTTP_REFERER'])
 
@@ -223,12 +206,12 @@ def butt_gps_all(request):
 
 def butt_ku_all(request):
     global c
-    print(c)
     print('KU vseh #')
     # TODO action 4 button
     c["action_strizh"] = "КУ всех"
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
+
 
 import json
 
@@ -244,23 +227,18 @@ def choose_nomer_strizha(request):
     # c["available_strizhes"] = arr_strizh
     # print(c["available_strizhes"])
 
-
-
     strizhes = Strizh.objects.order_by('-lon').all()
     if request.method == 'POST':
         form = StrizhForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
             c['chosen_strizh'] = chosen_strizh
 
             for strizh in strizhes:
                 if c['chosen_strizh'] == strizh:
                     c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
-                    print('url_uniping', strizh.uniping_ip)
 
         nomer = request.POST['chosen_strizh']
-        print('send', nomer, '\n')
         c['chosen_strizh'] = nomer
     if c.get("chosen_strizh"):
         # c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
@@ -297,7 +275,6 @@ def render_main_page(request):
     if request.method == 'POST':
         form = StrizhForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
             c['chosen_strizh'] = chosen_strizh
 
@@ -313,9 +290,6 @@ def render_main_page(request):
     c['actual_strizhes'] = strizhes
     c['info_drones'] = drones
 
-    c['drone_lat'] = drones[0].lat
-    c['drone_lon'] = drones[0].lon
-    c['drone_name'] = drones[0].system_name
     return render(request, "main.html", context=c)
 
 
@@ -349,7 +323,6 @@ def butt_skan(request):
                 scan_on_off(strizh.ip2)
                 print('skanirovanie dlya strizha #', strizh.name)
 
-
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 
@@ -363,6 +336,7 @@ def butt_glush(request):
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 
+
 def butt_gps(request):
     global c
     if c.get("chosen_strizh") != 0:
@@ -372,6 +346,7 @@ def butt_gps(request):
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 
+
 def butt_ku(request):
     global c
     if c.get("chosen_strizh") != 0:
@@ -380,6 +355,7 @@ def butt_ku(request):
     c["action_strizh"] = "КУ: {}".format(c.get('chosen_strizh'))
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
+
 
 def apply_period(request):
     global c, start_datetime, end_datetime
@@ -556,7 +532,8 @@ def send_impulse(line_name, time_pulse=3, action=''):
     global auth, lines_map, c
     line = lines_map.get(line_name)
     try:
-        result_get = requests.get(c['url_uniping'] + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth, timeout=0.05) \
+        result_get = requests.get(c['url_uniping'] + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth,
+                                  timeout=0.05) \
             .content.decode("utf-8")
     except:
         result_get = 'err in connection to uniping'

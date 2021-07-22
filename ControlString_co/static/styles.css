@@ -10,6 +10,7 @@
     font-size: 16px;
     /*margin: 4px 2px;*/
     margin-left: 10px;
+    border-radius: 10px;
 }
 
 .button-green-small {
@@ -22,6 +23,7 @@
     display: inline-block;
     font-size: 18px;
     margin: 2px 2px;
+    border-radius: 10px;
 }
 
 
@@ -60,6 +62,8 @@
     display: inline-block;
     font-size: 18px;
     margin: 2px 2px;
+    width: 245px;
+    border-radius: 10px;
 }
 
 .button-csv {
@@ -72,6 +76,8 @@
     display: inline-block;
     font-size: 18px;
     margin: 2px 10px;
+    width: 245px;
+    border-radius: 10px;
 }
 
 .button-blue-big {
@@ -86,6 +92,7 @@
     display: inline-block;
     font-size: 44px;
     margin: 1% 1%;
+    border-radius: 10px;
 }
 
 .button-white-big {
@@ -98,6 +105,7 @@
     display: inline-block;
     font-size: 14px;
     margin: 1% 1%;
+    border-radius: 10px;
 }
 
 .box-scroll {
