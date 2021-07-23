@@ -62,6 +62,7 @@ class DroneJournal(models.Model):
         verbose_name_plural = 'Дроны'
         verbose_name = 'Дрон'
 
+
 class Strizh(models.Model):
     name = models.CharField('Имя стрижа', max_length=500, default='стриж 0 (по умолчанию)')
     lat = models.FloatField('Широта', blank=True, null=True)
@@ -77,3 +78,19 @@ class Strizh(models.Model):
         verbose_name = 'Стриж'
         verbose_name_plural = 'Стрижи'
         ordering = ['name']
+
+
+class StrizhJournal(models.Model):
+
+    filtered_strizhes = models.CharField('Нужные стрижи', max_length=500, default='стриж 0 (по умолчанию)')
+    start_datetime = models.CharField('Время начала', max_length=50, blank=True, null=True)
+    end_datetime = models.CharField('Время конца', max_length=50, blank=True, null=True)
+    print(filtered_strizhes)
+
+    def __str__(self):
+        return str(self.filtered_strizhes)
+
+    class Meta:
+        verbose_name = 'Отфильтрованные стрижи'
+        # verbose_name_plural = 'Стрижи'
+        ordering = ['-pk']

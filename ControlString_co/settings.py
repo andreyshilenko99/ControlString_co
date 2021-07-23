@@ -175,6 +175,7 @@ LEAFLET_CONFIG = {
                    '/static/src/L.Realtime.js',
                    '/static/src/leaflet-realtime.js',
                    '/static/src/L.Icon.Pulse.js',
+                   '/static/src/leaflet.circle-sector.js',
                    ],
             'auto-include': True
         },

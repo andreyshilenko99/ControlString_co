@@ -9,7 +9,7 @@ from django.core.serializers import serialize
 from django.shortcuts import redirect
 from django.shortcuts import render
 
-from geo.models import Strizh, Point, DroneJournal
+from geo.models import Strizh, Point, DroneJournal, StrizhJournal
 # from .models import MyModel, MyStrizh
 # from .forms import MyModelForm
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm
@@ -26,7 +26,7 @@ low_h = 5
 high_h = 85
 auth = ('user', '555')
 message_condition = ''
-
+c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime, saved_table=False)
 
 def index(request):
     return render(request, "index.html")
@@ -74,15 +74,19 @@ def return_conditions(url):
     return temperature, humidity, weather_state
 
 
-c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime, available_strizhes=[])
-
 
 def journal(request):
     global c
-    c['filtered_strizhes'] = 0
+    print(c['saved_table'])
+
+    if not c.get('filtered_strizhes'):
+        c['filtered_strizhes'] = ''
+        strizh_names = ''
+    else:
+        strizh_names_arr = [st.name for st in c['filtered_strizhes']]
+        strizh_names = ', '.join(strizh_names_arr)
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
-    c['available_strizhes'] = get_strizhes()
 
     if request.method == 'POST':
         form_drone = DroneFilterForm(request.POST)
@@ -99,6 +103,22 @@ def journal(request):
     c['form_drone'] = form_drone
     c['form_filter'] = form_filter
 
+
+    strizh_value = StrizhJournal(filtered_strizhes=strizh_names,
+                                 start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
+
+    if c['filtered_strizhes'] != '' and c['start_datetime'] != 'Начало' and c['end_datetime'] != 'Конец':
+        if not c['saved_table']:
+            strizh_value.save()
+            c['saved_table'] = True
+        else:
+            strizh_value.save()
+            strizh_value.delete()
+
+    else:
+        strizh_value.save()
+        strizh_value.delete()
+    print(strizh_value)
     return render(request, "journal.html", context=c)
 
 
@@ -109,9 +129,6 @@ def filter_nomer_strizha(request):
         if form_filter.is_valid():
             filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
             c['filtered_strizhes'] = filtered_strizhes
-        # nomer = request.POST['filtered_strizhes']
-        nomer = filtered_strizhes
-        c = {'filtered_strizhes': nomer}
 
     return render(request, "journal.html", context=c)
 
@@ -218,14 +235,6 @@ import json
 
 def choose_nomer_strizha(request):
     global c
-    # geojson_strizhes = serialize('geojson', Strizh.objects.all())
-    # parsed_json = (json.loads(geojson_strizhes))
-    # arr_strizh = []
-    # for i in range(len(parsed_json.get("features"))):
-    #     strizh_name = parsed_json.get("features")[i].get("properties").get("name")
-    #     arr_strizh.append(strizh_name)
-    # c["available_strizhes"] = arr_strizh
-    # print(c["available_strizhes"])
 
     strizhes = Strizh.objects.order_by('-lon').all()
     if request.method == 'POST':
@@ -240,6 +249,7 @@ def choose_nomer_strizha(request):
 
         nomer = request.POST['chosen_strizh']
         c['chosen_strizh'] = nomer
+
     if c.get("chosen_strizh"):
         # c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
         temperature, humidity, weather_state = return_conditions(c['url_uniping'])
@@ -251,11 +261,8 @@ def choose_nomer_strizha(request):
     return render(request, "main.html", context=c)
 
 
-actual_strizhes = {}
-
-
 def render_main_page(request):
-    global c, actual_strizhes
+    global c
     complex_state = ''
     if not c.get('chosen_strizh'):
         c['chosen_strizh'] = 0
@@ -264,7 +271,6 @@ def render_main_page(request):
 
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
-    c['available_strizhes'] = get_strizhes()
 
     temperature, humidity, weather_state = return_conditions(c['url_uniping'])
     c['temperature'] = temperature
@@ -287,26 +293,9 @@ def render_main_page(request):
     # TODO current_time
     drones = Point.objects.order_by('-detection_time').all()
 
-    c['actual_strizhes'] = strizhes
     c['info_drones'] = drones
 
     return render(request, "main.html", context=c)
-
-
-# class CreateMyModelView(CreateView):
-#
-#     # model = Strizh
-#     model = MyStrizh
-#     form_class = StrizhForm
-#     template_name = 'main.html'
-#     success_url = 'main.html'
-#     context_object_name = 'strizh_model'
-#     print(form_class)
-#     temperature, humidity, humidity_temp, weather_state = return_conditions()
-#
-#     c = dict(nomer_strizha=0, start_datetime=start_datetime, end_datetime=end_datetime,
-#              available_strizhes=get_strizhes(), temperature=temperature,
-#              humidity=humidity, humidity_temp=humidity_temp, weather_state=weather_state)
 
 
 def butt_skan(request):
@@ -359,7 +348,7 @@ def butt_ku(request):
 
 def apply_period(request):
     global c, start_datetime, end_datetime
-    # TODO action 2 button
+    c['saved_table'] = False
     if request.method == 'POST':
         if request.POST.get('start_datetime'):
             start = request.POST['start_datetime']
@@ -380,8 +369,9 @@ def apply_period(request):
 
 def reset_filter(request):
     global c
-    c['filtered_strizhes'] = 0
+    c['filtered_strizhes'] = ''
     c['start_datetime'] = 'Начало'
+    c['saved_table'] = False
 
     if request.method == 'POST':
         form_filter = StrizhFilterForm(request.POST)
@@ -404,6 +394,7 @@ def get_datetime_drone(time_dron):
 
 def export_csv(request):
     global c
+    c['saved_table'] = False
     time_start = c['start_datetime']
     time_end = c['end_datetime']
     strizhes = c['filtered_strizhes']

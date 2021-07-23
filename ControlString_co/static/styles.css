@@ -11,6 +11,64 @@
     /*margin: 4px 2px;*/
     margin-left: 10px;
     border-radius: 10px;
+
+
+}
+
+.button-green-csv {
+    background-color: #04AA6D;
+    border: none;
+    color: white;
+    padding: 10.5% 20%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    /*margin: 4px 2px;*/
+    border-radius: 10px;
+}
+
+
+.button-red-sbros {
+    background-color: #ff3c3c;
+    border: none;
+    color: white;
+    padding: 5% 20%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+
+.button-green-on {
+    background-color: #04AA6D;
+    border: none;
+    color: white;
+    padding: 30px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    /*margin: 4px 2px;*/
+    margin-left: 10px;
+    border-radius: 10px;
+}
+
+
+.button-red {
+    background-color: #ff3c3c;
+    border: none;
+    color: white;
+    padding: 30px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    /*margin: 2px 2px;*/
+    /*width: 245px;*/
+    border-radius: 10px;
 }
 
 .button-green-small {
@@ -22,8 +80,13 @@
     text-decoration: none;
     display: inline-block;
     font-size: 18px;
-    margin: 2px 2px;
     border-radius: 10px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 
@@ -41,33 +104,22 @@
 }
 
 .button-blue-small {
-    background-color: #0483aa;
+    background-color: #059ccd;
     border: none;
     color: white;
-    padding: 5px;
+    padding: 10px 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     margin: 5px 5px;
-    font-size: 26px;
-}
-
-.button-red {
-    background-color: #ff3c3c;
-    border: none;
-    color: white;
-    padding: 16px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
     font-size: 18px;
-    margin: 2px 2px;
-    width: 245px;
     border-radius: 10px;
 }
 
+
 .button-csv {
-    background-color: #ef9900;
+    /*background-color: #ef9900;*/
+    background-color: #04AA6D;
     border: none;
     color: white;
     padding: 16px;
@@ -215,11 +267,13 @@
     margin-right: -12px;
     border-left-color: rgba(0, 0, 0, 0.4);
 }
+
 .leaflet-tooltip-right:before {
     left: 0;
     margin-left: -12px;
     border-right-color: rgba(0, 0, 0, 0.4);
-    }
+}
+
 .leaflet-tooltip-own {
     position: absolute;
     padding: 4px;
@@ -233,7 +287,13 @@
     -ms-user-select: none;
     user-select: none;
     pointer-events: none;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.round_form {
+    background-color: #3e22bf;
+    border-radius: 40px;
+
 }
 
 

@@ -7,54 +7,29 @@
 <head>
     <title>Journal page</title>
 
-
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-
-    <!--    <script crossorigin="anonymous" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"-->
-    <!--            src="https://code.jquery.com/jquery-3.2.1.min.js"></script>-->
-
     <script src="static/src/jquery-3.2.1.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
     <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
-
-    <!--    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"-->
-    <!--          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet">-->
-    <!--    <script crossorigin="anonymous" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"-->
-    <!--            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
-
-    <!--    <script crossorigin="anonymous" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"-->
-    <!--            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>-->
     <script src="static/src/popper.min.js"></script>
-
-
-    <!--    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css"-->
-    <!--          type="text/css" media="all" rel="stylesheet">-->
     <link rel="stylesheet" type="text/css" href="static/src/css/bootstrap-datetimepicker.css">
-
-    <!--    <link href="datepicker-widget.css" type="text/css" media="all" rel="stylesheet">-->
-
-    <!--    <script type="text/javascript"-->
-    <!--            src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>-->
     <script src="static/src/moment-with-locales.min.js"></script>
-
-    <!--    <script type="text/javascript"-->
-    <!--            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>-->
     <script src="static/src/bootstrap-datetimepicker.min.js"></script>
-
-    <!--    <script type="text/javascript"-->
-    <!--            src="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>-->
     <script src="static/src/datepicker-widget.js"></script>
 
-<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"-->
-<!--          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
-
-<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>-->
-
     <meta charset=utf-8>
-
     <link rel="stylesheet" href="/static/styles.css"/>
+
+    <style>
+        .round_form {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            height: 25px;
+            width: 200px;
+            margin: 10px 10px 10px 0;
+        }
+    </style>
 
     {% leaflet_js plugins="ALL" %}
     {% leaflet_css plugins="ALL" %}
@@ -96,19 +71,28 @@
 
                     <h3 style="margin-top: 4%"> Выбрать засечку для отображения </h3>
 
+
                     <form action="choose_drone_toshow" method="post">
-                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-11 ">
 
-                        <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255); margin: 2% 0;
-                    width: 98%; height: 75%">
-                            {{ form_drone.as_p }}
+                                <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255); margin: 2% 0;
+                    width: 100%; height: 95%">
+
+                                    {% csrf_token %}
+                                    {{ form_drone }}
+
+                                </div>
+                            </div>
+                            <div class="col-1 ">
+                                <button class="button-green-small">
+                                    выбор
+                                </button>
+
+                            </div>
                         </div>
-
-                        <button class="button-green-small">
-                            выбор
-                        </button>
-
                     </form>
+
                 </div>
 
             </div>
@@ -117,7 +101,7 @@
                     <div class="export-csv" style="margin-left: 5%;margin-top: 1%">
                         <div class="functions-cont" style="margin-top: 3%; ">
                             <div class="row" style="margin-top: 2%; width: 50vh">
-                                {% if filtered_strizhes == 0 %}
+                                {% if not filtered_strizhes %}
                                 <form action="filter_nomer_strizha" method="post">
                                     {% csrf_token %}
                                     <div class="row" style="margin-left: 2%; align-items:center; width: 50vh">
@@ -125,17 +109,23 @@
                                             Выбор стрижей
                                         </h3>
                                     </div>
-                                    <div class="row" style="margin-left: 3%">
-                                        {{ form_filter }}
-                                        <button class="button-green-small" style="margin: 0px 20px">
-                                            выбор
-                                        </button>
+                                    <div class="row" style="margin-left: 3% ">
+                                        <div class="col-4">
+                                            {{ form_filter }}
+                                        </div>
+                                        <div class="col-1">
+
+                                            <button class="button-green-small" style="margin: 0px 20px">
+                                                выбор
+                                            </button>
+                                        </div>
                                     </div>
+
                                 </form>
                                 {% endif %}
                             </div>
                             <div class="row">
-                                {% if filtered_strizhes != 0%}
+                                {% if filtered_strizhes %}
                                 <h3 style="text-align: center">
                                     Выбрано:
                                 </h3>
@@ -146,14 +136,16 @@
                                     </p>
                                     {% endfor %}
                                 </h5>
-                                <h5>
-                                    <form action="journal" method="get">
+                                <div class="span12 text-center" >
+<!--                                <h5>-->
+                                    <form action="journal" method="get" style="align-content: center; justify-content: center">
                                         {% csrf_token %}
                                         <button class="button-blue-small">
                                             выбрать другой
                                         </button>
                                     </form>
-                                </h5>
+<!--                                </h5>-->
+                                </div>
                                 {% endif %}
                             </div>
                         </div>
@@ -161,46 +153,50 @@
                         <form action="apply_period" method="post">
                             {% csrf_token %}
                             <h3> Период </h3>
-                            <h4 style="color: #72849e">
-                                <div class="form-group">
+
+                            <div class="form-group">
+                                <h4 style="color: #72849e">
                                     <label for="id_start_datetime">Начало</label>
-                                    <div class="input-group date" style="height: 48px; width: 90%">
-                                        <input type="text" name="start_datetime" value="Начало"
-                                               class="form-control" placeholder="{{start_datetime}}"
-                                               required="" id="id_start_datetime"
-                                               dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
-                                        <div class="input-group-addon input-group-append"
-                                             data-target="#datepicker" data-toggle="datetimepickerv">
-                                            <div class="input-group-text">
-                                                <i class="glyphicon glyphicon-calendar"></i>
-                                            </div>
+                                </h4>
+                                <div class="input-group date" style="height: 48px; width: 90%">
+                                    <input type="text" name="start_datetime" value="Начало"
+                                           class="form-control" placeholder="{{start_datetime}}"
+                                           required="" id="id_start_datetime"
+                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
+                                    <div class="input-group-addon input-group-append"
+                                         data-target="#datepicker" data-toggle="datetimepickerv">
+                                        <div class="input-group-text">
+                                            <i class="glyphicon glyphicon-calendar"></i>
                                         </div>
-                                        <button class="button-green-small" type='submit'> Применить</button>
                                     </div>
+                                    <button class="button-blue-small" type='submit'> Применить</button>
                                 </div>
+                            </div>
                             </h4>
 
                         </form>
 
                         <form action="apply_period" method="post">
                             {% csrf_token %}
-                            <h4 style="color: #72849e">
-                                <div class="form-group">
+
+                            <div class="form-group">
+                                <h4 style="color: #72849e">
                                     <label for="id_end_datetime">Конец</label>
-                                    <div class="input-group date" style="height: 48px; width: 90%">
-                                        <input type="text" name="end_datetime" value="Конец"
-                                               class="form-control" placeholder="{{end_datetime}}"
-                                               required="" id="id_end_datetime"
-                                               dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
-                                        <div class="input-group-addon input-group-append"
-                                             data-target="#datepicker" data-toggle="datetimepickerv">
-                                            <div class="input-group-text">
-                                                <i class="glyphicon glyphicon-calendar"></i>
-                                            </div>
+                                </h4>
+                                <div class="input-group date" style="height: 48px; width: 90%">
+                                    <input type="text" name="end_datetime" value="Конец"
+                                           class="form-control" placeholder="{{end_datetime}}"
+                                           required="" id="id_end_datetime"
+                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
+                                    <div class="input-group-addon input-group-append"
+                                         data-target="#datepicker" data-toggle="datetimepickerv">
+                                        <div class="input-group-text">
+                                            <i class="glyphicon glyphicon-calendar"></i>
                                         </div>
-                                        <button class="button-green-small" type='submit'> Применить</button>
                                     </div>
+                                    <button class="button-blue-small" type='submit'> Применить</button>
                                 </div>
+                            </div>
                             </h4>
 
                             <!--                            <input type="submit" value="применить">-->
@@ -214,26 +210,32 @@
                             });
                         </script>
 
-
-                        <div class="row" style="align-items: center; margin-left: 0%">
-                            <form action='reset_filter' method='post'>
-                                {% csrf_token %}
-                                <button class="button-red" type='submit'> Сбросить фильтры</button>
-                            </form>
-                            <form action="export_csv" method='GET'>
-                                <button class="button-csv"> Экспортировать csv</button>
-                            </form>
+                        <div class="row" style="margin-left: -2%;">
+                            <div class="col-5">
+                                <form action='reset_filter' method='post'>
+                                    {% csrf_token %}
+                                    <button class="button-red-sbros" type='submit'> Сбросить фильтры</button>
+                                </form>
+                            </div>
+                            <div class="col-5">
+                                <form action="export_csv" method='GET'>
+                                    <button class="button-green-csv"> Экспорт CSV
+                                    </button>
+                                </form>
+                            </div>
                         </div>
 
                     </div>
 
                 </div>
 
-
             </div>
+
+
         </div>
     </div>
 </div>
+
 
 
 <script>
@@ -303,8 +305,6 @@
                         }
                     });
                     var logoMarkerStrizh = new logoMarkerStyleStrizh({
-                        // iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
-                        //     'electronics-signal-technology-wifi-radiowaves-6-3098.png'
                         iconUrl: 'static/icons/antenna2.png'
                     });
 
@@ -350,7 +350,7 @@
                         // map.addLayer(name1)
                     }
                     // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
-                    let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/dron_top.png'});
+                    let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/dron_top.png', color: '#ff0000'});
                     let len_arr = 20;
                     console.log('data ', data)
                     // статичная отрисовка радиуса вокруг стрижа, стрижа и его подписи
@@ -385,13 +385,20 @@
                         let angle = (90 - (area_sector_start_grad + 30)) / 180 * Math.PI;
                         var d_y = r_y * Math.sin(angle);
                         var d_x = r_x * Math.cos(angle);
-                        L.sector({
-                            center: strizh_center,
-                            innerRadius: 0,
-                            outerRadius: radius,
-                            startBearing: area_sector_start_grad,
-                            endBearing: area_sector_end_grad,
-                            color: '#f1b44e'
+                        // L.sector({
+                        //     center: strizh_center,
+                        //     innerRadius: 0,
+                        //     outerRadius: radius,
+                        //     startBearing: area_sector_start_grad,
+                        //     endBearing: area_sector_end_grad,
+                        //     color: '#f1b44e',
+                        //     rhumb: false
+                        // }).addTo(layerDrones);
+                        L.circle(strizh_center, {
+                            radius: radius,
+                            startAngle: area_sector_start_grad,
+                            endAngle: area_sector_end_grad,
+
                         }).addTo(layerDrones);
                     }
 

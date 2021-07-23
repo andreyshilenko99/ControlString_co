@@ -7,15 +7,9 @@
 
 
     <title>Main page</title>
-    <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>-->
-
     <script src="static/src/jquery-3.2.1.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
     <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
-
-    <!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"-->
-    <!--          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
-
     <meta charset=utf-8>
 
     {% leaflet_js plugins="ALL" %}
@@ -97,7 +91,7 @@
 
             </div>
             <div class="col-4">
-                <div class="strizhes-all" style="height: 40vh; border: 0.5vh solid rgb(255,255,255)">
+                <div class="strizhes-all" style="height: 35%; border: 0.5vh solid rgb(255,255,255)">
                     <div class="strizh" style="margin-left: 5%;margin-top: 1%">
                         <div class="row" style="margin-left: 0px">
                             <h3>
@@ -180,9 +174,9 @@
 
                 </div>
                 <div class="information-bottom"
-                     style="height: 55vh; margin-top: 1%; border: 0.5vh solid rgb(255,255,255)">
+                     style="height: 65%; margin-top: 1%; border: 0.5vh solid rgb(255,255,255)">
 
-                    <form action='main' style="margin: 3% 3%" method='GET'>
+                    <form action='main' style="margin: 3.5% 5%" method='GET'>
                         <!--                        {% if url_uniping %}-->
                         <h5> Температура: {{ temperature }}&deg,</h5>
                         <h5> Влажность: {{ humidity }}%,</h5>
@@ -196,16 +190,20 @@
                     </form>
 
 
-                    <div class="row" style="margin: 3%;">
-                        <form action='turn_on_bp' method='GET'>
-                            <button class="button-green-small">Включение комплекса</button>
-                        </form>
-                        <form action='turn_off_bp' method='GET'>
-                            <button class="button-red">Выключение комплекса</button>
-                        </form>
+                    <div class="row" style="margin: 0.5%;">
+                        <div class="col-6">
+                            <form action='turn_on_bp' method='GET'>
+                                <button class="button-green-on">Включение комплекса</button>
+                            </form>
+                        </div>
+                        <div class="col-6">
+                            <form action='turn_off_bp' method='GET'>
+                                <button class="button-red">Выключение комплекса</button>
+                            </form>
+                        </div>
                     </div>
 
-                    <div class="box-scroll" style="height: 55%">
+                    <div class="box-scroll" style="height: 45%">
                         <form action='show_logs' method='GET'>
 
                             {% for el in logs_list %}
@@ -293,17 +291,13 @@
                             }
                         });
                         var logoMarkerStrizh = new logoMarkerStyleStrizh({
-                            iconUrl: 'https://cdn.iconscout.com/icon/free/png-256/antenna-' +
-                                'electronics-signal-technology-wifi-radiowaves-6-3098.png'
+                            iconUrl: 'static/icons/antenna2.png'
                         });
 
                         for (let j = 0; j < len_strizh_data; j++) {
 
                             strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
                                 strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
-
-                            // var popup = L.popup({maxWidth: 200, className: 'stylePopup'})
-                            //     .setContent(strizh_data.features[j].properties.name);
                             console.log('counter_periodic', counter_periodic)
                             console.log('strizh_data: ', strizh_data.features[j].properties)
 
@@ -338,8 +332,7 @@
                             // });
                             // map.addLayer(name1)
                         }
-                        // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
-                        let logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215736.png'});
+                        let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/dron_top.png'});
 
                         if (data.features.length < 20) {
                             var len_arr = data.features.length;
