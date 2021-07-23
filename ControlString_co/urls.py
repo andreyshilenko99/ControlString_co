@@ -39,7 +39,9 @@ urlpatterns = [
     path('filter_nomer_strizha', views.filter_nomer_strizha),
     path('choose_drone_toshow', views.choose_drone_toshow),
     path('reset_filter', views.reset_filter),
+    path('reset_filter_strizh', views.reset_filter_strizh),
     path('export_csv', views.export_csv),
+    path('filter_all', views.filter_all),
 
     path('configuration', views.configuration),
     path('butt_skan_all', views.butt_skan_all),

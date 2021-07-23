@@ -37,7 +37,7 @@
     {% leaflet_css %}
     {% csrf_token %}
 </head>
-<body>
+<body style="background-color:rgba(113,129,132,0.14);">
 <div class="everything">
     <div class="map-info" style="margin: 1%">
         <div class="row">
@@ -110,7 +110,7 @@
                                         </h3>
                                     </div>
                                     <div class="row" style="margin-left: 3% ">
-                                        <div class="col-4">
+                                        <div class="col-6">
                                             {{ form_filter }}
                                         </div>
                                         <div class="col-1">
@@ -136,15 +136,17 @@
                                     </p>
                                     {% endfor %}
                                 </h5>
-                                <div class="span12 text-center" >
-<!--                                <h5>-->
-                                    <form action="journal" method="get" style="align-content: center; justify-content: center">
+                                <div class="span12 text-center">
+                                    <!--                                <h5>-->
+                                    <form action="reset_filter_strizh" method="get"
+                                          style="align-content: center; justify-content: center">
                                         {% csrf_token %}
                                         <button class="button-blue-small">
-                                            выбрать другой
+                                            выбрать другие
                                         </button>
+
                                     </form>
-<!--                                </h5>-->
+                                    <!--                                </h5>-->
                                 </div>
                                 {% endif %}
                             </div>
@@ -211,15 +213,21 @@
                         </script>
 
                         <div class="row" style="margin-left: -2%;">
-                            <div class="col-5">
+                            <div class="col-4">
                                 <form action='reset_filter' method='post'>
                                     {% csrf_token %}
                                     <button class="button-red-sbros" type='submit'> Сбросить фильтры</button>
                                 </form>
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <form action="export_csv" method='GET'>
                                     <button class="button-green-csv"> Экспорт CSV
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-4">
+                                <form action="filter_all" method='GET'>
+                                    <button class="button-green-csv"> Фильтр
                                     </button>
                                 </form>
                             </div>
@@ -235,7 +243,6 @@
         </div>
     </div>
 </div>
-
 
 
 <script>

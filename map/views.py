@@ -6,6 +6,7 @@ import csv
 
 import requests
 from django.core.serializers import serialize
+from django.forms import ModelMultipleChoiceField
 from django.shortcuts import redirect
 from django.shortcuts import render
 
@@ -26,7 +27,8 @@ low_h = 5
 high_h = 85
 auth = ('user', '555')
 message_condition = ''
-c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime, saved_table=False)
+c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime)
+
 
 def index(request):
     return render(request, "index.html")
@@ -73,10 +75,22 @@ def return_conditions(url):
     c["weather_state"] = weather_state
     return temperature, humidity, weather_state
 
+def reset_filter_strizh(request):
+    global c
+    c['filtered_strizhes'] = ''
+
+    return render(request, "journal.html", context=c)
+
+
+def filter_all(request):
+    global c
+    return render(request, "journal.html", context=c)
 
 
 def journal(request):
     global c
+    if not c.get('saved_table'):
+        c['saved_table'] = False
     print(c['saved_table'])
 
     if not c.get('filtered_strizhes'):
@@ -84,7 +98,10 @@ def journal(request):
         strizh_names = ''
     else:
         strizh_names_arr = [st.name for st in c['filtered_strizhes']]
-        strizh_names = ', '.join(strizh_names_arr)
+        strizh_names = ';; '.join(strizh_names_arr)
+
+    print(strizh_names)
+
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
 
@@ -97,12 +114,25 @@ def journal(request):
         if form_filter.is_valid():
             filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
             c['filtered_strizhes'] = filtered_strizhes
+
     else:
+        all_drones = DroneFilterForm().AllDrones
+        filter_values = StrizhJournal.objects.all().order_by('-pk')
+        names_arr = filter_values[0].filtered_strizhes.split(';; ')
         form_drone = DroneFilterForm()
+        if len(names_arr) != 0:
+            form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(queryset=all_drones.filter(strig_name__in=names_arr),
+                                                    required=False, to_field_name="pk",
+                                                    label="")
+        else:
+            form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(queryset=all_drones,
+                                                    required=False, to_field_name="pk",
+                                                    label="")
+        print('names_arr', names_arr)
+
         form_filter = StrizhFilterForm()
     c['form_drone'] = form_drone
     c['form_filter'] = form_filter
-
 
     strizh_value = StrizhJournal(filtered_strizhes=strizh_names,
                                  start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
@@ -111,14 +141,25 @@ def journal(request):
         if not c['saved_table']:
             strizh_value.save()
             c['saved_table'] = True
-        else:
-            strizh_value.save()
-            strizh_value.delete()
-
-    else:
-        strizh_value.save()
-        strizh_value.delete()
     print(strizh_value)
+
+    # time_start = c['start_datetime']
+    # time_end = c['end_datetime']
+    # strizhes = c['filtered_strizhes']
+    # now = datetime.datetime.now()
+    # ts1 = time_start.split('/')
+    # ts2 = ts1[-1].split('-')
+    # ts3 = ts2[-1].split(':')
+    # time_start_datetime = now.replace(year=int(ts2[0]), month=int(ts1[0]), day=int(ts1[1]), hour=int(ts3[0]),
+    #                                   minute=int(ts3[1]), second=0)
+    # ts11 = time_end.split('/')
+    # ts22 = ts11[-1].split('-')
+    # ts33 = ts22[-1].split(':')
+    # time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
+    #                                 minute=int(ts33[1]), second=59)
+    # print(time_end_datetime > time_start_datetime)
+    # # get_datetime_drone(dr.detection_time)
+
     return render(request, "journal.html", context=c)
 
 
@@ -138,9 +179,17 @@ def choose_drone_toshow(request):
     if request.method == 'POST':
         form_drone = DroneFilterForm(request.POST)
         if form_drone.is_valid():
+            pks = [2, 1]
             drone_toshow = form_drone.cleaned_data.get('drone_toshow')
             c['drone_toshow'] = drone_toshow
             DP = drone_toshow[0]
+            print(DP.detection_time)
+            print(c['filtered_strizhes'])
+            print(c['start_datetime'])  # 07/20/2021-12:12
+            print(c['end_datetime'])
+
+            # .filter(ip__in=strizhes_ip)
+            # '2021-07-21 15:37:46'
             drone_value = DroneJournal(system_name=DP.system_name,
                                        center_freq=DP.center_freq,
                                        brandwidth=DP.brandwidth,
@@ -157,6 +206,8 @@ def choose_drone_toshow(request):
                                        strig_name=DP.strig_name)
 
             drone_value.save()
+    else:
+        print('HUUUUUI')
 
     return render(request, "journal.html", context=c)
 
@@ -346,8 +397,10 @@ def butt_ku(request):
     return render(request, "main.html", context=c)
 
 
+
+
 def apply_period(request):
-    global c, start_datetime, end_datetime
+    global c, start_datetime, end_datetime, reset_time
     c['saved_table'] = False
     if request.method == 'POST':
         if request.POST.get('start_datetime'):
@@ -412,6 +465,7 @@ def export_csv(request):
     time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
                                     minute=int(ts33[1]), second=59)
     print(time_end_datetime > time_start_datetime)
+
     strizhes_ip = []
     for strizh in strizhes:
         for ip in [strizh.ip1, strizh.ip2]:
