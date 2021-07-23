@@ -49,7 +49,7 @@ def return_conditions(url):
             c['temperature'] = temperature
         print('temperature:', temperature)
     except:
-        temperature = 'error in connection to uniping'
+        temperature = 'ошибка соединения с uniping'
     try:
         hum = requests.get(url + 'relhum.cgi?h1', auth=auth, timeout=0.05)
         hum_str = hum.content.decode("utf-8")
@@ -61,19 +61,20 @@ def return_conditions(url):
             # c['humidity_temp'] = humidity_temp
         print('humidity:', humidity)
     except:
-        humidity = 'error in connection to uniping'
+        humidity = 'ошибка соединения с uniping'
     c['humidity'] = humidity
     c['temperature'] = temperature
 
-    if 'error' not in temperature and 'error' not in humidity:
+    if 'ошибка' not in temperature and 'error' not in humidity:
         if low_t < float(temperature) < high_t and low_h < float(humidity) < high_h:
             weather_state = "OK"
         else:
             weather_state = "NOT OK !!!"
     else:
-        weather_state = "error in connection to uniping"
+        weather_state = "ошибка соединения с uniping"
     c["weather_state"] = weather_state
     return temperature, humidity, weather_state
+
 
 def reset_filter_strizh(request):
     global c
@@ -83,11 +84,6 @@ def reset_filter_strizh(request):
 
 
 def filter_all(request):
-    global c
-    return render(request, "journal.html", context=c)
-
-
-def journal(request):
     global c
     if not c.get('saved_table'):
         c['saved_table'] = False
@@ -100,7 +96,83 @@ def journal(request):
         strizh_names_arr = [st.name for st in c['filtered_strizhes']]
         strizh_names = ';; '.join(strizh_names_arr)
 
-    print(strizh_names)
+    c['start_datetime'] = start_datetime
+    c['end_datetime'] = end_datetime
+    strizh_value = StrizhJournal(filtered_strizhes=strizh_names,
+                                 start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
+    strizh_value.save()
+
+    if request.method == 'POST':
+        form_drone = DroneFilterForm(request.POST)
+        form_filter = StrizhFilterForm(request.POST)
+        if form_drone.is_valid():
+            drone_toshow = form_drone.cleaned_data.get('drone_toshow')
+            c['drone_toshow'] = drone_toshow
+        if form_filter.is_valid():
+            filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
+            c['filtered_strizhes'] = filtered_strizhes
+
+    else:
+        # all_drones = DroneFilterForm().AllDrones
+        all_drones = Point.objects.order_by('-detection_time')
+
+        filter_values = StrizhJournal.objects.all().order_by('-pk')
+        time_start = filter_values[0].start_datetime
+        time_end = filter_values[0].end_datetime
+        strizhes = filter_values[0].filtered_strizhes.split(';; ')
+
+        now = datetime.datetime.now()
+        if time_start != 'Начало':
+            ts1 = time_start.split('/')
+            ts2 = ts1[-1].split('-')
+            ts3 = ts2[-1].split(':')
+            time_start_datetime = now.replace(year=int(ts2[0]), month=int(ts1[0]), day=int(ts1[1]), hour=int(ts3[0]),
+                                              minute=int(ts3[1]), second=0)
+        else:
+            time_start_datetime = now.replace(year=1970)
+
+        if time_end != 'Конец':
+            ts11 = time_end.split('/')
+            ts22 = ts11[-1].split('-')
+            ts33 = ts22[-1].split(':')
+            time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
+                                            minute=int(ts33[1]), second=59)
+        else:
+            time_end_datetime = now
+
+        drones_pk = []
+        for drone in all_drones:
+            if time_start_datetime < get_datetime_drone(drone.detection_time) < time_end_datetime:
+                drones_pk.append(drone.pk)
+
+        drones_filtered_time = Point.objects.order_by('-detection_time').filter(pk__in=drones_pk)
+        names_str = filter_values[0].filtered_strizhes
+
+
+        form_drone = DroneFilterForm()
+        if len(names_str) != 0:
+            names_arr = names_str.split(';; ')
+            query = drones_filtered_time
+            form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(
+                queryset=query.filter(strig_name__in=names_arr),
+                required=False, to_field_name="pk",
+                label="")
+        else:
+            query = drones_filtered_time
+            form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(queryset=query,
+                                                                         required=False, to_field_name="pk",
+                                                                         label="")
+
+        form_filter = StrizhFilterForm()
+    c['form_drone'] = form_drone
+    c['form_filter'] = form_filter
+
+    return render(request, "journal.html", context=c)
+
+
+def journal(request):
+    global c
+
 
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
@@ -116,49 +188,35 @@ def journal(request):
             c['filtered_strizhes'] = filtered_strizhes
 
     else:
-        all_drones = DroneFilterForm().AllDrones
-        filter_values = StrizhJournal.objects.all().order_by('-pk')
-        names_arr = filter_values[0].filtered_strizhes.split(';; ')
         form_drone = DroneFilterForm()
-        if len(names_arr) != 0:
-            form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(queryset=all_drones.filter(strig_name__in=names_arr),
-                                                    required=False, to_field_name="pk",
-                                                    label="")
-        else:
-            form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(queryset=all_drones,
-                                                    required=False, to_field_name="pk",
-                                                    label="")
-        print('names_arr', names_arr)
-
         form_filter = StrizhFilterForm()
+
+        # all_drones = DroneFilterForm().AllDrones
+        # filter_values = StrizhJournal.objects.all().order_by('-pk')
+        # names_arr = filter_values[0].filtered_strizhes.split(';; ')
+        # if len(names_arr) != 0:
+        #     form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(queryset=all_drones.filter(strig_name__in=names_arr),
+        #                                             required=False, to_field_name="pk",
+        #                                             label="")
+        # else:
+        #     form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(queryset=all_drones,
+        #                                             required=False, to_field_name="pk",
+        #                                             label="")
+        # print('names_arr', names_arr)
+
     c['form_drone'] = form_drone
     c['form_filter'] = form_filter
 
-    strizh_value = StrizhJournal(filtered_strizhes=strizh_names,
-                                 start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
+    # strizh_value = StrizhJournal(filtered_strizhes=strizh_names,
+    #                              start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
 
-    if c['filtered_strizhes'] != '' and c['start_datetime'] != 'Начало' and c['end_datetime'] != 'Конец':
-        if not c['saved_table']:
-            strizh_value.save()
-            c['saved_table'] = True
-    print(strizh_value)
+    # if c['filtered_strizhes'] != '' and c['start_datetime'] != 'Начало' and c['end_datetime'] != 'Конец':
+    #     if not c['saved_table']:
+    #         strizh_value.save()
+    #         c['saved_table'] = True
+    # print(strizh_value)
 
-    # time_start = c['start_datetime']
-    # time_end = c['end_datetime']
-    # strizhes = c['filtered_strizhes']
-    # now = datetime.datetime.now()
-    # ts1 = time_start.split('/')
-    # ts2 = ts1[-1].split('-')
-    # ts3 = ts2[-1].split(':')
-    # time_start_datetime = now.replace(year=int(ts2[0]), month=int(ts1[0]), day=int(ts1[1]), hour=int(ts3[0]),
-    #                                   minute=int(ts3[1]), second=0)
-    # ts11 = time_end.split('/')
-    # ts22 = ts11[-1].split('-')
-    # ts33 = ts22[-1].split(':')
-    # time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
-    #                                 minute=int(ts33[1]), second=59)
-    # print(time_end_datetime > time_start_datetime)
-    # # get_datetime_drone(dr.detection_time)
+    #
 
     return render(request, "journal.html", context=c)
 
@@ -179,35 +237,29 @@ def choose_drone_toshow(request):
     if request.method == 'POST':
         form_drone = DroneFilterForm(request.POST)
         if form_drone.is_valid():
-            pks = [2, 1]
             drone_toshow = form_drone.cleaned_data.get('drone_toshow')
             c['drone_toshow'] = drone_toshow
-            DP = drone_toshow[0]
-            print(DP.detection_time)
-            print(c['filtered_strizhes'])
-            print(c['start_datetime'])  # 07/20/2021-12:12
-            print(c['end_datetime'])
+            if len(drone_toshow) != 0:
+                DP = drone_toshow[0]
 
-            # .filter(ip__in=strizhes_ip)
-            # '2021-07-21 15:37:46'
-            drone_value = DroneJournal(system_name=DP.system_name,
-                                       center_freq=DP.center_freq,
-                                       brandwidth=DP.brandwidth,
-                                       detection_time=DP.detection_time,
-                                       comment_string=DP.comment_string,
-                                       lat=DP.lat,
-                                       lon=DP.lon,
-                                       azimuth=DP.azimuth,
-                                       area_sector_start_grad=DP.area_sector_start_grad,
-                                       area_sector_end_grad=DP.area_sector_end_grad,
-                                       area_radius_m=DP.area_radius_m,
-                                       ip=DP.ip,
-                                       current_time=DP.current_time,
-                                       strig_name=DP.strig_name)
+                # .filter(ip__in=strizhes_ip)
+                # '2021-07-21 15:37:46'
+                drone_value = DroneJournal(system_name=DP.system_name,
+                                           center_freq=DP.center_freq,
+                                           brandwidth=DP.brandwidth,
+                                           detection_time=DP.detection_time,
+                                           comment_string=DP.comment_string,
+                                           lat=DP.lat,
+                                           lon=DP.lon,
+                                           azimuth=DP.azimuth,
+                                           area_sector_start_grad=DP.area_sector_start_grad,
+                                           area_sector_end_grad=DP.area_sector_end_grad,
+                                           area_radius_m=DP.area_radius_m,
+                                           ip=DP.ip,
+                                           current_time=DP.current_time,
+                                           strig_name=DP.strig_name)
 
-            drone_value.save()
-    else:
-        print('HUUUUUI')
+                drone_value.save()
 
     return render(request, "journal.html", context=c)
 
@@ -397,8 +449,6 @@ def butt_ku(request):
     return render(request, "main.html", context=c)
 
 
-
-
 def apply_period(request):
     global c, start_datetime, end_datetime, reset_time
     c['saved_table'] = False
@@ -428,9 +478,16 @@ def reset_filter(request):
 
     if request.method == 'POST':
         form_filter = StrizhFilterForm(request.POST)
+        form_drone = DroneFilterForm(request.POST)
+
+        for strizh in StrizhJournal.objects.all():
+            strizh.delete()
+
     else:
         form_filter = StrizhFilterForm()
+        form_filter = DroneFilterForm()
     c['form_filter'] = form_filter
+    c['form_drone'] = form_drone
 
     c['end_datetime'] = 'Конец'
     return render(request, "journal.html", context=c)
@@ -472,7 +529,7 @@ def export_csv(request):
             strizhes_ip.append(ip)
     # drones_filtered_strizh = Point.objects.order_by('detection_time').filter(
     #     reduce(operator.and_, (Q(ip=x) for x in strizhes_ip)))
-    drones_filtered_strizh = Point.objects.order_by('detection_time').filter(ip__in=strizhes_ip)
+    drones_filtered_strizh = Point.objects.order_by('-detection_time').filter(ip__in=strizhes_ip)
     d = datetime.datetime.now()
     csv_name = "log_{}_{}_{}_{}_{}_{}.csv".format(d.hour, d.minute, d.second, d.day, d.month, d.year)
     print(csv_name)
@@ -570,7 +627,7 @@ def send_line_command(line_name, arg):
     if 'ok' in result_get:
         collect_logs("{}".format(log_str))
     else:
-        collect_logs("send_line_command error")
+        collect_logs("проверьте, выбран ли стриж")
 
 
 def send_impulse(line_name, time_pulse=3, action=''):
@@ -691,6 +748,10 @@ def turn_on_bp(request):
         state5 = obtain_state('ЭВМ2')
         if state4 != 'вкл':
             send_impulse('ЭВМ1', time_pulse=3, action='вкл')
+            state44 = obtain_state('ЭВМ1')
+            if state44 != 'вкл':
+                send_impulse('ЭВМ1', time_pulse=3, action='вкл')
+            time.sleep(4)
         if state5 != 'вкл':
             send_impulse('ЭВМ2', time_pulse=3, action='вкл')
         complex_state = 'вкл'

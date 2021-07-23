@@ -91,7 +91,8 @@
 
             </div>
             <div class="col-4">
-                <div class="strizhes-all" style="height: 35%; border: 0.5vh solid rgb(255,255,255)">
+                <div class="strizhes-all" style="height: 35%; ">
+                <!--border: 0.5vh solid rgb(255,255,255)">-->
                     <div class="strizh" style="margin-left: 5%;margin-top: 1%">
                         <div class="row" style="margin-left: 0px">
                             <h3>
@@ -158,15 +159,7 @@
                                     <button class="button-green">КУ глуш.</button>
                                 </form>
                             </div>
-                            {% if action_strizh %}
-                            <div class="row">
-                                <h3 style="color: #050000; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%">
-                                    Включен режим: &nbsp;</h3>
-                                <h3 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif">
-                                    {{action_strizh}} </h3>
 
-                            </div>
-                            {% endif %}
                         </div>
 
 
@@ -174,9 +167,20 @@
 
                 </div>
                 <div class="information-bottom"
-                     style="height: 65%; margin-top: 1%; border: 0.5vh solid rgb(255,255,255)">
+                     style="height: 65%; margin-top: 2%;">
+<!--                    border: 0.5vh solid rgb(255,255,255)">-->
 
-                    <form action='main' style="margin: 3.5% 5%" method='GET'>
+                    {% if action_strizh %}
+                    <div class="row" style="margin-left: 3%">
+                        <h3 style="color: #050000; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%">
+                            Включен режим: &nbsp;</h3>
+                        <h3 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif">
+                            {{action_strizh}} </h3>
+
+                    </div>
+                    {% endif %}
+
+                    <form action='main' style="margin: 2.5% 40px" method='GET'>
                         <!--                        {% if url_uniping %}-->
                         <h5> Температура: {{ temperature }}&deg,</h5>
                         <h5> Влажность: {{ humidity }}%,</h5>
@@ -193,12 +197,20 @@
                     <div class="row" style="margin: 0.5%;">
                         <div class="col-6">
                             <form action='turn_on_bp' method='GET'>
+                                {% if chosen_strizh != 0 %}
+                                <button class="button-green-on">Включение {{chosen_strizh}}</button>
+                                {% else %}
                                 <button class="button-green-on">Включение комплекса</button>
+                                {% endif %}
                             </form>
                         </div>
                         <div class="col-6">
                             <form action='turn_off_bp' method='GET'>
+                                {% if chosen_strizh != 0 %}
+                                <button class="button-red">Выключение {{chosen_strizh}}</button>
+                                {% else %}
                                 <button class="button-red">Выключение комплекса</button>
+                                {% endif %}
                             </form>
                         </div>
                     </div>

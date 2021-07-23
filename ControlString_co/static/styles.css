@@ -19,7 +19,20 @@
     background-color: #04AA6D;
     border: none;
     color: white;
-    padding: 10.5% 20%;
+    padding: 20px 35px;
+    /*text-align: center;*/
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    /*margin: 4px 2px;*/
+    border-radius: 10px;
+}
+
+.button-blue-filter {
+    background-color: #059ccd;
+    border: none;
+    color: white;
+    padding: 20px 35px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -28,12 +41,11 @@
     border-radius: 10px;
 }
 
-
 .button-red-sbros {
     background-color: #ff3c3c;
     border: none;
     color: white;
-    padding: 5% 20%;
+    padding: 20px 35px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
