@@ -88,7 +88,6 @@
                                     {% endif %}
 
 
-
                                 </div>
                             </div>
                             <div class="col-1 ">
@@ -281,19 +280,10 @@
             return color;
         }
 
-        var dron_colors = {};
         var layerDrones = L.layerGroup().addTo(map);
         var layerStrizhes = L.layerGroup().addTo(map);
-
-        var data_drawn = new Set();
-        var ids_drawn = new Set();
-        var initial_draw = 0;
         var counter_periodic = -1;
-        var counter_drone_period = 0
-
         counter_periodic = counter_periodic + 1;
-
-        console.log('REFRESHED')
 
         $.getJSON('/geo/drone_journal/', function (data) {
                 let arc1;
@@ -327,9 +317,6 @@
                         strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
                             strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
 
-                        // var popup = L.popup({maxWidth: 200, className: 'stylePopup'})
-                        //     .setContent(strizh_data.features[j].properties.name);
-                        console.log('counter_periodic', counter_periodic)
                         console.log('strizh_data: ', strizh_data.features[j].properties)
 
                         if (counter_periodic <= 10) {
@@ -353,19 +340,8 @@
                             map.addLayer(layerStrizhes)
                         }
 
-                        // подпись красным
-                        // name1 = L.marker([strizh_data.features[j].properties.lat,
-                        //     strizh_data.features[j].properties.lon], {
-                        //     icon: L.divIcon({
-                        //         className: 'text-labels',   // Set class for CSS styling
-                        //         html: strizh_data.features[j].properties.name
-                        //     })
-                        // });
-                        // map.addLayer(name1)
                     }
-                    // var logoMarker = new logoMarkerStyle({iconUrl: 'https://image.flaticon.com/icons/png/512/215/215767.png'});
                     let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/dron_top.png', color: '#ff0000'});
-                    let len_arr = 20;
                     console.log('data ', data)
                     // статичная отрисовка радиуса вокруг стрижа, стрижа и его подписи
                     let radius = parseFloat(data.features[0].properties.area_radius_m);
@@ -378,7 +354,6 @@
 
                     let strizh_center = [strizh_map_name[data.features[0].properties.strig_name][0],
                         strizh_map_name[data.features[0].properties.strig_name][1]];
-
 
                     // Отрисовка сектора с обновлением + layerDrones
                     let r_y = 0.004499 * 4 / 5
@@ -399,15 +374,7 @@
                         let angle = (90 - (area_sector_start_grad + 30)) / 180 * Math.PI;
                         var d_y = r_y * Math.sin(angle);
                         var d_x = r_x * Math.cos(angle);
-                        // L.sector({
-                        //     center: strizh_center,
-                        //     innerRadius: 0,
-                        //     outerRadius: radius,
-                        //     startBearing: area_sector_start_grad,
-                        //     endBearing: area_sector_end_grad,
-                        //     color: '#f1b44e',
-                        //     rhumb: false
-                        // }).addTo(layerDrones);
+
                         L.circle(strizh_center, {
                             radius: radius,
                             startAngle: area_sector_start_grad,
@@ -426,7 +393,6 @@
                     var tooltip_drone = L.tooltip({
                         maxWidth: 2000,
                         direction: 'top',
-                        // noWrap: true,
                         offset: L.point({x: 0, y: -20}),
                         permanent: true,
                         opacity: 0.85,
@@ -438,33 +404,12 @@
                     L.marker([strizh_center[0] + d_y,
                         strizh_center[1] + d_x], {icon: logoMarker}).addTo(layerDrones)
                         .bindTooltip(tooltip_drone).openTooltip();
-
-                    // L.marker([strizh_center[0] + d_y,
-                    //     strizh_center[1] + d_x], {
-                    //     icon: L.divIcon({
-                    //         className: 'text-labels',   // Set class for CSS styling
-                    //         html: name_dron
-                    //     })
-                    // }).addTo(layerGroup);
-
-                    // let unique_drones = arr_drones.filter(onlyUnique);
                 });
             }
         )
-        console.log('counter_drone_period', counter_drone_period)
-        if (counter_drone_period === 3) {
-            counter_drone_period = 0;
-            layerDrones.clearLayers();
 
-        } else if (counter_drone_period === 0) {
-            // console.log('podpis', podpis)
-            counter_drone_period += 1;
-            map.addLayer(layerDrones)
-        } else {
-            counter_drone_period += 1;
-            map.addLayer(layerDrones)
-            // layerDrones.clearLayers();
-        }
+        map.addLayer(layerDrones)
+        // layerDrones.clearLayers();
 
 
     }
