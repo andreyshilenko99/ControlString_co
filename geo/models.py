@@ -19,9 +19,10 @@ class Point(models.Model):
 
     def __str__(self):
         prop_spos = 'Пропускная способность: {} МГц'.format(round(self.brandwidth, 2))
-        arr_to_return = [self.detection_time, self.system_name, self.area_sector_start_grad, self.area_sector_end_grad,
-                         self.azimuth, 'host:', self.ip, self.strig_name, prop_spos, self.comment_string,
-                         self.area_radius_m]
+        arr_to_return = [self.detection_time, self.system_name, str(int(self.area_sector_start_grad)) + '°-' +
+                         str(int(self.area_sector_end_grad)) + '° ', self.azimuth, 'host:', self.ip,
+                         self.strig_name, prop_spos, self.comment_string,
+                         str(int(self.area_radius_m)) + 'м.']
         arr_strings = [str(el) for el in arr_to_return]
 
         str_to_return = ', '.join(arr_strings)
@@ -50,9 +51,10 @@ class DroneJournal(models.Model):
 
     def __str__(self):
         prop_spos = 'Пропускная способность: {} МГц'.format(round(self.brandwidth, 2))
-        arr_to_return = [self.detection_time, self.system_name, self.area_sector_start_grad, self.area_sector_end_grad,
-                         self.azimuth, 'host:', self.ip, self.strig_name, prop_spos, self.comment_string,
-                         self.area_radius_m]
+        arr_to_return = [self.detection_time, self.system_name, int(self.area_sector_start_grad), '° -',
+                         int(self.area_sector_end_grad),'° ', self.azimuth, 'host:', self.ip,
+                         self.strig_name, prop_spos, self.comment_string,
+                         self.area_radius_m, 'м.']
         arr_strings = [str(el) for el in arr_to_return]
 
         str_to_return = ', '.join(arr_strings)
@@ -81,7 +83,6 @@ class Strizh(models.Model):
 
 
 class StrizhJournal(models.Model):
-
     filtered_strizhes = models.CharField('Нужные стрижи', max_length=500, default='стриж 0 (по умолчанию)')
     start_datetime = models.CharField('Время начала', max_length=50, blank=True, null=True)
     end_datetime = models.CharField('Время конца', max_length=50, blank=True, null=True)

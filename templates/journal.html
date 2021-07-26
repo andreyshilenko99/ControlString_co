@@ -68,21 +68,31 @@
 
                 </div>
                 <div class="information-bottom-left" style="height: 30vh; margin-top: 4%; border: 0.5vh">
+                    <form action="filter_all" method='GET'>
+                        <h3 style="margin-top: 4%"> Выбрать засечку для отображения
 
-                    <h3 style="margin-top: 4%"> Выбрать засечку для отображения </h3>
+                            <button class="button-blue-small">
+                                Обновить
+                            </button>
+                        </h3>
+                    </form>
 
 
                     <form action="choose_drone_toshow" method="post">
                         <div class="row">
                             <div class="col-11 ">
 
-                                <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255); margin: 2% 0;
+                                <div id="detections" class="box-scroll" style="background-color: rgb(226,226,226); margin: 2% 0;
                     width: 100%; height: 95%">
 
                                     {% csrf_token %}
                                     {% if form_drone.fields.drone_toshow.queryset.count != 0 %}
 
-                                    {{ form_drone }}
+                                    {% for field in form_drone %}
+                                    {{field}}
+
+                                    {% endfor %}
+
                                     {% else %}
                                     По выбранным критериям ничего не найдено
                                     {% endif %}
@@ -92,8 +102,9 @@
                             </div>
                             <div class="col-1 ">
                                 <button class="button-green-small">
-                                    выбор
+                                    Выбор
                                 </button>
+
 
                             </div>
                         </div>
@@ -103,7 +114,9 @@
 
             </div>
             <div class="col-4">
-                <div class="filters-all" style="height: 80%; border: 0.5vh solid #ffffff">
+                <div class="filters-all" style="height: 80%;">
+
+                    <!--                </div> border: 0.5vh solid #dedddd">-->
                     <div class="export-csv" style="margin-left: 5%;margin-top: 1%">
                         <div class="functions-cont" style="margin-top: 3%; ">
                             <div class="row" style="margin-top: 2%; width: 50vh">
@@ -152,7 +165,6 @@
                                         </button>
 
                                     </form>
-                                    <!--                                </h5>-->
                                 </div>
                                 {% endif %}
                             </div>
@@ -207,7 +219,6 @@
                             </div>
                             </h4>
 
-                            <!--                            <input type="submit" value="применить">-->
                         </form>
 
                         <script>
@@ -352,8 +363,10 @@
                     console.log('strizh_map_name[data.features[0].properties.strig_name]',
                         strizh_map_name[data.features[0].properties.strig_name])
 
-                    let strizh_center = [strizh_map_name[data.features[0].properties.strig_name][0],
-                        strizh_map_name[data.features[0].properties.strig_name][1]];
+                    console.log('strizh_map_name[data.features[0].properties.strig_name]',
+                        strizh_map_name[data.features[0].properties.strig_name])
+
+                    let strizh_center = [strizh_map_name[data.features[0].properties.strig_name][0], strizh_map_name[data.features[0].properties.strig_name][1]];
 
                     // Отрисовка сектора с обновлением + layerDrones
                     let r_y = 0.004499 * 4 / 5

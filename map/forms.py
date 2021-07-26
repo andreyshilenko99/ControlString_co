@@ -26,9 +26,9 @@ class StrizhFilterForm(ModelForm):
     class Meta:
         model = Strizh
         fields = ['filtered_strizhes']
-
         widgets = {
-            'filtered_strizhes': Select(attrs={'id': 'name', 'width': '300px'}),
+            'filtered_strizhes': Select(attrs={'id': 'name', 'width': '300px',
+                                               'class': 'myfieldclass'}),
 
         }
 
@@ -42,5 +42,9 @@ class DroneFilterForm(ModelForm):
 
     class Meta:
         model = Point
-        # model = MyStrizh
         fields = ['drone_toshow']
+        widgets = {
+            'filtered_strizhes': Select(attrs={'id': 'name', 'size': '10',
+                                               }),
+
+        }

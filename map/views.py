@@ -557,11 +557,12 @@ lines_control_map = {
 
 def collect_logs(log_string):
     global logs, logs_list
-    time_obj = time.gmtime()
-    y, m, d, h, min, sec, _, _, _ = time_obj
+    time_obj = datetime.datetime.now().strftime("%Y-%d-%m  %H:%M:%S")
+    # time_obj = time.gmtime()
+    # y, m, d, h, min, sec, _, _, _ = time_obj
 
-    date_time = "{}.{}.{}   {}:{}:{}  ".format(d, m, y, h + 3, min, sec)
-    log_one = date_time + log_string + '\n\t'
+    # date_time = "{}.{}.{}   {}:{}:{}  ".format(d, m, y, h + 3, min, sec)
+    log_one = time_obj + '   ' + log_string + '\n\t'
     logs += log_one
     logs_list.append(log_one)
     c['logs_list'] = logs_list

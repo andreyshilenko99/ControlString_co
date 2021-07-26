@@ -215,7 +215,7 @@
     bottom: 0;
     left: 100%;
     margin-left: 40%;
-    margin-top: 30%;
+    margin-top: 25%;
     opacity: 0;
     transition: opacity 0.2s;
     font-size: 20px;
@@ -306,6 +306,10 @@
     background-color: #3e22bf;
     border-radius: 40px;
 
+}
+
+.myfieldclass{
+    background-color: #3e22bf;
 }
 
 
