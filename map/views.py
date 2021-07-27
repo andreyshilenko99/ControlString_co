@@ -11,6 +11,8 @@ from django.forms import ModelMultipleChoiceField
 from django.shortcuts import redirect
 from django.shortcuts import render
 
+
+
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm
 
@@ -28,7 +30,7 @@ low_h = 5
 high_h = 85
 auth = ('user', '555')
 message_condition = ''
-c = dict(chosen_strizh=0, start_datetime=start_datetime, end_datetime=end_datetime)
+c = dict(chosen_strizh=[], start_datetime=start_datetime, end_datetime=end_datetime)
 
 
 def index(request):
@@ -365,27 +367,34 @@ def choose_nomer_strizha(request):
     global c
 
     strizhes = Strizh.objects.order_by('-lon').all()
+    c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
+    temperature_dict = {}
+    humidity_dict = {}
+    weather_state_dict = {}
+
     if request.method == 'POST':
         form = StrizhForm(request.POST)
         if form.is_valid():
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
-            c['chosen_strizh'] = chosen_strizh
+            # sadad = c
+            c['chosen_strizh'][0] = chosen_strizh.name
 
             for strizh in strizhes:
-                if c['chosen_strizh'] == strizh:
+                if c['chosen_strizh'][0] == strizh:
                     c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
 
-        nomer = request.POST['chosen_strizh']
-        c['chosen_strizh'] = nomer
+                    temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+                        return_conditions(c['url_uniping'])
+                    c['temperature_dict'] = temperature_dict
+                    c['humidity_dict'] = humidity_dict
+                    c['weather_state_dict'] = weather_state_dict
 
-    if c.get("chosen_strizh"):
-        # c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
-        temperature, humidity, weather_state = return_conditions(c['url_uniping'])
-        c['temperature'] = temperature
-        c['humidity'] = humidity
-        c['weather_state'] = weather_state
-    # return redirect(request.META['HTTP_REFERER'])
-    # return HttpResponseRedirect('/main')
+        # nomer = request.POST['chosen_strizh']
+        # c['chosen_strizh'] = nomer
+        xx = c
+
+
+
     return render(request, "main.html", context=c)
 
 
@@ -395,11 +404,18 @@ def choose_all_strizhes(request):
     strizhes = Strizh.objects.order_by('-lon').all()
     if request.method == 'POST':
 
-        c['chosen_strizh'] = 'все стрижи'
+        c['chosen_strizh'] = [strizh.name for strizh in strizhes]
 
+        temperature_dict = {}
+        humidity_dict = {}
+        weather_state_dict = {}
         for strizh in strizhes:
-            if c['chosen_strizh'] == strizh:
-                c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
+            c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
+            temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+                return_conditions(c['url_uniping'])
+        c['temperature_dict'] = temperature_dict
+        c['humidity_dict'] = humidity_dict
+        c['weather_state_dict'] = weather_state_dict
 
         # nomer = request.POST['chosen_strizh']
         # c['chosen_strizh'] = nomer
@@ -417,25 +433,35 @@ def choose_all_strizhes(request):
 def render_main_page(request):
     global c
     complex_state = ''
-    if not c.get('chosen_strizh'):
-        c['chosen_strizh'] = 0
+
     if not c.get('url_uniping'):
         c['url_uniping'] = ''
 
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
 
-    temperature, humidity, weather_state = return_conditions(c['url_uniping'])
-    c['temperature'] = temperature
-    c['humidity'] = humidity
-    c['weather_state'] = weather_state
-
+    temperature_dict = {}
+    humidity_dict = {}
+    weather_state_dict = {}
     strizhes = Strizh.objects.order_by('-lon').all()
+    for strizh in strizhes:
+        c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
+        temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+            return_conditions(c['url_uniping'])
+    c['temperature_dict'] = temperature_dict
+    c['humidity_dict'] = humidity_dict
+    c['weather_state_dict'] = weather_state_dict
+
+
+    if not c.get('chosen_strizh'):
+        # c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
+        c['chosen_strizh'] = [_.name for _ in strizhes]
+
     if request.method == 'POST':
         form = StrizhForm(request.POST)
         if form.is_valid():
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
-            c['chosen_strizh'] = chosen_strizh
+            c['chosen_strizh'][0] = chosen_strizh
 
 
     else:
@@ -447,6 +473,7 @@ def render_main_page(request):
     drones = Point.objects.order_by('-detection_time').all()
 
     c['info_drones'] = drones
+    c['all_strizhes'] = [_.name for _ in strizhes]
 
     return render(request, "main.html", context=c)
 
@@ -457,7 +484,7 @@ def butt_skan(request):
 
     if c.get("chosen_strizh") != 0:
 
-        c["action_strizh"] = "Сканирование: {}".format(c.get('chosen_strizh'))
+        c["action_strizh"] = "Сканирование: {}".format(', '.join([st for st in c['chosen_strizh'] if st != 'None']))
 
         for strizh in strizh_names:
             if strizh.name == c.get("chosen_strizh"):
@@ -474,7 +501,7 @@ def butt_glush(request):
     if c.get("chosen_strizh") != 0:
         print('glushenie dlya strizha #', c.get('chosen_strizh'))
         # TODO action 2 button
-    c["action_strizh"] = "Глушение: {}".format(c.get('chosen_strizh'))
+    c["action_strizh"] = "Глушение: {}".format(', '.join([st for st in c['chosen_strizh'] if st != 'None']))
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 
@@ -484,7 +511,7 @@ def butt_gps(request):
     if c.get("chosen_strizh") != 0:
         print('gps dlya strizha #', c.get('chosen_strizh'))
         # TODO action 3 button
-    c["action_strizh"] = "GPS: {}".format(c.get('chosen_strizh'))
+    c["action_strizh"] = "GPS: {}".format(', '.join([st for st in c['chosen_strizh'] if st != 'None']))
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 
@@ -494,7 +521,7 @@ def butt_ku(request):
     if c.get("chosen_strizh") != 0:
         print('KU dlya strizha #', c.get('chosen_strizh'))
         # TODO action 4 button
-    c["action_strizh"] = "КУ: {}".format(c.get('chosen_strizh'))
+    c["action_strizh"] = "КУ: {}".format(', '.join([st for st in c['chosen_strizh'] if st != 'None']))
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 

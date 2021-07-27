@@ -96,61 +96,81 @@
                 <div class="strizhes-all" style="height: 300px; ">
                     <!--border: 0.5vh solid rgb(255,255,255)">-->
                     <div class="strizh" style="margin-left: 5%;margin-top: 1%">
-                        <div class="row" style="margin-left: 0px">
-                            <h3>
-                                Все Стрижи
-                            </h3>
-                        </div>
-                        <div class="strizh-for-all">
-                            <div class="row">
-                                <form action='butt_skan_all' method='POST'>
-                                    {% csrf_token %}
-                                    <button class="button-green" type='submit'> Сканирование</button>
-                                </form>
-                                <form action='butt_glush_all' method='GET'>
-                                    <button class="button-green">Глуш.</button>
-                                </form>
-                                <form action='butt_gps_all' method='GET'>
-                                    <button class="button-green"> GPS глуш.</button>
-                                </form>
-                                <form action='butt_ku_all' method='GET'>
-                                    <button class="button-green">КУ глуш.</button>
-                                </form>
-                            </div>
-                        </div>
+                        <!--                        <div class="row" style="margin-left: 0px">-->
+                        <!--                            <h3>-->
+                        <!--                                Все Стрижи-->
+                        <!--                            </h3>-->
+                        <!--                        </div>-->
+                        <!--                        <div class="strizh-for-all">-->
+                        <!--                            <div class="row">-->
+                        <!--                                <form action='butt_skan_all' method='POST'>-->
+                        <!--                                    {% csrf_token %}-->
+                        <!--                                    <button class="button-green" type='submit'> Сканирование</button>-->
+                        <!--                                </form>-->
+                        <!--                                <form action='butt_glush_all' method='GET'>-->
+                        <!--                                    <button class="button-green">Глуш.</button>-->
+                        <!--                                </form>-->
+                        <!--                                <form action='butt_gps_all' method='GET'>-->
+                        <!--                                    <button class="button-green"> GPS глуш.</button>-->
+                        <!--                                </form>-->
+                        <!--                                <form action='butt_ku_all' method='GET'>-->
+                        <!--                                    <button class="button-green">КУ глуш.</button>-->
+                        <!--                                </form>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
 
                         <div class="row" style="margin-top: 2%;margin-left: 0.5%; width: 100%">
-                            <form action="choose_nomer_strizha" method="post">
+                            <form action="choose_all_strizhes" method="post">
                                 {% csrf_token %}
-                                <div style="width: 100%">
-                                    <h3>
-                                        Управление одним стрижом
-                                    </h3>
-                                </div>
-                                <h5>
+                                <button class="button-blue-small">
+                                    Управление всеми стрижами
+                                </button>
+                            </form>
+                        </div>
+                        <div class="row" style="margin-top: 2%;margin-left: 0.5%; width: 100%">
+
+                            <div style="width: 100%">
+                                <h3>
+                                    Управление одним стрижом
+                                </h3>
+                            </div>
+                            <h5>
+                                <form action="choose_nomer_strizha" method="post">
+                                    {% csrf_token %}
                                     {{ form }}
                                     <button class="button-blue-small">
                                         ввод
                                     </button>
+                                </form>
 
+                            </h5>
 
-                                </h5>
-                            </form>
 
                         </div>
 
 
                         <div class="row">
-                            {% if chosen_strizh != 0 %}
+
                             <h5 style="text-align: center; margin-left: 2%">
-                                Выбран: {{chosen_strizh}}
+
+                                {% if chosen_strizh != all_strizhes %}
+                                Выбран
+                                {% for striz in chosen_strizh %}
+                                {% if striz != 'None' %}
+                                {{ striz }}
+                                {% endif %}
+                                {% endfor%}
+                                {% else %}
+                                Выбраны все
+                                {% endif %}
                             </h5>
-                            {% endif %}
+
                         </div>
 
 
-                        <div class="strizh-each">
-                            <div class="row">
+                        <div class="strizh-each" style="margin-left: 0.5%">
+                            <div class="row" >
+
                                 <form action='butt_skan' method='GET'>
                                     <button class="button-green" type='submit'> Сканирование</button>
                                 </form>
@@ -172,40 +192,74 @@
 
                 </div>
                 <div class="information-bottom"
-                     style="height: 65%; margin-top: 2%;">
+                     style="height: 65%; margin-top: 5px;">
                     <!--                    border: 0.5vh solid rgb(255,255,255)">-->
 
                     {% if action_strizh %}
-                    <div class="row" style="margin-left: 3%; margin-top: 25px">
+                    <div class="row" style="margin-left: 3%; margin-top: 10px">
+
                         <h3 style="color: #050000; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
                             Включен режим: &nbsp;</h3>
                         <h3 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif">
-                            {{action_strizh}} </h3>
+
+                            {{action_strizh}}
+
+                        </h3>
+
 
                     </div>
                     {% endif %}
 
+                    {% if chosen_strizh != all_strizhes %}
                     <form action='main' style="margin: 2.5% 25px" method='GET'>
-                        <!--                        {% if url_uniping %}-->
-                        <h5> Температура: {{ temperature }}&deg,</h5>
-                        <h5> Влажность: {{ humidity }}%,</h5>
-                        <!--                        <h5>Температура датчика влажности: {{humidity_temp}}&deg</h5>-->
-                        <h5> Состояние: {{ weather_state }}</h5>
-                        <h5> Комплекс {{ complex_state }} </h5>
-
-                        <h5>
-                        </h5>
-                        <!--                        {% endif %}-->
+                        {% for striz in chosen_strizh %}
+                        {% if striz != 'None' %}
+                        <h5> Температура: {{ temperature_dict|getkey:striz }} &deg </h5>
+                        <h5> Влажность: {{ humidity_dict|getkey:striz }}% </h5>
+                        <h5> Состояние: {{ weather_state_dict|getkey:striz }} </h5>
+                        {% endif %}
+                        {% endfor %}
                     </form>
+                    {% elif chosen_strizh == all_strizhes %}
+                    <div class="row" style="margin-left: 0.5%;">
+                        <div class="col-12">
+                    <div class="box-scroll" style="height: 200px; background-color: rgb(255,255,255)">
+
+                        <form action='main' style="margin: 2.5% 25px" method='GET'>
+                            {% for striz in chosen_strizh %}
+                            {% if striz != 'None' %}
+                            {% if weather_state_dict|getkey:striz == 'ошибка соединения с uniping' %}
+                            <h5 style="color: #aa0505"> Состояние {{striz}}: {{ weather_state_dict|getkey:striz }} </h5>
+                            {% else %}
+                            <h5 style="color: #165c27"> Состояние {{striz}}: {{ weather_state_dict|getkey:striz }} </h5>
+                            {% endif %}
+
+                            {% endif %}
+                            {% endfor %}
+
+                        </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {% endif %}
 
 
                     <div class="row" style="margin: 0.5%;">
                         <div class="col-6">
                             <form action='turn_on_bp' method='GET'>
-                                {% if chosen_strizh != 0 %}
+                                {% if chosen_strizh != all_strizhes %}
                                 <button class="button-green-on">
-<!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
-                                    Включение {{chosen_strizh}}</button>
+                                    {% for striz in chosen_strizh %}
+                                    {% if striz != 'None' %}
+                                    <!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
+                                    Включение {{striz}}
+
+                                    {% endif %}
+                                    {% endfor %}
+
+                                </button>
                                 {% else %}
                                 <button class="button-green-on">Включение комплекса</button>
                                 {% endif %}
@@ -213,8 +267,17 @@
                         </div>
                         <div class="col-6">
                             <form action='turn_off_bp' method='GET'>
-                                {% if chosen_strizh != 0 %}
-                                <button class="button-red">Выключение {{chosen_strizh}}</button>
+                                {% if chosen_strizh != all_strizhes %}
+                                <button class="button-red">
+                                    {% for striz in chosen_strizh %}
+                                    {% if striz != 'None' %}
+                                    <!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
+                                    Выключение {{striz}}
+
+                                    {% endif %}
+                                    {% endfor %}
+
+                                </button>
                                 {% else %}
                                 <button class="button-red">Выключение комплекса</button>
                                 {% endif %}
