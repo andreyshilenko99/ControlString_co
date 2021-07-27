@@ -53,6 +53,9 @@
                         <form action="journal" method='GET'>
                             <button class="button-blue"> Журнал</button>
                         </form>
+                        <form action="configuration" method='GET'>
+                            <button class="button-blue"> Конфигуратор</button>
+                        </form>
                         <form action="admin" method='GET'>
                             <button class="button-blue"> Администратор</button>
                         </form>
@@ -145,16 +148,19 @@
                             </div>
                             <div class="row" style="margin-left: 2%">
                                 {% if filtered_strizhes %}
-                                <h3 style="text-align: center">
+                                <h3>
                                     Выбрано:
                                 </h3>
-                                <h5 style="text-align: center">
+
+                                <h3 style="text-align: center; color: #1d3e81">
                                     {% for f_str in filtered_strizhes %}
-                                    <p style="text-align: center">
-                                        {{f_str}}
-                                    </p>
+                                    {% if filtered_strizhes.count == 1 %}
+                                    {{f_str}}
+                                    {% elif filtered_strizhes.count > 1 %}
+                                    {{f_str}}, <br>
+                                    {% endif %}
                                     {% endfor %}
-                                </h5>
+                                </h3>
                                 <div class="span12 text-center">
                                     <!--                                <h5>-->
                                     <form action="reset_filter_strizh" method="get"
@@ -377,9 +383,10 @@
                         var d_y = 0.004499 * Math.sin(angle);
                         var d_x = 0.008892 * Math.cos(angle);
                         arc1 = L.circle(strizh_center, {
-                            color: '#02f8f1',
-                            fillColor: "#f1b44e",
-                            fillOpacity: 0.1,
+                            color: '#0296f8',
+                            // fillColor: "#f1b44e",
+                            fillColor: "#3aacfd",
+                            fillOpacity: 0.15,
                             radius: radius
                         }).addTo(layerDrones);
 

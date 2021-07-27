@@ -36,12 +36,14 @@
                         <form action="journal" method='GET'>
                             <button class="button-blue"> Журнал</button>
                         </form>
+                        <form action="configuration" method='GET'>
+                            <button class="button-blue"> Конфигуратор</button>
+                        </form>
                         <form action="admin" method='GET'>
                             <button class="button-blue"> Администратор</button>
                         </form>
-                        <!--                        <form action="journal">-->
-                        <!--                        <input type="submit" value="Журнал" />-->
-                        <!--                        </form>-->
+
+
                     </div>
                     <div class="leaflet-container" style="border: 0.5vh ">
 
@@ -130,8 +132,11 @@
                                     <button class="button-blue-small">
                                         ввод
                                     </button>
+
+
                                 </h5>
                             </form>
+
                         </div>
 
 
@@ -171,8 +176,8 @@
                     <!--                    border: 0.5vh solid rgb(255,255,255)">-->
 
                     {% if action_strizh %}
-                    <div class="row" style="margin-left: 3%">
-                        <h3 style="color: #050000; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%">
+                    <div class="row" style="margin-left: 3%; margin-top: 25px">
+                        <h3 style="color: #050000; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
                             Включен режим: &nbsp;</h3>
                         <h3 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif">
                             {{action_strizh}} </h3>
@@ -180,7 +185,7 @@
                     </div>
                     {% endif %}
 
-                    <form action='main' style="margin: 2.5% 40px" method='GET'>
+                    <form action='main' style="margin: 2.5% 25px" method='GET'>
                         <!--                        {% if url_uniping %}-->
                         <h5> Температура: {{ temperature }}&deg,</h5>
                         <h5> Влажность: {{ humidity }}%,</h5>
@@ -198,7 +203,9 @@
                         <div class="col-6">
                             <form action='turn_on_bp' method='GET'>
                                 {% if chosen_strizh != 0 %}
-                                <button class="button-green-on">Включение {{chosen_strizh}}</button>
+                                <button class="button-green-on">
+<!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
+                                    Включение {{chosen_strizh}}</button>
                                 {% else %}
                                 <button class="button-green-on">Включение комплекса</button>
                                 {% endif %}
@@ -215,7 +222,7 @@
                         </div>
                     </div>
 
-                    <div class="box-scroll" style="height: 275px; background-color: rgb(255,255,255)">
+                    <div class="box-scroll" style="height: 265px; background-color: rgb(255,255,255)">
                         <form action='show_logs' method='GET'>
 
                             {% for el in logs_list %}

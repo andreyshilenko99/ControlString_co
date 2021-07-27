@@ -11,8 +11,8 @@ from django.forms import ModelMultipleChoiceField
 from django.shortcuts import redirect
 from django.shortcuts import render
 
-from geo.models import Strizh, Point, DroneJournal, StrizhJournal
-from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm
+from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
+from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm
 
 from ControlString_co.control_trace import scan_on_off
 from ControlString_co.control_trace import jammer_on_off, scan_on_off
@@ -167,7 +167,6 @@ def filter_all(request):
 def journal(request):
     global c
 
-
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
 
@@ -239,7 +238,74 @@ def get_strizhes():
     return arr_strizh
 
 
+def choose_apem_toshow(request):
+    global c
+    if request.method == 'POST':
+        form_apem = ApemsConfigurationForm(request.POST)
+        # for el_db in DroneJournal.objects.all():
+        #     el_db.delete()
+        if form_apem.is_valid():
+            apem_toshow = form_apem.cleaned_data.get('apem_toshow')
+            c['apem_toshow'] = apem_toshow
+            # if len(apem_toshow) != 0:
+            #     DP = apem_toshow[0]
+            #     apem_value = DroneJournal(system_name=DP.system_name,
+            #                                center_freq=DP.center_freq,
+            #                                brandwidth=DP.brandwidth,
+            #                                detection_time=DP.detection_time,
+            #                                comment_string=DP.comment_string,
+            #                                lat=DP.lat,
+            #                                lon=DP.lon,
+            #                                azimuth=DP.azimuth,
+            #                                area_sector_start_grad=DP.area_sector_start_grad,
+            #                                area_sector_end_grad=DP.area_sector_end_grad,
+            #                                area_radius_m=DP.area_radius_m,
+            #                                ip=DP.ip,
+            #                                current_time=DP.current_time,
+            #                                strig_name=DP.strig_name)
+            #     apem_value.save()
+    else:
+        form_apem = ApemsConfigurationForm()
+    c['form_apem'] = form_apem
+
+
+    return render(request, "configuration.html", context=c)
+
+
 def configuration(request):
+    global c
+    if request.method == 'POST':
+        form_apem = ApemsConfigurationForm(request.POST)
+        # for el_db in DroneJournal.objects.all():
+        #     el_db.delete()
+        if form_apem.is_valid():
+            apem_toshow = form_apem.cleaned_data.get('apem_toshow')
+            c['apem_toshow'] = apem_toshow
+            # if len(apem_toshow) != 0:
+            #     DP = apem_toshow[0]
+            #     apem_value = DroneJournal(system_name=DP.system_name,
+            #                                center_freq=DP.center_freq,
+            #                                brandwidth=DP.brandwidth,
+            #                                detection_time=DP.detection_time,
+            #                                comment_string=DP.comment_string,
+            #                                lat=DP.lat,
+            #                                lon=DP.lon,
+            #                                azimuth=DP.azimuth,
+            #                                area_sector_start_grad=DP.area_sector_start_grad,
+            #                                area_sector_end_grad=DP.area_sector_end_grad,
+            #                                area_radius_m=DP.area_radius_m,
+            #                                ip=DP.ip,
+            #                                current_time=DP.current_time,
+            #                                strig_name=DP.strig_name)
+            #     apem_value.save()
+    else:
+        form_apem = ApemsConfigurationForm()
+    c['form_apem'] = form_apem
+
+    apems = ApemsConfiguration.objects.order_by('-freq_podavitelya').all()
+
+    c['apems'] = apems
+
     return render(request, "configuration.html", context=c)
 
 
@@ -320,6 +386,31 @@ def choose_nomer_strizha(request):
         c['weather_state'] = weather_state
     # return redirect(request.META['HTTP_REFERER'])
     # return HttpResponseRedirect('/main')
+    return render(request, "main.html", context=c)
+
+
+def choose_all_strizhes(request):
+    global c
+
+    strizhes = Strizh.objects.order_by('-lon').all()
+    if request.method == 'POST':
+
+        c['chosen_strizh'] = 'все стрижи'
+
+        for strizh in strizhes:
+            if c['chosen_strizh'] == strizh:
+                c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
+
+        # nomer = request.POST['chosen_strizh']
+        # c['chosen_strizh'] = nomer
+
+    # if c.get("chosen_strizh"):
+    #     # c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
+    #     temperature, humidity, weather_state = return_conditions(c['url_uniping'])
+    #     c['temperature'] = temperature
+    #     c['humidity'] = humidity
+    #     c['weather_state'] = weather_state
+
     return render(request, "main.html", context=c)
 
 

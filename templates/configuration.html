@@ -1,156 +1,95 @@
 <!DOCTYPE html>
+{% load leaflet_tags %}
+{% load geojson_tags %}
+
 <html>
 <head>
-    <title>Leaflet.draw vector editing handlers</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Конфигурация</title>
+    <script src="static/src/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
+    <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
     <meta charset=utf-8>
 
-    <link rel="stylesheet" href="/static/styles.css"/>
-
-    <script src="/static/src/libs/leaflet-src.js"></script>
-    <link rel="stylesheet" href="/static/src/libs/leaflet.css"/>
-
-    <script src="/static/src/Leaflet.draw.js"></script>
-    <script src="/static/src/Leaflet.Draw.Event.js"></script>
-    <link rel="stylesheet" href="/static/src/leaflet.draw.css"/>
-
-    <script src="/static/src/Toolbar.js"></script>
-    <script src="/static/src/Tooltip.js"></script>
-
-    <script src="/static/src/ext/GeometryUtil.js"></script>
-    <script src="/static/src/ext/LatLngUtil.js"></script>
-    <script src="/static/src/ext/LineUtil.Intersect.js"></script>
-    <script src="/static/src/ext/Polygon.Intersect.js"></script>
-    <script src="/static/src/ext/Polyline.Intersect.js"></script>
-    <script src="/static/src/ext/TouchEvents.js"></script>
-
-    <script src="/static/src/draw/DrawToolbar.js"></script>
-    <script src="/static/src/draw/handler/Draw.Feature.js"></script>
-    <script src="/static/src/draw/handler/Draw.SimpleShape.js"></script>
-    <script src="/static/src/draw/handler/Draw.Polyline.js"></script>
-    <script src="/static/src/draw/handler/Draw.Marker.js"></script>
-    <script src="/static/src/draw/handler/Draw.Circle.js"></script>
-    <script src="/static/src/draw/handler/Draw.CircleMarker.js"></script>
-    <script src="/static/src/draw/handler/Draw.Polygon.js"></script>
-    <script src="/static/src/draw/handler/Draw.Rectangle.js"></script>
-
-    <script src="/static/src/edit/EditToolbar.js"></script>
-    <script src="/static/src/edit/handler/EditToolbar.Edit.js"></script>
-    <script src="/static/src/edit/handler/EditToolbar.Delete.js"></script>
-
-    <script src="/static/src/Control.Draw.js"></script>
-
-    <script src="/static/src/edit/handler/Edit.Poly.js"></script>
-    <script src="/static/src/edit/handler/Edit.SimpleShape.js"></script>
-    <script src="/static/src/edit/handler/Edit.Rectangle.js"></script>
-    <script src="/static/src/edit/handler/Edit.Marker.js"></script>
-    <script src="/static/src/edit/handler/Edit.CircleMarker.js"></script>
-    <script src="/static/src/edit/handler/Edit.Circle.js"></script>
+    {% leaflet_js plugins="ALL" %}
+    {% leaflet_css plugins="ALL" %}
+    {% leaflet_js %}
+    {% leaflet_css %}
     {% csrf_token %}
 
 </head>
-<body>
+<body style="text-align: left">
 <div class="everything">
-    <div class="map-info" style="margin: 1%">
+    <!--    <input id="slider1" type="range" value="3" min="1" max="20" step="1"/>-->
+    <div class="row" style="margin: 1%">
+        <form action="menu" method='GET'>
+            <button class="button-blue"> Меню</button>
+        </form>
+        <form action="main" method='GET'>
+            <button class="button-blue"> Главная</button>
+        </form>
+        <form action="journal" method='GET'>
+            <button class="button-blue"> Журнал</button>
+        </form>
+        <form action="configuration" method='GET'>
+            <button class="button-blue"> Конфигуратор</button>
+        </form>
+        <form action="admin" method='GET'>
+            <button class="button-blue"> Администратор</button>
+        </form>
 
+
+    </div>
+    <form action="choose_apem_toshow" method="post">
+        {% csrf_token %}
         <div class="row">
-            <div class="col-8 " >
-                <div class="map-box" style="height: 70vh">
-                    <div class="row" style="margin: 1%">
-                        <form action="menu" method='GET'>
-                            <button class="button-blue"> Меню </button>
-                        </form>
-                        <form action="main" method='GET'>
-                            <button class="button-blue"> Титул </button>
-                        </form>
-                        <form action="journal" method='GET'>
-                            <button class="button-blue"> Журнал </button>
-                        </form>
-                        <form action="configuration" method='GET'>
-                            <button class="button-blue"> Конфигуратор </button>
-                        </form>
+            <div class="col-11 " style="margin: 30px 30px">
+                <h2 style="margin: 30px 30px">
+                    Просмотр блоков АПЕМ, Шелест
+                </h2>
+                <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255);
+                    width: 700px; height: 400px; margin: 30px 30px">
+                    {% load mytags %}
+                    <!--                        <form action="get_drones" method='POST'>-->
+                    {% for apem in apems%}
+                    <div class="mx-auto">
+                        <!--                            <span style="font-weight: 600; color: #2b570e; margin-left: 1%">{{ dron.pk }}. </span>-->
 
-<!--                        <form action="journal">-->
-<!--                        <input type="submit" value="Журнал" />-->
-<!--                        </form>-->
+                        <img src="static/icons/on.png" alt="on" style="max-width: 20px;">
+                        <img src="static/icons/off.png" alt="on" style="max-width: 20px;">
+                        <!--                        <button>-->
+                        <span style="font-weight: 600; color: #488423; margin-left: 1%">{{ apem }}</span>
+                        <!--                        </button>-->
+
+
+                        <span style="font-weight: 600; color: #c1802e">{{ apem.type_podavitelya}}, </span>
+                        <span style="font-weight: 600; color: #872525"> хост: {{ apem.ip_podavitelya}}, </span>
+
+
+                        <span style="font-weight: 600; color: #0059b6">
+                                канал: {{apem.canal_podavitelya}},
+                            </span>
+
+                        <span style="font-weight: 600; color: 	#872525"> усиление: {{ apem.usileniye_db}} дБ, </span>
+
                     </div>
 
 
-                </div>
-                <div class="information-bottom" style="height: 25vh; margin-top: 1%; border: 0.5vh solid #dfee99" >
-
-                        Инфо по последним засечкам
-
+                    {% endfor %}
                 </div>
 
-            </div>
-            <div class="col-4" >
-                <div class="strizhes-all" style="height: 60vh; border: 0.5vh solid #dfee99">
-                    <div class="strizh" style="margin-left: 5%;margin-top: 1%">
-                        <div class="row">
-                        <h3>
-                            Все Стрижи
-                        </h3>
-                        </div>
-                        <div class="strizh-for-all">
-                            <div class="row">
-                            <form action='butt_skan_all' method='GET'>
-                                <button class="button-green" type='submit'> Сканирование</button>
-                            </form>
-                            <form action='butt_glush_all' method='GET'>
-                                <button class="button-green">Глуш.</button>
-                            </form>
-                            <form action='butt_gps_all' method='GET'>
-                                <button class="button-green"> GPS глуш.</button>
-                            </form>
-                            <form action='butt_ku_all' method='GET'>
-                                <button class="button-green">КУ глуш.</button>
-                            </form>
-                            </div>
-                        </div>
-                        <div class="row" style="margin-top: 2%">
-                            <h3>
-                            <form action="choose_nomer_strizha" method="post">
-                                {% csrf_token %}
-                                Стриж #
-                                <input type="number" style="width: 15%" name="nomer_strizha" placeholder={{nomer}}>
-                                <input type="submit" value="ввод">
-                            </form>
-                            </h3>
-<!--                            <form action="update_nomer_strizha" method="get">-->
-<!--                                upd {{  nomer }}-->
-<!--                                <input type="submit" value="ввод">-->
-<!--                            </form>-->
 
-                        </div>
-                        <div class="strizh-each">
-                            <div class="row">
-                            <form action='butt_skan' method='GET'>
-                                <button class="button-green" type='submit'> Сканирование</button>
-                            </form>
-                            <form action='butt_glush' method='GET'>
-                                <button class="button-green">Глуш.</button>
-                            </form>
-                            <form action='butt_gps' method='GET'>
-                                <button class="button-green"> GPS глуш.</button>
-                            </form>
-                            <form action='butt_ku' method='GET'>
-                                <button class="button-green">КУ глуш.</button>
-                            </form>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="information-bottom" style="height: 35vh; margin-top: 1%; border: 0.5vh solid #dfee99" >
-                        Служебка, Uniping, АГМ, логи
-                </div>
             </div>
         </div>
-    </div>
+        <!--            <div class="col-1 ">-->
+        <!--                <button class="button-green-small">-->
+        <!--                    Выбор-->
+        <!--                </button>-->
 
 
+        <!--            </div>-->
+</div>
+</form>
 
 
 </div>

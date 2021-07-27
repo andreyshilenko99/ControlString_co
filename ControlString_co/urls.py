@@ -20,7 +20,6 @@ from geo.views import geojson_view
 from map import views
 from django.http import HttpResponseRedirect
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('geo/', include('geo.urls')),
@@ -32,8 +31,6 @@ urlpatterns = [
     # path('main', views.CreateMyModelView.as_view()),
     path('main', views.render_main_page),
     path('back2main', views.back2main),
-
-
 
     path('journal', views.journal),
     path('filter_nomer_strizha', views.filter_nomer_strizha),
@@ -49,7 +46,7 @@ urlpatterns = [
     path('butt_gps_all', views.butt_gps_all),
     path('butt_ku_all', views.butt_ku_all),
     path('choose_nomer_strizha', views.choose_nomer_strizha),
-
+    path('choose_all_strizhes', views.choose_all_strizhes),
 
     path(r'strizh_view', geojson_view),
 
@@ -66,5 +63,7 @@ urlpatterns = [
     path('turn_off_bp', views.turn_off_bp),
     path('functioning_loop', views.functioning_loop),
     path('show_logs', views.show_logs),
+
+    path('choose_apem_toshow', views.choose_apem_toshow),
 
 ]

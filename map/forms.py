@@ -1,7 +1,7 @@
 from django.forms import ModelForm, Select, ModelChoiceField, ModelMultipleChoiceField, CharField
 
 # from .models import MyModel, MyStrizh
-from geo.models import Strizh, Point, DroneJournal, StrizhJournal
+from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
 from django.forms import widgets
 
 
@@ -46,5 +46,20 @@ class DroneFilterForm(ModelForm):
         widgets = {
             'filtered_strizhes': Select(attrs={'id': 'name', 'size': '10',
                                                }),
+        }
 
+
+class ApemsConfigurationForm(ModelForm):
+    names_arr = []
+    AllApems = ApemsConfiguration.objects.all().order_by('-freq_podavitelya')
+    apem_toshow = ModelChoiceField(queryset=AllApems,
+                                   required=False, to_field_name="pk",
+                                   label="")
+
+    class Meta:
+        model = ApemsConfiguration
+        fields = ['apem_toshow']
+        widgets = {
+            'apem_toshow': Select(attrs={'id': 'name', 'size': '10',
+                                         }),
         }

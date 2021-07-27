@@ -52,7 +52,7 @@ class DroneJournal(models.Model):
     def __str__(self):
         prop_spos = 'Пропускная способность: {} МГц'.format(round(self.brandwidth, 2))
         arr_to_return = [self.detection_time, self.system_name, int(self.area_sector_start_grad), '° -',
-                         int(self.area_sector_end_grad),'° ', self.azimuth, 'host:', self.ip,
+                         int(self.area_sector_end_grad), '° ', self.azimuth, 'host:', self.ip,
                          self.strig_name, prop_spos, self.comment_string,
                          self.area_radius_m, 'м.']
         arr_strings = [str(el) for el in arr_to_return]
@@ -95,3 +95,34 @@ class StrizhJournal(models.Model):
         verbose_name = 'Отфильтрованные стрижи'
         # verbose_name_plural = 'Стрижи'
         ordering = ['-pk']
+
+
+PODAVITEL_CHOICES = (
+    ('АПЕМ (Многоканальный)', 'АПЕМ (Многоканальный)'),
+    ('Тестовый модуль', 'Тестовый модуль'),
+    ('Шелест', 'Шелест'),
+    ('Шелест (Многоканальный)', 'Шелест (Многоканальный)'),
+    ('BarGen (Enter Morph)', 'BarGen (Enter Morph)'),
+    ('BarGen (Плата Б)', 'BarGen (Плата Б)'),
+)
+
+
+class ApemsConfiguration(models.Model):
+    freq_podavitelya = models.CharField('Частота подавителя', max_length=500, default=' ')
+    deg_podavitelya = models.IntegerField('Номер подавителя (60, 120 ...)', default=0)
+    # name_podavitelya = models.CharField('Имя подавителя', max_length=500, default='qwd ')
+    type_podavitelya = models.CharField('Тип подавителя', max_length=500, choices=PODAVITEL_CHOICES)
+    ip_podavitelya = models.GenericIPAddressField('IP-адрес подавителя')
+    canal_podavitelya = models.IntegerField('Канал подавителя', default=0)
+    usileniye_db = models.IntegerField('Усиление')
+
+
+
+    def __str__(self):
+        str_to_return = str(self.freq_podavitelya) + ' - ' + str(self.deg_podavitelya) + '°'
+        return str_to_return
+
+    class Meta:
+        verbose_name = 'Конфигурация АПЕМ'
+        verbose_name_plural = 'АПЕМы'
+        ordering = ['-freq_podavitelya']
