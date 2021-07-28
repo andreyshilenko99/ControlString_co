@@ -637,6 +637,7 @@ lines_map = {'обогрев': 1,
              }
 
 lines_control_map = {
+    'вентилятор': 2,
     'БП ПЭВМ': 4,
     'БП Шелест': 6,
     'БП АПЕМ': 8,
@@ -649,10 +650,6 @@ lines_control_map = {
 def collect_logs(log_string):
     global logs, logs_list
     time_obj = datetime.datetime.now().strftime("%Y-%d-%m  %H:%M:%S")
-    # time_obj = time.gmtime()
-    # y, m, d, h, min, sec, _, _, _ = time_obj
-
-    # date_time = "{}.{}.{}   {}:{}:{}  ".format(d, m, y, h + 3, min, sec)
     log_one = time_obj + '   ' + log_string + '\n\t'
     logs += log_one
     logs_list.append(log_one)
@@ -767,46 +764,58 @@ def set_correct_temperature(url, strizh_name, temperature_state):
 
 def turn_on_bp(request):
     global comlex_state, logs
+    x = c
     for striz in c.get('chosen_strizh'):
         if striz != 'None':
             url = c['url_uniping_dict'][striz]
+
+            try:
+                requests.get(url, auth=auth, timeout=0.2)
+            except:
+                result_get = 'ошибка соединения с uniping'
+                collect_logs(striz + ': ' + result_get)
+                continue
+
             temperature_state = check_condition(c['temperature_dict'][striz], low_border=low_t, high_border=high_t)
             if temperature_state != 0:
                 print('температура не в порядке')
-                set_correct_temperature(url, striz.name, temperature_state)
+                set_correct_temperature(url, striz, temperature_state)
             elif temperature_state == 0:
                 # turn everything on
-                send_line_command(url, 'вентилятор', 1)
+                state0 = obtain_state(url, 'датчик потока')
+                if state0 != 'вкл':
+                    send_line_command(url, 'вентилятор', 1)
                 state1 = obtain_state(url, 'БП ПЭВМ')
                 if state1 != 'вкл':
                     # collect_logs('БП ПЭВМ выключен')
                     send_line_command(url, 'БП ПЭВМ', 1)
                 state2 = obtain_state(url, 'БП Шелест')
-
                 if state2 != 'вкл':
                     # collect_logs('БП Шелест выключен')
                     send_line_command(url, 'БП Шелест', 1)
-
                 state3 = obtain_state(url, 'БП АПЕМ')
                 if state3 != 'вкл':
                     # collect_logs('БП АПЕМ выключен')
                     send_line_command(url, 'БП АПЕМ', 1)
-
                 state4 = obtain_state(url, 'ЭВМ1')
                 state5 = obtain_state(url, 'ЭВМ2')
                 if state4 != 'вкл':
                     send_impulse(url, 'ЭВМ1', time_pulse=3, action='вкл')
-                    state44 = obtain_state(url, 'ЭВМ1')
-                    if state44 != 'вкл':
+                    state4 = obtain_state(url, 'ЭВМ1')
+                    if state4 != 'вкл':
                         send_impulse(url, 'ЭВМ1', time_pulse=3, action='вкл')
                     time.sleep(4)
                 if state5 != 'вкл':
                     send_impulse(url, 'ЭВМ2', time_pulse=3, action='вкл')
-                complex_state = 'вкл'
+
+                states = [state1, state2, state3, state4, state5]
+                xx = all([True if x == 'вкл' else False for x in states])
+                complex_state = 'включен' if xx else 'выключен'
                 c['complex_state'] = complex_state
-                c['logs'] = logs
+                str_log = striz + ': ' + complex_state
+                collect_logs(str_log)
                 c['logs_list'] = logs_list
-                render(request, "main.html", context=c)
+                # render(request, "main.html", context=c)
                 # functioning_loop(request)
     return render(request, "main.html", context=c)
 
@@ -816,6 +825,14 @@ def turn_off_bp(request):
     for striz in c.get('chosen_strizh'):
         if striz != 'None':
             url = c['url_uniping_dict'][striz]
+
+            try:
+                requests.get(url, auth=auth, timeout=0.2)
+            except:
+                result_get = 'ошибка соединения с uniping'
+                collect_logs(striz + ': ' + result_get)
+                continue
+
             state4 = obtain_state(url, 'ЭВМ1')
             state5 = obtain_state(url, 'ЭВМ2')
             if state4 != 'выкл':
@@ -824,7 +841,6 @@ def turn_off_bp(request):
                 send_impulse(url, 'ЭВМ2', time_pulse=3, action='выкл')
 
             time.sleep(5)
-
             state1 = obtain_state(url, 'БП ПЭВМ')
             if state1 != 'выкл':
                 # collect_logs('БП ПЭВМ включен')
@@ -846,7 +862,7 @@ def turn_off_bp(request):
             c['complex_state'] = complex_state
             c['logs'] = logs
             c['logs_list'] = logs_list
-    render(request, "main.html", context=c)
+    # render(request, "main.html", context=c)
     # functioning_loop(request)
 
     return render(request, "main.html", context=c)
