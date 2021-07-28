@@ -58,10 +58,10 @@ urlpatterns = [
     path('butt_gps', views.butt_gps),
     path('butt_ku', views.butt_ku),
     path('apply_period', views.apply_period),
-    path('get_conditions', views.get_conditions),
+    # path('get_conditions', views.get_conditions),
     path('turn_on_bp', views.turn_on_bp),
     path('turn_off_bp', views.turn_off_bp),
-    path('functioning_loop', views.functioning_loop),
+    # path('functioning_loop', views.functioning_loop),
     path('show_logs', views.show_logs),
 
     path('choose_apem_toshow', views.choose_apem_toshow),

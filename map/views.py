@@ -11,8 +11,6 @@ from django.forms import ModelMultipleChoiceField
 from django.shortcuts import redirect
 from django.shortcuts import render
 
-
-
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm
 
@@ -40,14 +38,13 @@ def index(request):
 def return_conditions(url):
     global low_t, high_t, low_h, high_h, humidity, c
     global auth
+    temperature = ''
     try:
         temp = requests.get(url + 'thermo.cgi?t1', auth=auth, timeout=0.05)
         temp_str = temp.content.decode("utf-8")
         temp_list = re.findall('[0-9]+', temp_str)
         if len(temp_list) > 0:
             temperature = '.'.join(temp_list)
-            c['temperature'] = temperature
-        print('temperature:', temperature)
     except:
         temperature = 'ошибка соединения с uniping'
     try:
@@ -56,23 +53,18 @@ def return_conditions(url):
         hum_list = re.findall('[0-9]+', hum_str)
         if len(hum_list) > 1:
             humidity = hum_list[0]
-            c['humidity'] = humidity
-            # humidity_temp = '.'.join(hum_list[1:])
-            # c['humidity_temp'] = humidity_temp
-        print('humidity:', humidity)
     except:
         humidity = 'ошибка соединения с uniping'
-    c['humidity'] = humidity
-    c['temperature'] = temperature
 
-    if 'ошибка' not in temperature and 'error' not in humidity:
+    if 'ошибка' not in temperature and 'ошибка' not in humidity:
         if low_t < float(temperature) < high_t and low_h < float(humidity) < high_h:
             weather_state = "OK"
         else:
             weather_state = "NOT OK !!!"
     else:
         weather_state = "ошибка соединения с uniping"
-    c["weather_state"] = weather_state
+    # c["weather_state"] = weather_state
+    print(url, temperature, humidity, weather_state)
     return temperature, humidity, weather_state
 
 
@@ -270,7 +262,6 @@ def choose_apem_toshow(request):
         form_apem = ApemsConfigurationForm()
     c['form_apem'] = form_apem
 
-
     return render(request, "configuration.html", context=c)
 
 
@@ -371,29 +362,23 @@ def choose_nomer_strizha(request):
     temperature_dict = {}
     humidity_dict = {}
     weather_state_dict = {}
-
     if request.method == 'POST':
         form = StrizhForm(request.POST)
         if form.is_valid():
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
-            # sadad = c
             c['chosen_strizh'][0] = chosen_strizh.name
-
             for strizh in strizhes:
-                if c['chosen_strizh'][0] == strizh:
-                    c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
-
+                if c['chosen_strizh'][0] == strizh.name:
+                    c['url_uniping_dict'][strizh.name] = 'http://' + strizh.uniping_ip + '/'
                     temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-                        return_conditions(c['url_uniping'])
-                    c['temperature_dict'] = temperature_dict
-                    c['humidity_dict'] = humidity_dict
-                    c['weather_state_dict'] = weather_state_dict
+                        return_conditions(c['url_uniping_dict'][strizh.name])
+            c['temperature_dict'] = temperature_dict
+            c['humidity_dict'] = humidity_dict
+            c['weather_state_dict'] = weather_state_dict
 
         # nomer = request.POST['chosen_strizh']
         # c['chosen_strizh'] = nomer
         xx = c
-
-
 
     return render(request, "main.html", context=c)
 
@@ -409,13 +394,15 @@ def choose_all_strizhes(request):
         temperature_dict = {}
         humidity_dict = {}
         weather_state_dict = {}
+        url_uniping_dict = {}
         for strizh in strizhes:
-            c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
+            url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
             temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-                return_conditions(c['url_uniping'])
+                return_conditions(url_uniping_dict[strizh.name])
         c['temperature_dict'] = temperature_dict
         c['humidity_dict'] = humidity_dict
         c['weather_state_dict'] = weather_state_dict
+        c['url_uniping_dict'] = url_uniping_dict
 
         # nomer = request.POST['chosen_strizh']
         # c['chosen_strizh'] = nomer
@@ -434,44 +421,38 @@ def render_main_page(request):
     global c
     complex_state = ''
 
-    if not c.get('url_uniping'):
-        c['url_uniping'] = ''
-
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
 
     temperature_dict = {}
     humidity_dict = {}
     weather_state_dict = {}
+    url_uniping_dict = {}
     strizhes = Strizh.objects.order_by('-lon').all()
     for strizh in strizhes:
-        c['url_uniping'] = 'http://' + strizh.uniping_ip + '/'
+        url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
+
         temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-            return_conditions(c['url_uniping'])
+            return_conditions(url_uniping_dict[strizh.name])
     c['temperature_dict'] = temperature_dict
+    xx = c
     c['humidity_dict'] = humidity_dict
     c['weather_state_dict'] = weather_state_dict
-
+    c['url_uniping_dict'] = url_uniping_dict
 
     if not c.get('chosen_strizh'):
         # c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
         c['chosen_strizh'] = [_.name for _ in strizhes]
-
     if request.method == 'POST':
         form = StrizhForm(request.POST)
         if form.is_valid():
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
             c['chosen_strizh'][0] = chosen_strizh
-
-
     else:
         form = StrizhForm()
     c['form'] = form
-    # filter(id=id)
-
     # TODO current_time
     drones = Point.objects.order_by('-detection_time').all()
-
     c['info_drones'] = drones
     c['all_strizhes'] = [_.name for _ in strizhes]
 
@@ -628,14 +609,6 @@ def export_csv(request):
     return render(request, "journal.html", context=c)
 
 
-def get_conditions(request):
-    temperature, humidity, weather_state = return_conditions(c['url_uniping'])
-    c['temperature'] = temperature
-    c['humidity'] = humidity
-    c["weather_state"] = weather_state
-    return render(request, "main.html", context=c)
-
-
 def check_condition(value, low_border, high_border, condition="температура"):
     assert low_border < high_border, 'error in defining low or high border'
     try:
@@ -687,7 +660,7 @@ def collect_logs(log_string):
     print(log_one)
 
 
-def send_line_command(line_name, arg):
+def send_line_command(url, line_name, arg):
     # arg = 0 or 1
     global auth, lines_map, c
 
@@ -695,7 +668,7 @@ def send_line_command(line_name, arg):
     log_str = '{} {}ючен'.format(line_name, state)
     line = lines_map.get(line_name)
     try:
-        result_get = requests.get(c['url_uniping'] + 'io.cgi?io{}={}'.format(line, arg), auth=auth, timeout=0.05) \
+        result_get = requests.get(url + 'io.cgi?io{}={}'.format(line, arg), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         result_get = 'ошибка соединения с uniping'
@@ -705,11 +678,11 @@ def send_line_command(line_name, arg):
         collect_logs("проверьте, выбран ли стриж")
 
 
-def send_impulse(line_name, time_pulse=3, action=''):
+def send_impulse(url, line_name, time_pulse=3, action=''):
     global auth, lines_map, c
     line = lines_map.get(line_name)
     try:
-        result_get = requests.get(c['url_uniping'] + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth,
+        result_get = requests.get(url + 'io.cgi?io{}=f,{}'.format(line, time_pulse), auth=auth,
                                   timeout=0.05) \
             .content.decode("utf-8")
     except:
@@ -721,12 +694,12 @@ def send_impulse(line_name, time_pulse=3, action=''):
     time.sleep(time_pulse + 1)
 
 
-def obtain_state(line_name, to_collect_logs=False):
+def obtain_state(url, line_name, to_collect_logs=False):
     global lines_control_map, c
     result_state = 0
     line = lines_control_map.get(line_name)
     try:
-        stroka = requests.get(c['url_uniping'] + 'io.cgi?io{}'.format(line), auth=auth, timeout=0.05) \
+        stroka = requests.get(url + 'io.cgi?io{}'.format(line), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
         stroka = 'err in connection to uniping'
@@ -741,134 +714,140 @@ def obtain_state(line_name, to_collect_logs=False):
     return state
 
 
-def set_correct_temperature(temperature_state):
-    global temperature
+def set_correct_temperature(url, strizh_name, temperature_state):
+    global c
     if temperature_state != 0:
         while temperature_state != 0:
-            temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
+            temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
+                                                high_border=high_t)
             if temperature_state == 1:
-                send_line_command('вентилятор', 1)
-                state0 = obtain_state('датчик потока')
+                send_line_command(url, 'вентилятор', 1)
+                state0 = obtain_state(url, 'датчик потока')
                 if state0 != 'вкл':
                     collect_logs('АВАРИЯ! отсутствует вентиляция, возможен перегрев оборудования')
             elif temperature_state == -1:
-                send_line_command('обогрев', 1)
+                send_line_command(url, 'обогрев', 1)
             time.sleep(60)
 
 
-def check_states_on():
-    temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
-    if temperature_state != 0:
-        collect_logs('температура не в порядке')
-        set_correct_temperature(temperature_state)
-
-    state0 = obtain_state('датчик потока', to_collect_logs=True)
-    if state0 != 'вкл':
-        collect_logs('АВАРИЯ! отсутствует вентиляция, возможен перегрев оборудования')
-        # send_line_command('датчик потока', arg=1)
-
-    state1 = obtain_state('БП ПЭВМ', to_collect_logs=True)
-    if state1 != 'вкл':
-        collect_logs('АВАРИЯ! БП ПЭВМ выключен')
-    state2 = obtain_state('БП Шелест', to_collect_logs=True)
-    if state2 != 'вкл':
-        collect_logs('АВАРИЯ! БП Шелест выключен')
-    state3 = obtain_state('БП АПЕМ', to_collect_logs=True)
-    if state3 != 'вкл':
-        collect_logs('АВАРИЯ! БП АПЕМ выключен')
-    state4 = obtain_state('ЭВМ1', to_collect_logs=True)
-    if state4 != 'вкл':
-        collect_logs('АВАРИЯ! ЭВМ1 выключен')
-        send_impulse('ЭВМ1', time_pulse=3, action='вкл')
-    state5 = obtain_state('ЭВМ2', to_collect_logs=True)
-    if state5 != 'вкл':
-        collect_logs('АВАРИЯ! ЭВМ2 выключен')
-        send_impulse('ЭВМ2', time_pulse=3, action='вкл')
-
-    states_names = [state1, state2, state3, state4, state5]
-    states = [True if st == 'вкл' else False for st in states_names]
-    if all(states):
-        return True
+# def check_states_on():
+#     temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
+#     if temperature_state != 0:
+#         collect_logs('температура не в порядке')
+#         set_correct_temperature(temperature_state)
+#
+#     state0 = obtain_state('датчик потока', to_collect_logs=True)
+#     if state0 != 'вкл':
+#         collect_logs('АВАРИЯ! отсутствует вентиляция, возможен перегрев оборудования')
+#         # send_line_command('датчик потока', arg=1)
+#
+#     state1 = obtain_state('БП ПЭВМ', to_collect_logs=True)
+#     if state1 != 'вкл':
+#         collect_logs('АВАРИЯ! БП ПЭВМ выключен')
+#     state2 = obtain_state('БП Шелест', to_collect_logs=True)
+#     if state2 != 'вкл':
+#         collect_logs('АВАРИЯ! БП Шелест выключен')
+#     state3 = obtain_state('БП АПЕМ', to_collect_logs=True)
+#     if state3 != 'вкл':
+#         collect_logs('АВАРИЯ! БП АПЕМ выключен')
+#     state4 = obtain_state('ЭВМ1', to_collect_logs=True)
+#     if state4 != 'вкл':
+#         collect_logs('АВАРИЯ! ЭВМ1 выключен')
+#         send_impulse('ЭВМ1', time_pulse=3, action='вкл')
+#     state5 = obtain_state('ЭВМ2', to_collect_logs=True)
+#     if state5 != 'вкл':
+#         collect_logs('АВАРИЯ! ЭВМ2 выключен')
+#         send_impulse('ЭВМ2', time_pulse=3, action='вкл')
+#
+#     states_names = [state1, state2, state3, state4, state5]
+#     states = [True if st == 'вкл' else False for st in states_names]
+#     if all(states):
+#         return True
 
 
 def turn_on_bp(request):
     global comlex_state, logs
-    temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)
-    if temperature_state != 0:
-        print('температура не в порядке')
-        set_correct_temperature(temperature_state)
-    elif temperature_state == 0:
-        # turn everything on
-        send_line_command('вентилятор', 1)
-        state1 = obtain_state('БП ПЭВМ')
-        if state1 != 'вкл':
-            # collect_logs('БП ПЭВМ выключен')
-            send_line_command('БП ПЭВМ', 1)
-        state2 = obtain_state('БП Шелест')
+    for striz in c.get('chosen_strizh'):
+        if striz != 'None':
+            url = c['url_uniping_dict'][striz]
+            temperature_state = check_condition(c['temperature_dict'][striz], low_border=low_t, high_border=high_t)
+            if temperature_state != 0:
+                print('температура не в порядке')
+                set_correct_temperature(url, striz.name, temperature_state)
+            elif temperature_state == 0:
+                # turn everything on
+                send_line_command(url, 'вентилятор', 1)
+                state1 = obtain_state(url, 'БП ПЭВМ')
+                if state1 != 'вкл':
+                    # collect_logs('БП ПЭВМ выключен')
+                    send_line_command(url, 'БП ПЭВМ', 1)
+                state2 = obtain_state(url, 'БП Шелест')
 
-        if state2 != 'вкл':
-            # collect_logs('БП Шелест выключен')
-            send_line_command('БП Шелест', 1)
+                if state2 != 'вкл':
+                    # collect_logs('БП Шелест выключен')
+                    send_line_command(url, 'БП Шелест', 1)
 
-        state3 = obtain_state('БП АПЕМ')
-        if state3 != 'вкл':
-            # collect_logs('БП АПЕМ выключен')
-            send_line_command('БП АПЕМ', 1)
+                state3 = obtain_state(url, 'БП АПЕМ')
+                if state3 != 'вкл':
+                    # collect_logs('БП АПЕМ выключен')
+                    send_line_command(url, 'БП АПЕМ', 1)
 
-        state4 = obtain_state('ЭВМ1')
-        state5 = obtain_state('ЭВМ2')
-        if state4 != 'вкл':
-            send_impulse('ЭВМ1', time_pulse=3, action='вкл')
-            state44 = obtain_state('ЭВМ1')
-            if state44 != 'вкл':
-                send_impulse('ЭВМ1', time_pulse=3, action='вкл')
-            time.sleep(4)
-        if state5 != 'вкл':
-            send_impulse('ЭВМ2', time_pulse=3, action='вкл')
-        complex_state = 'вкл'
-        c['complex_state'] = complex_state
-        c['logs'] = logs
-        c['logs_list'] = logs_list
-        render(request, "main.html", context=c)
-        # functioning_loop(request)
+                state4 = obtain_state(url, 'ЭВМ1')
+                state5 = obtain_state(url, 'ЭВМ2')
+                if state4 != 'вкл':
+                    send_impulse(url, 'ЭВМ1', time_pulse=3, action='вкл')
+                    state44 = obtain_state(url, 'ЭВМ1')
+                    if state44 != 'вкл':
+                        send_impulse(url, 'ЭВМ1', time_pulse=3, action='вкл')
+                    time.sleep(4)
+                if state5 != 'вкл':
+                    send_impulse(url, 'ЭВМ2', time_pulse=3, action='вкл')
+                complex_state = 'вкл'
+                c['complex_state'] = complex_state
+                c['logs'] = logs
+                c['logs_list'] = logs_list
+                render(request, "main.html", context=c)
+                # functioning_loop(request)
     return render(request, "main.html", context=c)
 
 
 def turn_off_bp(request):
     global complex_state
+    for striz in c.get('chosen_strizh'):
+        if striz != 'None':
+            url = c['url_uniping_dict'][striz]
+            state4 = obtain_state(url, 'ЭВМ1')
+            state5 = obtain_state(url, 'ЭВМ2')
+            if state4 != 'выкл':
+                send_impulse(url, 'ЭВМ1', time_pulse=3, action='выкл')
+            if state5 != 'выкл':
+                send_impulse(url, 'ЭВМ2', time_pulse=3, action='выкл')
 
-    state4 = obtain_state('ЭВМ1')
-    state5 = obtain_state('ЭВМ2')
-    if state4 != 'выкл':
-        send_impulse('ЭВМ1', time_pulse=3, action='выкл')
-    if state5 != 'выкл':
-        send_impulse('ЭВМ2', time_pulse=3, action='выкл')
+            time.sleep(5)
 
-    time.sleep(5)
+            state1 = obtain_state(url, 'БП ПЭВМ')
+            if state1 != 'выкл':
+                # collect_logs('БП ПЭВМ включен')
+                send_line_command(url, 'БП ПЭВМ', 0)
+            state2 = obtain_state(url, 'БП Шелест')
+            if state2 != 'выкл':
+                # collect_logs('БП Шелест включен')
+                send_line_command(url, 'БП Шелест', 0)
+            state3 = obtain_state(url, 'БП АПЕМ')
+            if state3 != 'выкл':
+                # collect_logs('БП АПЕМ включен')
+                send_line_command(url, 'БП АПЕМ', 0)
 
-    state1 = obtain_state('БП ПЭВМ')
-    if state1 != 'выкл':
-        # collect_logs('БП ПЭВМ включен')
-        send_line_command('БП ПЭВМ', 0)
-    state2 = obtain_state('БП Шелест')
-    if state2 != 'выкл':
-        # collect_logs('БП Шелест включен')
-        send_line_command('БП Шелест', 0)
-    state3 = obtain_state('БП АПЕМ')
-    if state3 != 'выкл':
-        # collect_logs('БП АПЕМ включен')
-        send_line_command('БП АПЕМ', 0)
+            send_line_command(url, 'вентилятор', 0)
+            time.sleep(1)
+            send_impulse(url, 'РЕЗЕТ', time_pulse=6, action='выкл')
 
-    send_line_command('вентилятор', 0)
-    time.sleep(1)
-    send_impulse('РЕЗЕТ', time_pulse=6, action='выкл')
-
-    complex_state = 'выкл'
-    c['complex_state'] = complex_state
-    c['logs'] = logs
-    c['logs_list'] = logs_list
+            complex_state = 'выкл'
+            c['complex_state'] = complex_state
+            c['logs'] = logs
+            c['logs_list'] = logs_list
     render(request, "main.html", context=c)
-    functioning_loop(request)
+    # functioning_loop(request)
 
     return render(request, "main.html", context=c)
 
@@ -879,18 +858,17 @@ def show_logs(request):
     c['logs_list'] = logs_list
     return render(request, "main.html", context=c)
 
-
-def functioning_loop(request):
-    global c
-    print('loop')
-    is_on = True
-    if c['complex_state'] == 'вкл':
-        while is_on:
-            is_on = check_states_on()
-            render(request, "main.html", context=c)
-            time.sleep(10)
-    elif c['complex_state'] == 'выкл':
-        print('всё выключено')
-        # while True:
-        #     # check_states_off()
-        #     break
+# def functioning_loop(request):
+#     global c
+#     print('loop')
+#     is_on = True
+#     if c['complex_state'] == 'вкл':
+#         while is_on:
+#             is_on = check_states_on()
+#             render(request, "main.html", context=c)
+#             time.sleep(10)
+#     elif c['complex_state'] == 'выкл':
+#         print('всё выключено')
+#         # while True:
+#         #     # check_states_off()
+#         #     break

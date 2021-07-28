@@ -52,12 +52,12 @@
 
 
                 </div>
-                <div class="information-bottom-right" style="height: 30vh; margin-top: 4%; border: 0.5vh">
+                <div class="information-bottom-left" style="height: 30vh; margin-top: 10px; border: 0.5vh">
 
                     <h3 style="margin-top: 4%"> Информация о засечках </h3>
 
-                    <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255); margin: 2% 0;
-                    width: 100%; height: 75%">
+                    <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255); margin: 10px 0;
+                    width: 100%; height: 240px">
                         {% load mytags %}
                         <!--                        <form action="get_drones" method='POST'>-->
                         {% for dron in info_drones%}
@@ -93,32 +93,9 @@
 
             </div>
             <div class="col-4">
-                <div class="strizhes-all" style="height: 300px; ">
+                <div class="strizhes-all" style="height: 280px; ">
                     <!--border: 0.5vh solid rgb(255,255,255)">-->
                     <div class="strizh" style="margin-left: 5%;margin-top: 1%">
-                        <!--                        <div class="row" style="margin-left: 0px">-->
-                        <!--                            <h3>-->
-                        <!--                                Все Стрижи-->
-                        <!--                            </h3>-->
-                        <!--                        </div>-->
-                        <!--                        <div class="strizh-for-all">-->
-                        <!--                            <div class="row">-->
-                        <!--                                <form action='butt_skan_all' method='POST'>-->
-                        <!--                                    {% csrf_token %}-->
-                        <!--                                    <button class="button-green" type='submit'> Сканирование</button>-->
-                        <!--                                </form>-->
-                        <!--                                <form action='butt_glush_all' method='GET'>-->
-                        <!--                                    <button class="button-green">Глуш.</button>-->
-                        <!--                                </form>-->
-                        <!--                                <form action='butt_gps_all' method='GET'>-->
-                        <!--                                    <button class="button-green"> GPS глуш.</button>-->
-                        <!--                                </form>-->
-                        <!--                                <form action='butt_ku_all' method='GET'>-->
-                        <!--                                    <button class="button-green">КУ глуш.</button>-->
-                        <!--                                </form>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
-
                         <div class="row" style="margin-top: 2%;margin-left: 0.5%; width: 100%">
                             <form action="choose_all_strizhes" method="post">
                                 {% csrf_token %}
@@ -142,17 +119,10 @@
                                         ввод
                                     </button>
                                 </form>
-
                             </h5>
-
-
                         </div>
-
-
                         <div class="row">
-
                             <h5 style="text-align: center; margin-left: 2%">
-
                                 {% if chosen_strizh != all_strizhes %}
                                 Выбран
                                 {% for striz in chosen_strizh %}
@@ -164,12 +134,10 @@
                                 Выбраны все
                                 {% endif %}
                             </h5>
-
                         </div>
 
-
                         <div class="strizh-each" style="margin-left: 0.5%">
-                            <div class="row" >
+                            <div class="row">
 
                                 <form action='butt_skan' method='GET'>
                                     <button class="button-green" type='submit'> Сканирование</button>
@@ -196,22 +164,18 @@
                     <!--                    border: 0.5vh solid rgb(255,255,255)">-->
 
                     {% if action_strizh %}
-                    <div class="row" style="margin-left: 3%; margin-top: 10px">
-
-                        <h3 style="color: #050000; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
-                            Включен режим: &nbsp;</h3>
-                        <h3 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif">
-
+                    <div class="row" style="margin-left: 3%">
+                        <h4 style="color: #050000; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
+                            Включен режим: </h4>
+                        <!--                        &nbsp;-->
+                        <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
                             {{action_strizh}}
-
-                        </h3>
-
-
+                        </h4>
                     </div>
                     {% endif %}
 
                     {% if chosen_strizh != all_strizhes %}
-                    <form action='main' style="margin: 2.5% 25px" method='GET'>
+                    <form action='main' style="margin: 2.5% 35px" method='GET'>
                         {% for striz in chosen_strizh %}
                         {% if striz != 'None' %}
                         <h5> Температура: {{ temperature_dict|getkey:striz }} &deg </h5>
@@ -221,31 +185,26 @@
                         {% endfor %}
                     </form>
                     {% elif chosen_strizh == all_strizhes %}
-                    <div class="row" style="margin-left: 0.5%;">
+                    <div class="row" >
                         <div class="col-12">
-                    <div class="box-scroll" style="height: 200px; background-color: rgb(255,255,255)">
-
-                        <form action='main' style="margin: 2.5% 25px" method='GET'>
-                            {% for striz in chosen_strizh %}
-                            {% if striz != 'None' %}
-                            {% if weather_state_dict|getkey:striz == 'ошибка соединения с uniping' %}
-                            <h5 style="color: #aa0505"> Состояние {{striz}}: {{ weather_state_dict|getkey:striz }} </h5>
-                            {% else %}
-                            <h5 style="color: #165c27"> Состояние {{striz}}: {{ weather_state_dict|getkey:striz }} </h5>
-                            {% endif %}
-
-                            {% endif %}
-                            {% endfor %}
-
-                        </form>
+                            <div class="box-scroll" style="height: 100px; background-color: rgb(255,255,255)">
+                                <form action='main' style="margin: 10px 15px" method='GET'>
+                                    {% for striz in chosen_strizh %}
+                                    {% if striz != 'None' %}
+                                    {% if weather_state_dict|getkey:striz == 'ошибка соединения с uniping' %}
+                                    <h5 style="color: #aa0505"> Состояние {{striz}}:
+                                        {{ weather_state_dict|getkey:striz }} </h5>
+                                    {% else %}
+                                    <h5 style="color: #165c27"> Состояние {{striz}}:
+                                        {{ weather_state_dict|getkey:striz }} </h5>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </form>
                             </div>
                         </div>
                     </div>
-
-
                     {% endif %}
-
-
                     <div class="row" style="margin: 0.5%;">
                         <div class="col-6">
                             <form action='turn_on_bp' method='GET'>
@@ -381,7 +340,6 @@
                                 strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
                                     strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
                                 console.log('counter_periodic', counter_periodic)
-                                console.log('strizh_data: ', strizh_data.features[j].properties)
 
                                 if (counter_periodic <= 10) {
                                     if (counter_periodic === 10) {
@@ -404,15 +362,6 @@
                                     map.addLayer(layerStrizhes)
                                 }
 
-                                // подпись красным
-                                // name1 = L.marker([strizh_data.features[j].properties.lat,
-                                //     strizh_data.features[j].properties.lon], {
-                                //     icon: L.divIcon({
-                                //         className: 'text-labels',   // Set class for CSS styling
-                                //         html: strizh_data.features[j].properties.name
-                                //     })
-                                // });
-                                // map.addLayer(name1)
                             }
                             let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/dron_top.png'});
 
@@ -446,7 +395,6 @@
                                     // задан цвет
                                     if (Object.keys(dron_colors).includes(data.features[i].properties.system_name)) {
                                         if (data_drawn.has(data.features[i].properties.system_name)) {
-                                            console.log('DRAWING OLD')
                                             data_drawn.add(data.features[i].properties.system_name);
                                             ids_drawn.add(data.features[i].properties.pk);
                                             counter_drone_period = 3;
@@ -454,7 +402,6 @@
                                     }
                                     // не задан цвет
                                     else if (!Object.keys(dron_colors).includes(data.features[i].properties.system_name)) {
-                                        console.log('give color')
                                         dron_colors[data.features[i].properties.system_name] = getRandomColor();
                                         data_drawn.add(data.features[i].properties.system_name);
                                     }
@@ -474,14 +421,6 @@
                                     let angle = (90 - (area_sector_start_grad)) / 180 * Math.PI;
                                     var d_y = 0.004499 * Math.sin(angle);
                                     var d_x = 0.008892 * Math.cos(angle);
-                                    // arc1 = L.sector({
-                                    //     center: strizh_center,
-                                    //     innerRadius: 0,
-                                    //     outerRadius: radius,
-                                    //     startBearing: 0,
-                                    //     endBearing: 360,
-                                    //     color: '#c6d498'
-                                    // }).addTo(layerDrones);
                                     arc1 = L.circle(strizh_center, {
                                         color: '#0062ea',
                                         fillColor: "#e0aa4e",
@@ -497,29 +436,12 @@
                                         startAngle: area_sector_start_grad,
                                         endAngle: area_sector_end_grad
                                     }).addTo(layerDrones);
-                                    // L.sector({
-                                    //     center: strizh_center,
-                                    //     innerRadius: 0,
-                                    //     outerRadius: radius,
-                                    //     startBearing: area_sector_start_grad,
-                                    //     endBearing: area_sector_end_grad,
-                                    //     color: dron_colors[data.features[i].properties.system_name]
-                                    // }).addTo(layerDrones);
-                                    // L.arc({
-                                    //     center: strizh_center,
-                                    //     radius: radius,
-                                    //     color: '#812bb6',
-                                    //     startBearing: 0,
-                                    //     endBearing: 360,
-                                    // }).addTo(layerDrones);
                                 }
 
                                 // Отрисовка подписи к дрону в секторе + layerDrones
                                 //TODO current_time
                                 let podpis = data.features[i].properties.detection_time.substr(0, 19) + '.  ' +
                                     data.features[i].properties.system_name + '.  ' + data.features[i].properties.comment_string
-
-                                console.log('podpis', podpis)
 
                                 var tooltip_drone = L.tooltip({
                                     maxWidth: 2000,
@@ -536,16 +458,7 @@
                                 L.marker([strizh_center[0] + d_y,
                                     strizh_center[1] + d_x], {icon: logoMarker}).addTo(layerDrones)
                                     .bindTooltip(tooltip_drone).openTooltip();
-
-                                // L.marker([strizh_center[0] + d_y,
-                                //     strizh_center[1] + d_x], {
-                                //     icon: L.divIcon({
-                                //         className: 'text-labels',   // Set class for CSS styling
-                                //         html: name_dron
-                                //     })
-                                // }).addTo(layerGroup);
                             }
-                            // let unique_drones = arr_drones.filter(onlyUnique);
                         }
                     );
                 }
@@ -554,21 +467,14 @@
             if (counter_drone_period === 3) {
                 counter_drone_period = 0;
                 layerDrones.clearLayers();
-
-            } else if (counter_drone_period === 0) {
-                // console.log('podpis', podpis)
-                counter_drone_period += 1;
-                map.addLayer(layerDrones)
             } else {
                 counter_drone_period += 1;
                 map.addLayer(layerDrones)
-                // layerDrones.clearLayers();
             }
         }
 
         refreshMarkers()
         setInterval(refreshMarkers, seconds_wait * 1000);
-
     }
 
 
