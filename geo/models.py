@@ -124,7 +124,7 @@ class ApemsConfiguration(models.Model):
     type_podavitelya = models.CharField('Тип подавителя', max_length=500, choices=PODAVITEL_CHOICES)
     ip_podavitelya = models.GenericIPAddressField('IP-адрес подавителя')
     canal_podavitelya = IntegerRangeField('Канал подавителя', default=0, min_value=0, max_value=2)
-    usileniye_db = IntegerRangeField('Усиление', min_value=0, max_value=31)
+    usileniye_db = IntegerRangeField('Усиление', default=0, min_value=0, max_value=31)
 
     def __str__(self):
         str_to_return = str(self.freq_podavitelya) + ' - ' + str(self.deg_podavitelya) + '°'
