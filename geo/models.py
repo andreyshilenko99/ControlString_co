@@ -106,17 +106,25 @@ PODAVITEL_CHOICES = (
     ('BarGen (Плата Б)', 'BarGen (Плата Б)'),
 )
 
+from django.db import models
+
+class IntegerRangeField(models.IntegerField):
+    def __init__(self, verbose_name=None, name=None, min_value=None, max_value=None, **kwargs):
+        self.min_value, self.max_value = min_value, max_value
+        models.IntegerField.__init__(self, verbose_name, name, **kwargs)
+    def formfield(self, **kwargs):
+        defaults = {'min_value': self.min_value, 'max_value':self.max_value}
+        defaults.update(kwargs)
+        return super(IntegerRangeField, self).formfield(**defaults)
 
 class ApemsConfiguration(models.Model):
     freq_podavitelya = models.CharField('Частота подавителя', max_length=500, default=' ')
-    deg_podavitelya = models.IntegerField('Номер подавителя (60, 120 ...)', default=0)
+    deg_podavitelya = IntegerRangeField('Номер подавителя (60, 120 ...)', default=0, min_value=0, max_value=300)
     # name_podavitelya = models.CharField('Имя подавителя', max_length=500, default='qwd ')
     type_podavitelya = models.CharField('Тип подавителя', max_length=500, choices=PODAVITEL_CHOICES)
     ip_podavitelya = models.GenericIPAddressField('IP-адрес подавителя')
-    canal_podavitelya = models.IntegerField('Канал подавителя', default=0)
-    usileniye_db = models.IntegerField('Усиление')
-
-
+    canal_podavitelya = IntegerRangeField('Канал подавителя', default=0, min_value=0, max_value=2)
+    usileniye_db = IntegerRangeField('Усиление', min_value=0, max_value=31)
 
     def __str__(self):
         str_to_return = str(self.freq_podavitelya) + ' - ' + str(self.deg_podavitelya) + '°'

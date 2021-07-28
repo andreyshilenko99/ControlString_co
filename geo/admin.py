@@ -4,7 +4,6 @@ from geo.models import Point, Strizh, ApemsConfiguration
 
 # from map.models import MyStrizh
 
-
 class Inc(admin.ModelAdmin):
     # list_display = ('name','mpoint')
     list_display = ('name')
@@ -13,8 +12,6 @@ class Inc(admin.ModelAdmin):
 admin.site.register(Point)
 admin.site.register(Strizh)
 admin.site.register(ApemsConfiguration)
-
-
 
 from django.apps import apps
 

@@ -247,7 +247,7 @@
                     <div class="box-scroll" style="; background-color: rgb(255,255,255)">
                         <form action='show_logs' method='GET'>
 
-                            {% for el in logs_list %}
+                            {% for el in logs_list reversed %}
                             {{ el }} <br>
                             {% endfor %}
 
