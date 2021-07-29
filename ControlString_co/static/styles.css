@@ -312,6 +312,32 @@
     background-color: #3e22bf;
 }
 
+.button-config {
+    background-color: #04AA6D;
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    border-radius: 10px;
+    margin: 20px 20px;
+    position: absolute;
+    width:300px
+
+}
+
+.block2 {
+    width: 500px;
+    background: #fc0;
+    padding: 5px;
+    border: solid 1px black;
+    float: left;
+    position: relative;
+    top: 40px;
+    left: -70px;
+   }
 
 /*60.014340, 30.452578*/
 /*60.012439, 30.447278*/

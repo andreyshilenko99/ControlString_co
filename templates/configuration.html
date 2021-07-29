@@ -18,7 +18,8 @@
     {% csrf_token %}
 
 </head>
-<body style="text-align: left">
+<body style="text-align: left; background-color:rgba(113,129,132,0.14);">
+<!--<body style="text-align: left">-->
 <div class="everything">
     <!--    <input id="slider1" type="range" value="3" min="1" max="20" step="1"/>-->
     <div class="row" style="margin: 1%">
@@ -40,59 +41,90 @@
 
 
     </div>
-    <form action="choose_apem_toshow" method="post">
+
+    <div class="row">
+        <h2 style="margin: 30px 100px">
+            Просмотр блоков АПЕМ, Шелест
+        </h2>
+    </div>
+    <form action="new_apem" method="post">
         {% csrf_token %}
-        <div class="row">
-            <div class="col-11 " style="margin: 30px 30px">
-                <h2 style="margin: 30px 30px">
-                    Просмотр блоков АПЕМ, Шелест
-                </h2>
-                <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255);
-                    width: 700px; height: 400px; margin: 30px 30px">
-                    {% load mytags %}
-                    <!--                        <form action="get_drones" method='POST'>-->
-                    {% for apem in apems%}
-                    <div class="mx-auto">
-                        <!--                            <span style="font-weight: 600; color: #2b570e; margin-left: 1%">{{ dron.pk }}. </span>-->
+        <button class="button-blue-small">
+            Добавить новый блок
+        </button>
+    </form>
 
-                        <img src="static/icons/on.png" alt="on" style="max-width: 20px;">
-                        <img src="static/icons/off.png" alt="on" style="max-width: 20px;">
-                        <!--                        <button>-->
-                        <span style="font-weight: 600; color: #488423; margin-left: 1%">{{ apem }}</span>
-                        <!--                        </button>-->
-
-
-                        <span style="font-weight: 600; color: #c1802e">{{ apem.type_podavitelya}}, </span>
-                        <span style="font-weight: 600; color: #872525"> хост: {{ apem.ip_podavitelya}}, </span>
-
-
-                        <span style="font-weight: 600; color: #0059b6">
-                                канал: {{apem.canal_podavitelya}},
-                            </span>
-
-                        <span style="font-weight: 600; color: 	#872525"> усиление: {{ apem.usileniye_db}} дБ, </span>
-
-                    </div>
-
-
-                    {% endfor %}
+    <div class="row">
+        <form action="choose_apem_toshow" method="post">
+            {% csrf_token %}
+            <!--            <div id="apems" class="box-scroll" style="width: 800px; height: 400px; background-color: rgb(255,255,255);-->
+            <!--                    margin: 30px 30px">-->
+            <div class="row" style="margin-left: 100px">
+                {% load mytags %}
+                <!--                    {% for apem in apems%}-->
+                <!--                    <img src="static/icons/on.png" alt="on" style="max-width: 20px;">-->
+                <!--                    <img src="static/icons/off.png" alt="on" style="max-width: 20px;">-->
+                <!--                    <span style="font-weight: 600; color: #488423; margin-left: 1%">{{ apem }}</span>-->
+                <!--                    <span style="font-weight: 600; color: #c1802e">{{ apem.type_podavitelya}}, </span>-->
+                <!--                    <span style="font-weight: 600; color: #872525"> хост: {{ apem.ip_podavitelya}}, </span>-->
+                <!--                    <span style="font-weight: 600; color: #0059b6">-->
+                <!--                                канал: {{apem.canal_podavitelya}},-->
+                <!--                            </span>-->
+                <!--                    <span style="font-weight: 600; color: 	#872525"> усиление: {{ apem.usileniye_db}} дБ, </span>-->
+                <!--                    {% endfor %}-->
+                <div class="block2">
+                    {% if form_apem.fields.freq_podavitelya.queryset.count != 0 %}
+                    {{form_apem}}
+                    <button class="button-blue-small">
+                        выбрать
+                    </button>
+                    {% else %}
+                    <h3> Необходимо добавить в базу имеющиеся блоки АПЕМ, Шелест </h3>
+                    {% endif %}
                 </div>
 
-
             </div>
-        </div>
-        <!--            <div class="col-1 ">-->
-        <!--                <button class="button-green-small">-->
-        <!--                    Выбор-->
-        <!--                </button>-->
+        </form>
+        <form action="set_apem" method="post">
+            {% csrf_token %}
+            {% if apem_change_form.fields %}
+            <div class="row">
 
 
-        <!--            </div>-->
+                <div id="apems_form" style="
+                    margin: 30px 100px">
+
+
+                    <h3> Редактирование {% for apem in apem_toshow %}
+                        {{apem}}
+                        {% endfor %}
+                    </h3>
+
+                    {{apem_change_form}}
+
+
+                </div>
+            </div>
+
+            <div class="row" style="margin-left: 95px">
+                <button class="button-config">
+                    ввод
+                </button>
+            </div>
+            {% endif %}
+
+
+    </div>
+    </form>
 </div>
-</form>
+
+<!--            <div class="col-1 ">-->
+<!--                <button class="button-green-small">-->
+<!--                    Выбор-->
+<!--                </button>-->
 
 
-</div>
+<!--            </div>-->
 
 
 </body>

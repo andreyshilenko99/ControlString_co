@@ -12,7 +12,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
-from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm
+from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm
 
 from ControlString_co.control_trace import scan_on_off
 from ControlString_co.control_trace import jammer_on_off, scan_on_off
@@ -236,31 +236,80 @@ def choose_apem_toshow(request):
     global c
     if request.method == 'POST':
         form_apem = ApemsConfigurationForm(request.POST)
-        # for el_db in DroneJournal.objects.all():
-        #     el_db.delete()
+
         if form_apem.is_valid():
             apem_toshow = form_apem.cleaned_data.get('apem_toshow')
             c['apem_toshow'] = apem_toshow
-            # if len(apem_toshow) != 0:
-            #     DP = apem_toshow[0]
-            #     apem_value = DroneJournal(system_name=DP.system_name,
-            #                                center_freq=DP.center_freq,
-            #                                brandwidth=DP.brandwidth,
-            #                                detection_time=DP.detection_time,
-            #                                comment_string=DP.comment_string,
-            #                                lat=DP.lat,
-            #                                lon=DP.lon,
-            #                                azimuth=DP.azimuth,
-            #                                area_sector_start_grad=DP.area_sector_start_grad,
-            #                                area_sector_end_grad=DP.area_sector_end_grad,
-            #                                area_radius_m=DP.area_radius_m,
-            #                                ip=DP.ip,
-            #                                current_time=DP.current_time,
-            #                                strig_name=DP.strig_name)
-            #     apem_value.save()
+            apem_change_form = ApemsChangingForm()
+            AP = ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk)
+            apem_change_form.fields['freq_podavitelya'].initial = AP.freq_podavitelya
+            apem_change_form.fields['deg_podavitelya'].initial = AP.deg_podavitelya
+            apem_change_form.fields['type_podavitelya'].initial = AP.type_podavitelya
+            apem_change_form.fields['ip_podavitelya'].initial = AP.ip_podavitelya
+            apem_change_form.fields['canal_podavitelya'].initial = AP.canal_podavitelya
+            apem_change_form.fields['usileniye_db'].initial = AP.usileniye_db
+
     else:
         form_apem = ApemsConfigurationForm()
+        apem_change_form = ApemsChangingForm()
     c['form_apem'] = form_apem
+    c['apem_change_form'] = apem_change_form
+
+    return render(request, "configuration.html", context=c)
+
+
+def set_apem(request):
+    global c
+    if request.method == 'POST':
+        form_apem = ApemsConfigurationForm(request.POST)
+
+        if form_apem.is_valid():
+            apem_change_form = ApemsChangingForm(request.POST)
+            if apem_change_form.is_valid():
+                AP = apem_change_form.cleaned_data
+                ApemsNew = ApemsConfiguration(freq_podavitelya=AP.get('freq_podavitelya'),
+                                              deg_podavitelya=AP.get('deg_podavitelya'),
+                                              type_podavitelya=AP.get('type_podavitelya'),
+                                              ip_podavitelya=AP.get('ip_podavitelya'),
+                                              canal_podavitelya=AP.get('canal_podavitelya'),
+                                              usileniye_db=AP.get('usileniye_db'))
+
+                if c.get('apem_toshow'):
+                    ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
+                    ApemsNew.save()
+                # apem_change_form.fields['freq_podavitelya'].placeholder = AP.get('freq_podavitelya')
+                # apem_change_form.fields['deg_podavitelya'].placeholder = AP.get('deg_podavitelya')
+                # apem_change_form.fields['type_podavitelya'].placeholder = AP.get('type_podavitelya')
+                # apem_change_form.fields['ip_podavitelya'].placeholder = AP.get('ip_podavitelya')
+                # apem_change_form.fields['canal_podavitelya'].placeholder = AP.get('canal_podavitelya')
+                # apem_change_form.fields['usileniye_db'].placeholder = AP.get('usileniye_db')
+                else:
+                    ApemsNew.save()
+                print(apem_change_form)
+    else:
+        form_apem = ApemsConfigurationForm()
+        apem_change_form = ApemsChangingForm()
+
+    c['form_apem'] = form_apem
+    c['apem_change_form'] = apem_change_form
+
+    return render(request, "configuration.html", context=c)
+
+
+def new_apem(request):
+    global c
+    if request.method == 'POST':
+        form_apem = ApemsConfigurationForm(request.POST)
+        if form_apem.is_valid():
+            apem_change_form = ApemsChangingForm()
+
+
+    else:
+        form_apem = ApemsConfigurationForm()
+        apem_change_form = ApemsChangingForm()
+
+    c['form_apem'] = form_apem
+    c['apem_change_form'] = apem_change_form
 
     return render(request, "configuration.html", context=c)
 
