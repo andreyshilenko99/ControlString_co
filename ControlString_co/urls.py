@@ -41,10 +41,10 @@ urlpatterns = [
     path('filter_all', views.filter_all),
 
     path('configuration', views.configuration),
-    path('butt_skan_all', views.butt_skan_all),
-    path('butt_glush_all', views.butt_glush_all),
-    path('butt_gps_all', views.butt_gps_all),
-    path('butt_ku_all', views.butt_ku_all),
+    # path('butt_skan_all', views.butt_skan_all),
+    # path('butt_glush_all', views.butt_glush_all),
+    # path('butt_gps_all', views.butt_gps_all),
+    # path('butt_ku_all', views.butt_ku_all),
     path('choose_nomer_strizha', views.choose_nomer_strizha),
     path('choose_all_strizhes', views.choose_all_strizhes),
 

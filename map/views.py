@@ -236,12 +236,13 @@ def choose_apem_toshow(request):
     global c
     if request.method == 'POST':
         form_apem = ApemsConfigurationForm(request.POST)
-
+        c['form_apem'] = form_apem
         if form_apem.is_valid():
             apem_toshow = form_apem.cleaned_data.get('apem_toshow')
             c['apem_toshow'] = apem_toshow
             apem_change_form = ApemsChangingForm()
             AP = ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk)
+            c['apem_action_message'] = 'Редактирование {}'.format(AP)
             apem_change_form.fields['freq_podavitelya'].initial = AP.freq_podavitelya
             apem_change_form.fields['deg_podavitelya'].initial = AP.deg_podavitelya
             apem_change_form.fields['type_podavitelya'].initial = AP.type_podavitelya
@@ -275,6 +276,7 @@ def set_apem(request):
                                               usileniye_db=AP.get('usileniye_db'))
 
                 if c.get('apem_toshow'):
+                    c['apem_action_message'] = 'Редактирование {}'.format(AP)
                     ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
                     ApemsNew.save()
                 # apem_change_form.fields['freq_podavitelya'].placeholder = AP.get('freq_podavitelya')
@@ -302,7 +304,7 @@ def new_apem(request):
         form_apem = ApemsConfigurationForm(request.POST)
         if form_apem.is_valid():
             apem_change_form = ApemsChangingForm()
-
+            c['apem_action_message'] = 'Создание нового блока'
 
     else:
         form_apem = ApemsConfigurationForm()
@@ -351,56 +353,54 @@ def configuration(request):
     return render(request, "configuration.html", context=c)
 
 
-def butt_skan_all(request):
-    global c
-    # nomer_strizha = 0
-    strizh_names = Strizh.objects.all()
-    for strizh in strizh_names:
-        # TODO action 1 button
-        print('skanirovanie vseh: ', strizh.ip1, strizh.ip2)
-        scan_on_off(strizh.ip1)
-        scan_on_off(strizh.ip2)
+# def butt_skan_all(request):
+#     global c
+#     # nomer_strizha = 0
+#     strizh_names = Strizh.objects.all()
+#     for strizh in strizh_names:
+#         # TODO action 1 button
+#         print('skanirovanie vseh: ', strizh.ip1, strizh.ip2)
+#         scan_on_off(strizh.ip1)
+#         scan_on_off(strizh.ip2)
+#
+#     c["action_strizh"] = "Сканирование всех"
+#     # return redirect(request.META['HTTP_REFERER'])
+#     return render(request, "main.html", context=c)
+#
+#
+# def butt_glush_all(request):
+#     global c
+#     strizh_names = Strizh.objects.all()
+#     print(strizh_names)
+#     for strizh in strizh_names:
+#         print('glushenie vseh: ', strizh.ip1, strizh.ip2)
+#         # jammer_on_off(strizh.ip)
+#
+#     # TODO trace pomenyat
+#
+#     c["action_strizh"] = "Глушение всех"
+#     # return redirect(request.META['HTTP_REFERER'])
+#     return render(request, "main.html", context=c)
 
-    c["action_strizh"] = "Сканирование всех"
-    # return redirect(request.META['HTTP_REFERER'])
-    return render(request, "main.html", context=c)
-
-
-def butt_glush_all(request):
-    global c
-    strizh_names = Strizh.objects.all()
-    print(strizh_names)
-    for strizh in strizh_names:
-        print('glushenie vseh: ', strizh.ip1, strizh.ip2)
-        # jammer_on_off(strizh.ip)
-
-    # TODO trace pomenyat
-
-    c["action_strizh"] = "Глушение всех"
-    # return redirect(request.META['HTTP_REFERER'])
-    return render(request, "main.html", context=c)
-
+# def butt_gps_all(request):
+#     global c
+#     print('gps vseh')
+#     # TODO action 3 button
+#     c["action_strizh"] = "GPS для всех"
+#     # return redirect(request.META['HTTP_REFERER'])
+#     return render(request, "main.html", context=c)
+#
+#
+# def butt_ku_all(request):
+#     global c
+#     print('KU vseh #')
+#     # TODO action 4 button
+#     c["action_strizh"] = "КУ всех"
+#     # return redirect(request.META['HTTP_REFERER'])
+#     return render(request, "main.html", context=c)
 
 def back2main(request):
     return redirect(request.META['HTTP_REFERER'])
-
-
-def butt_gps_all(request):
-    global c
-    print('gps vseh')
-    # TODO action 3 button
-    c["action_strizh"] = "GPS для всех"
-    # return redirect(request.META['HTTP_REFERER'])
-    return render(request, "main.html", context=c)
-
-
-def butt_ku_all(request):
-    global c
-    print('KU vseh #')
-    # TODO action 4 button
-    c["action_strizh"] = "КУ всех"
-    # return redirect(request.META['HTTP_REFERER'])
-    return render(request, "main.html", context=c)
 
 
 def choose_nomer_strizha(request):
@@ -412,6 +412,7 @@ def choose_nomer_strizha(request):
     humidity_dict = {}
     weather_state_dict = {}
     if request.method == 'POST':
+        c['action_strizh'] = ''
         form = StrizhForm(request.POST)
         if form.is_valid():
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
@@ -466,6 +467,18 @@ def choose_all_strizhes(request):
     return render(request, "main.html", context=c)
 
 
+def get_complex_state(url):
+    state0 = obtain_state(url, 'датчик потока')
+    state1 = obtain_state(url, 'БП ПЭВМ')
+    state2 = obtain_state(url, 'БП Шелест')
+    state3 = obtain_state(url, 'БП АПЕМ')
+    state4 = obtain_state(url, 'ЭВМ1')
+    state5 = obtain_state(url, 'ЭВМ2')
+    states = [state0, state1, state2, state3, state4, state5]
+    xx = all([True if x == 'вкл' else False for x in states])
+    complex_state = 'включен' if xx else 'выключен'
+    return complex_state
+
 def render_main_page(request):
     global c
     complex_state = ''
@@ -477,17 +490,22 @@ def render_main_page(request):
     humidity_dict = {}
     weather_state_dict = {}
     url_uniping_dict = {}
+    complex_state_dict = {}
+
     strizhes = Strizh.objects.order_by('-lon').all()
     for strizh in strizhes:
         url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
 
-        temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+        temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name], = \
             return_conditions(url_uniping_dict[strizh.name])
+
+        complex_state_dict[strizh.name] = get_complex_state(url_uniping_dict[strizh.name])
     c['temperature_dict'] = temperature_dict
     xx = c
     c['humidity_dict'] = humidity_dict
     c['weather_state_dict'] = weather_state_dict
     c['url_uniping_dict'] = url_uniping_dict
+    c['complex_state_dict'] = complex_state_dict
 
     if not c.get('chosen_strizh'):
         # c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
@@ -812,8 +830,8 @@ def set_correct_temperature(url, strizh_name, temperature_state):
 
 
 def turn_on_bp(request):
-    global comlex_state, logs
-    x = c
+    global c, comlex_state, logs
+    c['action_strizh'] = ''
     for striz in c.get('chosen_strizh'):
         if striz != 'None':
             url = c['url_uniping_dict'][striz]
@@ -857,9 +875,8 @@ def turn_on_bp(request):
                 if state5 != 'вкл':
                     send_impulse(url, 'ЭВМ2', time_pulse=3, action='вкл')
 
-                states = [state1, state2, state3, state4, state5]
-                xx = all([True if x == 'вкл' else False for x in states])
-                complex_state = 'включен' if xx else 'выключен'
+
+                complex_state = get_complex_state(url)
                 c['complex_state'] = complex_state
                 str_log = striz + ': ' + complex_state
                 collect_logs(str_log)
@@ -870,7 +887,8 @@ def turn_on_bp(request):
 
 
 def turn_off_bp(request):
-    global complex_state
+    global c
+    c['action_strizh'] = ''
     for striz in c.get('chosen_strizh'):
         if striz != 'None':
             url = c['url_uniping_dict'][striz]

@@ -1,9 +1,13 @@
-from django.forms import ModelForm, Select, ModelChoiceField, ModelMultipleChoiceField, CharField, IntegerField
+import django.forms
+from django.forms import ModelForm, Select, ModelChoiceField, ModelMultipleChoiceField, CharField, IntegerField, \
+    TextInput
+from django.forms import CheckboxSelectMultiple
 
-# from .models import MyModel, MyStrizh
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
-from django.forms import widgets
+# from django.forms import widgets
+from django import forms
 
+from django.forms import IntegerField, TextInput, NumberInput
 
 class StrizhForm(ModelForm):
     chosen_strizh = ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
@@ -49,23 +53,25 @@ class DroneFilterForm(ModelForm):
         }
 
 
+
+
 class ApemsConfigurationForm(ModelForm):
-    names_arr = []
+
     AllApems = ApemsConfiguration.objects.all().order_by('-freq_podavitelya')
     apem_toshow = ModelMultipleChoiceField(queryset=AllApems,
                                            required=False, to_field_name="pk",
-                                           label="")
+                                           label="",
+                                           )
+    # apem_toshow.widget = Select(attrs={'size': 12, 'id': 'block2'
+    #                        })
 
     class Meta:
         model = ApemsConfiguration
         fields = ['apem_toshow']
-        widgets = {
-            'apem_toshow': Select(attrs={'id': 'name', 'size': '10', 'class': 'block2',
+        widget = {
+            'apem_toshow': Select(attrs={'id': 'block2', 'size': 10,
                                          }),
         }
-
-
-from django.forms import IntegerField, TextInput, NumberInput
 
 
 class ApemsChangingForm(ModelForm):
@@ -78,7 +84,7 @@ class ApemsChangingForm(ModelForm):
                   ]
         widgets = {
             'freq_podavitelya': NumberInput(attrs={'class': 'form-control', 'required': 'False',
-                                                 'placeholder': 'Частота подавителя'}),
+                                                   'placeholder': 'Частота подавителя'}),
             'deg_podavitelya': NumberInput(attrs={'class': 'form-control',
                                                   'placeholder': 'Номер подавителя (60, 120 ...)'}),
             'type_podavitelya': Select(attrs={'class': 'form-control', 'placeholder': 'Тип подавителя'}),

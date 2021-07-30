@@ -27,23 +27,25 @@
             <div class="col-8 ">
                 <div class="map-box" style="height: 60vh; width:98%; solid:#ffffff">
                     <div class="row" style="margin: 1%">
+                        <a href="menu">
+                            <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">
+                        </a>
+
                         <form action="menu" method='GET'>
-                            <button class="button-blue"> Меню</button>
+                            <button class="button-black" style="margin-left: 10px"> Меню</button>
                         </form>
                         <form action="main" method='GET'>
-                            <button class="button-blue"> Главная</button>
+                            <button class="button-black"> Главная</button>
                         </form>
                         <form action="journal" method='GET'>
-                            <button class="button-blue"> Журнал</button>
+                            <button class="button-black"> Журнал</button>
                         </form>
                         <form action="configuration" method='GET'>
-                            <button class="button-blue"> Конфигуратор</button>
+                            <button class="button-black"> Конфигуратор</button>
                         </form>
                         <form action="admin" method='GET'>
-                            <button class="button-blue"> Администратор</button>
+                            <button class="button-black"> Администратор</button>
                         </form>
-
-
                     </div>
                     <div class="leaflet-container" style="border: 0.5vh ">
 
@@ -165,12 +167,23 @@
 
                     {% if action_strizh %}
                     <div class="row" style="margin-left: 3%">
+                        {% for striz in chosen_strizh %}
+                        {% if striz != 'None' %}
+                        {% if complex_state_dict|getkey:striz == 'включен' %}
+
                         <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
                             Включен режим: </h4>
                         <!--                        &nbsp;-->
                         <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
                             {{action_strizh}}
                         </h4>
+                        {% else %}
+                        <h4 style="font-weight:600; font-family: Calibri,
+                            sans-serif; margin-left: 2%; color: #a10202">
+                            Необходимо включить {{striz}} </h4>
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
                     </div>
                     {% endif %}
 
@@ -181,11 +194,18 @@
                         <h5> Температура: {{ temperature_dict|getkey:striz }} &deg </h5>
                         <h5> Влажность: {{ humidity_dict|getkey:striz }}% </h5>
                         <h5> Состояние: {{ weather_state_dict|getkey:striz }} </h5>
+                        <h5> Комплекс:
+                            {% if complex_state_dict|getkey:striz == 'включен' %}
+                            <span style="color: #027d1e"> {{ complex_state_dict|getkey:striz }} </span>
+                            {% else %}
+                            <span style="color: #a10202"> {{ complex_state_dict|getkey:striz }} </span>
+                            {% endif %}
+                        </h5>
                         {% endif %}
                         {% endfor %}
                     </form>
                     {% elif chosen_strizh == all_strizhes %}
-                    <div class="row" >
+                    <div class="row">
                         <div class="col-12">
                             <div class="box-scroll" style="height: 100px; background-color: rgb(255,255,255)">
                                 <form action='main' style="margin: 10px 15px" method='GET'>

@@ -18,28 +18,28 @@
     {% csrf_token %}
 
 </head>
-<body style="text-align: left; background-color:rgba(113,129,132,0.14);">
-<!--<body style="text-align: left">-->
-<div class="everything">
-    <!--    <input id="slider1" type="range" value="3" min="1" max="20" step="1"/>-->
+<body style="text-align: left;  background: rgba(113,129,132,0.14) url(static/icons/strizh6.png); ">
+<div class="everything" style="margin: 1%">
     <div class="row" style="margin: 1%">
+        <a href="menu">
+            <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">
+        </a>
+
         <form action="menu" method='GET'>
-            <button class="button-blue"> Меню</button>
+            <button class="button-black" style="margin-left: 10px"> Меню</button>
         </form>
         <form action="main" method='GET'>
-            <button class="button-blue"> Главная</button>
+            <button class="button-black"> Главная</button>
         </form>
         <form action="journal" method='GET'>
-            <button class="button-blue"> Журнал</button>
+            <button class="button-black"> Журнал</button>
         </form>
         <form action="configuration" method='GET'>
-            <button class="button-blue"> Конфигуратор</button>
+            <button class="button-black"> Конфигуратор</button>
         </form>
         <form action="admin" method='GET'>
-            <button class="button-blue"> Администратор</button>
+            <button class="button-black"> Администратор</button>
         </form>
-
-
     </div>
 
     <div class="row">
@@ -47,12 +47,14 @@
             Просмотр блоков АПЕМ, Шелест
         </h2>
     </div>
-    <form action="new_apem" method="post">
-        {% csrf_token %}
-        <button class="button-blue-small">
-            Добавить новый блок
-        </button>
-    </form>
+    <div class="row" style="margin: 20px 100px">
+        <form action="new_apem" method="post">
+            {% csrf_token %}
+            <button class="button-blue-small">
+                Добавить новый блок
+            </button>
+        </form>
+    </div>
 
     <div class="row">
         <form action="choose_apem_toshow" method="post">
@@ -72,7 +74,7 @@
                 <!--                            </span>-->
                 <!--                    <span style="font-weight: 600; color: 	#872525"> усиление: {{ apem.usileniye_db}} дБ, </span>-->
                 <!--                    {% endfor %}-->
-                <div class="block2">
+<!--                <div class="block2">-->
                     {% if form_apem.fields.freq_podavitelya.queryset.count != 0 %}
                     {{form_apem}}
                     <button class="button-blue-small">
@@ -81,7 +83,7 @@
                     {% else %}
                     <h3> Необходимо добавить в базу имеющиеся блоки АПЕМ, Шелест </h3>
                     {% endif %}
-                </div>
+<!--                </div>-->
 
             </div>
         </form>
@@ -94,15 +96,9 @@
                 <div id="apems_form" style="
                     margin: 30px 100px">
 
-
-                    <h3> Редактирование {% for apem in apem_toshow %}
-                        {{apem}}
-                        {% endfor %}
+                    <h3> {{apem_action_message}}
                     </h3>
-
                     {{apem_change_form}}
-
-
                 </div>
             </div>
 

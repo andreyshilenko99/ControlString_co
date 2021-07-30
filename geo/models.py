@@ -122,17 +122,17 @@ class IntegerRangeField(models.IntegerField):
 
 class ApemsConfiguration(models.Model):
     freq_podavitelya = IntegerRangeField('Частота подавителя', default=2400, min_value=2400, max_value=6000,
-                                        error_messages={'required': ''})
+                                        )
     deg_podavitelya = IntegerRangeField('Номер подавителя (60, 120 ...)', default=60, min_value=0, max_value=300,
-                                        error_messages={'required': ''})
+                                        )
     # name_podavitelya = models.CharField('Имя подавителя', max_length=500, default='qwd ')
     type_podavitelya = models.CharField('Тип подавителя', max_length=500, choices=PODAVITEL_CHOICES,
-                                        error_messages={'required': ''})
-    ip_podavitelya = models.GenericIPAddressField('IP-адрес подавителя', max_length=500, default='192.168.2.121', error_messages={'required': ''})
+                                        )
+    ip_podavitelya = models.GenericIPAddressField('IP-адрес подавителя', max_length=500, default='192.168.2.121',)
     canal_podavitelya = IntegerRangeField('Канал подавителя', default=0, min_value=0, max_value=2,
-                                          error_messages={'required': ''})
+                                          )
     usileniye_db = IntegerRangeField('Усиление', default=0, min_value=0, max_value=31,
-                                     error_messages={'required': ''})
+                                     )
 
     def __str__(self):
         str_to_return = str(self.freq_podavitelya) + ' - ' + str(self.deg_podavitelya) + '°'
