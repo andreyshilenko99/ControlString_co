@@ -50,9 +50,9 @@ class DroneJournal(models.Model):
     strig_name = models.CharField('Имя стрижа', max_length=500, default='')
 
     def __str__(self):
-        prop_spos = 'Пропускная способность: {} МГц'.format(round(self.brandwidth, 2))
+        prop_spos = 'Bandwidth: {} МГц'.format(round(self.brandwidth, 2))
         arr_to_return = [self.detection_time, self.system_name, int(self.area_sector_start_grad), '° -',
-                         int(self.area_sector_end_grad), '° ', self.azimuth, 'host:', self.ip,
+                         int(self.area_sector_end_grad), '° ', self.azimuth, 'host:' + str(self.ip),
                          self.strig_name, prop_spos, self.comment_string,
                          self.area_radius_m, 'м.']
         arr_strings = [str(el) for el in arr_to_return]
@@ -122,20 +122,27 @@ class IntegerRangeField(models.IntegerField):
 
 class ApemsConfiguration(models.Model):
     freq_podavitelya = IntegerRangeField('Частота подавителя', default=2400, min_value=2400, max_value=6000,
-                                        )
+                                         error_messages={'required': ''}
+                                         )
     deg_podavitelya = IntegerRangeField('Номер подавителя (60, 120 ...)', default=60, min_value=0, max_value=300,
+                                        error_messages={'required': ''}
                                         )
     # name_podavitelya = models.CharField('Имя подавителя', max_length=500, default='qwd ')
     type_podavitelya = models.CharField('Тип подавителя', max_length=500, choices=PODAVITEL_CHOICES,
+                                        error_messages={'required': ''}
                                         )
-    ip_podavitelya = models.GenericIPAddressField('IP-адрес подавителя', max_length=500, default='192.168.2.121',)
+    ip_podavitelya = models.GenericIPAddressField('IP-адрес подавителя', max_length=500, default='192.168.2.121',
+                                                  error_messages={'required': ''})
     canal_podavitelya = IntegerRangeField('Канал подавителя', default=0, min_value=0, max_value=2,
+                                          error_messages={'required': ''}
                                           )
-    usileniye_db = IntegerRangeField('Усиление', default=0, min_value=0, max_value=31,
+    usileniye_db = IntegerRangeField('Усиление', default=0, min_value=0, max_value=31, error_messages={'required': ''}
                                      )
 
     def __str__(self):
-        str_to_return = str(self.freq_podavitelya) + ' - ' + str(self.deg_podavitelya) + '°'
+        str_to_return = str(self.freq_podavitelya) + ' - ' + str(self.deg_podavitelya) + '° ' + str(
+            self.type_podavitelya) + \
+                        ' ' + str(self.usileniye_db) + 'db'
         return str_to_return
 
     class Meta:

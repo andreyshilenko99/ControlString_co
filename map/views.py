@@ -235,6 +235,7 @@ def get_strizhes():
 def choose_apem_toshow(request):
     global c
     if request.method == 'POST':
+        c['initial'] = 'False'
         form_apem = ApemsConfigurationForm(request.POST)
         c['form_apem'] = form_apem
         if form_apem.is_valid():
@@ -262,38 +263,79 @@ def choose_apem_toshow(request):
 def set_apem(request):
     global c
     if request.method == 'POST':
+        c['initial'] = 'True'
+        # form_apem = ApemsConfigurationForm()
+        #
+        # if form_apem.is_valid():
+        apem_change_form = ApemsChangingForm(request.POST)
+        if apem_change_form.is_valid():
+            AP = apem_change_form.cleaned_data
+            ApemsNew = ApemsConfiguration(freq_podavitelya=AP.get('freq_podavitelya'),
+                                          deg_podavitelya=AP.get('deg_podavitelya'),
+                                          type_podavitelya=AP.get('type_podavitelya'),
+                                          ip_podavitelya=AP.get('ip_podavitelya'),
+                                          canal_podavitelya=AP.get('canal_podavitelya'),
+                                          usileniye_db=AP.get('usileniye_db'))
+
+            apem_change_form.fields['freq_podavitelya'].initial = AP.get('freq_podavitelya')
+            apem_change_form.fields['deg_podavitelya'].initial = AP.get('deg_podavitelya')
+            apem_change_form.fields['type_podavitelya'].initial = AP.get('type_podavitelya')
+            apem_change_form.fields['ip_podavitelya'].initial = AP.get('ip_podavitelya')
+            apem_change_form.fields['canal_podavitelya'].initial = AP.get('canal_podavitelya')
+            apem_change_form.fields['usileniye_db'].initial = AP.get('usileniye_db')
+
+            if c.get('apem_toshow'):
+                xx = c['apem_toshow']
+                c['apem_action_message'] = '{} был отредактирован'.format(c.get('apem_toshow')[0])
+
+                try:
+                    ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
+                    c['apem_toshow'] = [ApemsNew]
+                except:
+                    print(c['apem_toshow'][0])
+                ApemsNew.save()
+            # apem_change_form.fields['freq_podavitelya'].placeholder = AP.get('freq_podavitelya')
+            # apem_change_form.fields['deg_podavitelya'].placeholder = AP.get('deg_podavitelya')
+            # apem_change_form.fields['type_podavitelya'].placeholder = AP.get('type_podavitelya')
+            # apem_change_form.fields['ip_podavitelya'].placeholder = AP.get('ip_podavitelya')
+            # apem_change_form.fields['canal_podavitelya'].placeholder = AP.get('canal_podavitelya')
+            # apem_change_form.fields['usileniye_db'].placeholder = AP.get('usileniye_db')
+            else:
+                c['apem_action_message'] = '{} был создан'.format(ApemsNew)
+                # c['apem_toshow'] = [ApemsNew]
+                ApemsNew.save()
+    else:
+
+        apem_change_form = ApemsChangingForm()
+
+    # c['form_apem'] = form_apem
+    c['apem_change_form'] = apem_change_form
+
+    return render(request, "configuration.html", context=c)
+
+
+def delete_apem(request):
+    global c
+    if request.method == 'POST':
+        c['initial'] = 'True'
         form_apem = ApemsConfigurationForm(request.POST)
 
         if form_apem.is_valid():
             apem_change_form = ApemsChangingForm(request.POST)
-            if apem_change_form.is_valid():
-                AP = apem_change_form.cleaned_data
-                ApemsNew = ApemsConfiguration(freq_podavitelya=AP.get('freq_podavitelya'),
-                                              deg_podavitelya=AP.get('deg_podavitelya'),
-                                              type_podavitelya=AP.get('type_podavitelya'),
-                                              ip_podavitelya=AP.get('ip_podavitelya'),
-                                              canal_podavitelya=AP.get('canal_podavitelya'),
-                                              usileniye_db=AP.get('usileniye_db'))
+            xx = c
+            if c.get('apem_toshow'):
+                c['apem_action_message'] = '{} был удален'.format(c.get('apem_toshow')[0])
+                print(c.get('apem_toshow'))
+                ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
 
-                if c.get('apem_toshow'):
-                    c['apem_action_message'] = 'Редактирование {}'.format(AP)
-                    ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
-                    ApemsNew.save()
-                # apem_change_form.fields['freq_podavitelya'].placeholder = AP.get('freq_podavitelya')
-                # apem_change_form.fields['deg_podavitelya'].placeholder = AP.get('deg_podavitelya')
-                # apem_change_form.fields['type_podavitelya'].placeholder = AP.get('type_podavitelya')
-                # apem_change_form.fields['ip_podavitelya'].placeholder = AP.get('ip_podavitelya')
-                # apem_change_form.fields['canal_podavitelya'].placeholder = AP.get('canal_podavitelya')
-                # apem_change_form.fields['usileniye_db'].placeholder = AP.get('usileniye_db')
-                else:
-                    ApemsNew.save()
-                print(apem_change_form)
+                    # ApemsNew.save()
+
     else:
         form_apem = ApemsConfigurationForm()
         apem_change_form = ApemsChangingForm()
 
-    c['form_apem'] = form_apem
-    c['apem_change_form'] = apem_change_form
+    # c['form_apem'] = form_apem
+    # c['apem_change_form'] = apem_change_form
 
     return render(request, "configuration.html", context=c)
 
@@ -301,14 +343,17 @@ def set_apem(request):
 def new_apem(request):
     global c
     if request.method == 'POST':
+        c['initial'] = 'False'
         form_apem = ApemsConfigurationForm(request.POST)
         if form_apem.is_valid():
             apem_change_form = ApemsChangingForm()
             c['apem_action_message'] = 'Создание нового блока'
+            c['apem_toshow'] = ''
 
     else:
         form_apem = ApemsConfigurationForm()
         apem_change_form = ApemsChangingForm()
+
 
     c['form_apem'] = form_apem
     c['apem_change_form'] = apem_change_form
@@ -342,7 +387,9 @@ def configuration(request):
             #                                current_time=DP.current_time,
             #                                strig_name=DP.strig_name)
             #     apem_value.save()
+        c['initial'] = 'True'
     else:
+        c['initial'] = 'True'
         form_apem = ApemsConfigurationForm()
     c['form_apem'] = form_apem
 

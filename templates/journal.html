@@ -83,11 +83,11 @@
 
 
                     <form action="choose_drone_toshow" method="post">
-                        <div class="row">
+                        <div class="row" >
                             <div class="col-11 ">
 
-                                <div id="detections" class="box-scroll" style="background-color: rgb(226,226,226); margin: 2% 0;
-                    width: 100%; height: 95%">
+                                <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255); margin: 10px 0;
+                    width: 100%; height: 240px">
 
                                     {% csrf_token %}
                                     {% if form_drone.fields.drone_toshow.queryset.count != 0 %}
@@ -100,7 +100,6 @@
                                     {% else %}
                                     По выбранным критериям ничего не найдено
                                     {% endif %}
-
 
                                 </div>
                             </div>

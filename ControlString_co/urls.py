@@ -67,5 +67,6 @@ urlpatterns = [
     path('choose_apem_toshow', views.choose_apem_toshow),
     path('set_apem', views.set_apem),
     path('new_apem', views.new_apem),
+    path('delete_apem', views.delete_apem),
 
 ]

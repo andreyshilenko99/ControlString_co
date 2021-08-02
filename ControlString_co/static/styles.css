@@ -310,7 +310,7 @@
 
 }
 
-.myfieldclass{
+.myfieldclass {
     background-color: #3e22bf;
 }
 
@@ -326,8 +326,54 @@
     border-radius: 10px;
     margin: 20px 20px;
     position: absolute;
-    width:300px
+    width: 300px
 
+}
+
+.button-delete {
+    background-color: #ce1212;
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    border-radius: 10px;
+    margin: 20px 20px;
+    position: absolute;
+    width: 300px
+
+}
+
+#choose_strizh {
+    width: 200px;
+    background: #ffffff;
+    padding: 5px;
+    border: solid 1px #4b4b4b;
+    float: left;
+    position: relative;
+
+
+}
+
+/*#detections{*/
+/*    background-color: rgb(255, 255, 255);*/
+/*    margin: 2% 0;*/
+/*    width: 1100px;*/
+/*    height: 150px;*/
+/*    position: relative;*/
+
+/*}*/
+#block1 {
+    width: 350px;
+    background: #f6f6f6;
+    padding: 5px;
+    border: solid 1px black;
+    float: left;
+    position: relative;
+    top: 20px;
+    left: 20px;
 }
 
 #block2 {
@@ -339,7 +385,18 @@
     position: relative;
     top: 40px;
     left: -70px;
-   }
+}
+
+.block2 {
+    width: 500px;
+    background: #5abb4f;
+    padding: 5px;
+    border: solid 1px black;
+    float: left;
+    position: relative;
+    top: 40px;
+    left: -70px;
+}
 
 /*60.014340, 30.452578*/
 /*60.012439, 30.447278*/

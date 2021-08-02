@@ -1,6 +1,6 @@
 import django.forms
 from django.forms import ModelForm, Select, ModelChoiceField, ModelMultipleChoiceField, CharField, IntegerField, \
-    TextInput
+    TextInput, SelectMultiple
 from django.forms import CheckboxSelectMultiple
 
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
@@ -26,7 +26,8 @@ class StrizhFilterForm(ModelForm):
     filtered_strizhes = ModelMultipleChoiceField(queryset=Strizh.objects.all(),
                                                  required=False, to_field_name="name",
                                                  label="")
-
+    filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '4',
+                                                })
     class Meta:
         model = Strizh
         fields = ['filtered_strizhes']
@@ -43,14 +44,13 @@ class DroneFilterForm(ModelForm):
     drone_toshow = ModelMultipleChoiceField(queryset=AllDrones,
                                             required=False, to_field_name="pk",
                                             label="")
-
+    drone_toshow.widget = SelectMultiple(attrs={'id': 'detections', 'size': '8',
+                                                     })
     class Meta:
         model = Point
         fields = ['drone_toshow']
-        widgets = {
-            'filtered_strizhes': Select(attrs={'id': 'name', 'size': '10',
-                                               }),
-        }
+
+
 
 
 
@@ -62,16 +62,17 @@ class ApemsConfigurationForm(ModelForm):
                                            required=False, to_field_name="pk",
                                            label="",
                                            )
-    # apem_toshow.widget = Select(attrs={'size': 12, 'id': 'block2'
-    #                        })
+    apem_toshow.widget = SelectMultiple(attrs={'size': 12, 'id': 'block1'
+                           })
 
     class Meta:
         model = ApemsConfiguration
         fields = ['apem_toshow']
-        widget = {
-            'apem_toshow': Select(attrs={'id': 'block2', 'size': 10,
-                                         }),
-        }
+#         widgets = {
+#             'apem_toshow': Select(attrs={'size': 12, 'id': 'block2'
+#                            })
+# ,
+#         }
 
 
 class ApemsChangingForm(ModelForm):
