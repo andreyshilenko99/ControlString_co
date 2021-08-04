@@ -51,7 +51,7 @@ def snmp_send(community, ip, port, oid):
 def main_check():
     srizhes = apps.get_model('geo', 'Strizh').objects.all()
     for strizh in srizhes:
-        ip_address_host = strizh.uniping
+        ip_address_host = strizh.uniping_ip
         name = (snmp_get(community_string, ip_address_host, port_snmp, temperature))
         print('answer= ' + name)
         # print(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get(temperature)))
@@ -115,3 +115,5 @@ def main_check():
                         snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('warm'))
                     # if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('wind'))) == 1:
                     #     snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('wind'))
+
+

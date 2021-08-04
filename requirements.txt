@@ -31,3 +31,4 @@ wcwidth==0.2.5
 zipp==3.4.1
 
 google~=3.0.0
+pysnmp~=4.4.12
