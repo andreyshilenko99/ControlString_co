@@ -38,6 +38,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'admin_numeric_filter',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -87,26 +88,24 @@ CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 CELERY_TIMEZONE = 'Europe/Moscow'
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'stuff',
-        'USER': 'dron',
-        'PASSWORD': '555',
-        'HOST': '192.168.1.66',
-        'PORT': '5432', }
-}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'test_bd',
+#         'NAME': 'stuff',
 #         'USER': 'dron',
 #         'PASSWORD': '555',
-#         'HOST': '127.0.0.1',
+#         'HOST': '192.168.1.66',
 #         'PORT': '5432', }
 # }
-
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': '555',
+        'HOST': '127.0.0.1',
+        'PORT': '5432', }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -166,6 +165,7 @@ LEAFLET_CONFIG = {
                     '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css',
                     '/static/src/L.Icon.Pulse.css',
                     '/static/styles.css',
+                    '/static/datepicker-widget.css',
                     ],
             'js': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.js',
                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js',
@@ -174,6 +174,7 @@ LEAFLET_CONFIG = {
                    '/static/src/L.Realtime.js',
                    '/static/src/leaflet-realtime.js',
                    '/static/src/L.Icon.Pulse.js',
+                   '/static/src/leaflet.circle-sector.js',
                    ],
             'auto-include': True
         },
@@ -185,4 +186,4 @@ LEAFLET_CONFIG = {
 
 SERIALIZATION_MODULES = {
     "geojson": "django.contrib.gis.serializers.geojson",
- }
+}
