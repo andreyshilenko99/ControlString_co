@@ -86,8 +86,7 @@
                         <div class="row" >
                             <div class="col-11 ">
 
-                                <div id="detections" class="box-scroll" style="background-color: rgb(255,255,255); margin: 10px 0;
-                    width: 100%; height: 240px">
+                                <div id="detections" class="box-scroll">
 
                                     {% csrf_token %}
                                     {% if form_drone.fields.drone_toshow.queryset.count != 0 %}
@@ -220,7 +219,7 @@
                                             <i class="glyphicon glyphicon-calendar"></i>
                                         </div>
                                     </div>
-                                    <button class="button-blue-small" type='submit'> Применить</button>
+                                    <button class="button-blue-small" type='submit'> Применить </button>
                                 </div>
                             </div>
                             </h4>

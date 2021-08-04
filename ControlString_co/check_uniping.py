@@ -2,6 +2,8 @@ from django.apps import apps
 from pysnmp.hlapi import *
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902
+# from geo.models import Strizh
+
 
 community_string = 'SWITCH'  # From file
 ip_address_host = '192.168.2.51'  # From file
@@ -50,6 +52,7 @@ def snmp_send(community, ip, port, oid):
 
 def main_check():
     srizhes = apps.get_model('geo', 'Strizh').objects.all()
+    # srizhes = Strizh.objects.all()
     for strizh in srizhes:
         ip_address_host = strizh.uniping
         name = (snmp_get(community_string, ip_address_host, port_snmp, temperature))
@@ -115,3 +118,7 @@ def main_check():
                         snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('warm'))
                     # if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('wind'))) == 1:
                     #     snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('wind'))
+
+
+if __name__ == "__main__":
+    main_check()

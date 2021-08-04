@@ -63,8 +63,7 @@ def return_conditions(url):
             weather_state = "NOT OK !!!"
     else:
         weather_state = "ошибка соединения с uniping"
-    # c["weather_state"] = weather_state
-    print(url, temperature, humidity, weather_state)
+
     return temperature, humidity, weather_state
 
 
@@ -485,7 +484,7 @@ def choose_all_strizhes(request):
 
     strizhes = Strizh.objects.order_by('-lon').all()
     if request.method == 'POST':
-
+        c['action_strizh'] = ''
         c['chosen_strizh'] = [strizh.name for strizh in strizhes]
 
         temperature_dict = {}
@@ -575,28 +574,34 @@ def render_main_page(request):
 
 def butt_skan(request):
     global c
+    xx = c
     strizh_names = Strizh.objects.all()
-
+    c["action_strizh"] = "Сканирование: "
     if c.get("chosen_strizh") != 0:
-
-        c["action_strizh"] = "Сканирование: {}".format(', '.join([st for st in c['chosen_strizh'] if st != 'None']))
-
+        print('Сканирование dlya strizha #', c.get('chosen_strizh'))
         for strizh in strizh_names:
-            if strizh.name == c.get("chosen_strizh"):
+            if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
+                # print(strizh.ip1)
+                c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
                 scan_on_off(strizh.ip1)
                 scan_on_off(strizh.ip2)
-                print('skanirovanie dlya strizha #', strizh.name)
 
-    # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 
 
 def butt_glush(request):
     global c
+    xx = c
+    strizh_names = Strizh.objects.all()
+    c["action_strizh"] = "Глушение: "
     if c.get("chosen_strizh") != 0:
         print('glushenie dlya strizha #', c.get('chosen_strizh'))
-        # TODO action 2 button
-    c["action_strizh"] = "Глушение: {}".format(', '.join([st for st in c['chosen_strizh'] if st != 'None']))
+        for strizh in strizh_names:
+            if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
+                # print(strizh.ip1)
+                c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
+
+    xxx = c
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 

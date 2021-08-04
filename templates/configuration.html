@@ -109,16 +109,20 @@
             </div>
             {% if initial != 'True' %}
 
+
+        </form>
+        <form action="set_apem" method="post">
+            {% csrf_token %}
             <div class="row" style="margin-left: 95px">
 
 
-                {% csrf_token %}
                 <button class="button-config">
                     ввод
                 </button>
 
             </div>
         </form>
+
 
         <div class="row" style="margin-top: 100px">
             <form action="delete_apem" method="post">
