@@ -88,24 +88,25 @@ CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 CELERY_TIMEZONE = 'Europe/Moscow'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'stuff',
-#         'USER': 'dron',
-#         'PASSWORD': '555',
-#         'HOST': '192.168.1.66',
-#         'PORT': '5432', }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': 'stuff',
+        'USER': 'dron',
         'PASSWORD': '555',
-        'HOST': '127.0.0.1',
+        'HOST': '192.168.1.66',
         'PORT': '5432', }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': '555',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432', }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

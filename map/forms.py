@@ -32,7 +32,7 @@ class StrizhFilterForm(ModelForm):
         model = Strizh
         fields = ['filtered_strizhes']
         widgets = {
-            'filtered_strizhes': Select(attrs={'id': 'name', 'width': '300px',
+            'filtered_strizhes': SelectMultiple(attrs={'id': 'name', 'width': '300px',
                                                'class': 'myfieldclass'}),
 
         }

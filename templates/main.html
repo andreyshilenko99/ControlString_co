@@ -101,7 +101,7 @@
                         <div class="row" style="margin-top: 2%;margin-left: 0.5%; width: 100%">
                             <form action="choose_all_strizhes" method="post">
                                 {% csrf_token %}
-                                <button class="button-blue-small">
+                                <button class="btn btn-primary">
                                     Управление всеми стрижами
                                 </button>
                             </form>
@@ -117,7 +117,7 @@
                                 <form action="choose_nomer_strizha" method="post">
                                     {% csrf_token %}
                                     {{ form }}
-                                    <button class="button-blue-small">
+                                    <button class="btn btn-primary">
                                         ввод
                                     </button>
                                 </form>
@@ -145,7 +145,7 @@
                                     <button class="button-green" type='submit'> Сканирование</button>
                                 </form>
                                 <form action='butt_glush' method='GET'>
-                                    <button class="button-green">Глуш.</button>
+                                    <button class="button-green" >Глуш.</button>
                                 </form>
                                 <form action='butt_gps' method='GET'>
                                     <button class="button-green"> GPS глуш.</button>

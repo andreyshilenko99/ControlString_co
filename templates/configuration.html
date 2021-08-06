@@ -50,7 +50,7 @@
     <div class="row" style="margin: 20px 100px">
         <form action="new_apem" method="post">
             {% csrf_token %}
-            <button class="button-blue-small">
+            <button type="submit" name="new_apem" class="button-blue-small">
                 Добавить новый блок
             </button>
         </form>
@@ -58,23 +58,8 @@
 
     <div class="row">
 
-        <!--            <div id="apems" class="box-scroll" style="width: 800px; height: 400px; background-color: rgb(255,255,255);-->
-        <!--                    margin: 30px 30px">-->
         <div class="row" style="margin-left: 100px">
             {% load mytags %}
-            <!--                    {% for apem in apems%}-->
-            <!--                    <img src="static/icons/on.png" alt="on" style="max-width: 20px;">-->
-            <!--                    <img src="static/icons/off.png" alt="on" style="max-width: 20px;">-->
-            <!--                    <span style="font-weight: 600; color: #488423; margin-left: 1%">{{ apem }}</span>-->
-            <!--                    <span style="font-weight: 600; color: #c1802e">{{ apem.type_podavitelya}}, </span>-->
-            <!--                    <span style="font-weight: 600; color: #872525"> хост: {{ apem.ip_podavitelya}}, </span>-->
-            <!--                    <span style="font-weight: 600; color: #0059b6">-->
-            <!--                                канал: {{apem.canal_podavitelya}},-->
-            <!--                            </span>-->
-            <!--                    <span style="font-weight: 600; color: 	#872525"> усиление: {{ apem.usileniye_db}} дБ, </span>-->
-            <!--                    {% endfor %}-->
-            <!--                <div class="block2">-->
-
 
             <!--            <div id="block1">-->
             <form action="choose_apem_toshow" method="post">
@@ -94,13 +79,13 @@
             <!--                </div>-->
 
         </div>
-        <form action="set_apem" method="post">
+        <form action="" method="post">
+
+            {% csrf_token %}
             {% if apem_change_form.fields %}
             <div class="row">
-
                 <div id="apems_form" style="
-                    margin: 30px 100px">
-
+                    margin: 0px 100px">
                     <h3> {{apem_action_message}}
                     </h3>
                     {{apem_change_form}}
@@ -108,31 +93,32 @@
                 </div>
             </div>
             {% if initial != 'True' %}
-
-
-        </form>
-        <form action="set_apem" method="post">
-            {% csrf_token %}
-            <div class="row" style="margin-left: 95px">
-
-
-                <button class="button-config">
+            <div class="row" style="margin-left: 100px">
+                <button type="submit" name="set_apem" class="button-config">
                     ввод
                 </button>
-
             </div>
+            {% if delete_button != 'False' %}
+            <div style="margin-left: 500px">
+                <button type="submit" name="delete_apem" class="button-delete">
+                    удалить
+                </button>
+            </div>
+            {% endif %}
+
+<!--            <div class="row" style="margin-top: 100px">-->
+<!--            <form action="delete_apem" method="post">-->
+<!--                {% csrf_token %}-->
+<!--                <button class="button-delete">-->
+<!--                    удалить-->
+<!--                </button>-->
+
+<!--            </form>-->
+<!--        </div>-->
         </form>
 
 
-        <div class="row" style="margin-top: 100px">
-            <form action="delete_apem" method="post">
-                {% csrf_token %}
-                <button class="button-delete">
-                    удалить
-                </button>
 
-            </form>
-        </div>
 
         {% endif %}
     </div>

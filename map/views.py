@@ -236,19 +236,63 @@ def choose_apem_toshow(request):
     if request.method == 'POST':
         c['initial'] = 'False'
         form_apem = ApemsConfigurationForm(request.POST)
-        c['form_apem'] = form_apem
+        c['delete_button'] = 'True'
         if form_apem.is_valid():
-            apem_toshow = form_apem.cleaned_data.get('apem_toshow')
-            c['apem_toshow'] = apem_toshow
-            apem_change_form = ApemsChangingForm()
-            AP = ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk)
-            c['apem_action_message'] = 'Редактирование {}'.format(AP)
-            apem_change_form.fields['freq_podavitelya'].initial = AP.freq_podavitelya
-            apem_change_form.fields['deg_podavitelya'].initial = AP.deg_podavitelya
-            apem_change_form.fields['type_podavitelya'].initial = AP.type_podavitelya
-            apem_change_form.fields['ip_podavitelya'].initial = AP.ip_podavitelya
-            apem_change_form.fields['canal_podavitelya'].initial = AP.canal_podavitelya
-            apem_change_form.fields['usileniye_db'].initial = AP.usileniye_db
+            apem_change_form = ApemsChangingForm(request.POST)
+            if True:
+                if apem_change_form.is_valid():
+                    if 'delete_apem' in request.POST:
+                        c['initial'] = 'True'
+
+                        xx = c
+                        if c.get('apem_toshow'):
+                            c['apem_action_message'] = '{} был удален'.format(c.get('apem_toshow')[0])
+                            print(c.get('apem_toshow'))
+                            ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
+
+                    elif 'set_apem' in request.POST:
+                        AP = apem_change_form.cleaned_data
+                        ApemsNew = ApemsConfiguration(freq_podavitelya=AP.get('freq_podavitelya'),
+                                                      deg_podavitelya=AP.get('deg_podavitelya'),
+                                                      type_podavitelya=AP.get('type_podavitelya'),
+                                                      ip_podavitelya=AP.get('ip_podavitelya'),
+                                                      canal_podavitelya=AP.get('canal_podavitelya'),
+                                                      usileniye_db=AP.get('usileniye_db'))
+
+                        apem_change_form.fields['freq_podavitelya'].initial = AP.get('freq_podavitelya')
+                        apem_change_form.fields['deg_podavitelya'].initial = AP.get('deg_podavitelya')
+                        apem_change_form.fields['type_podavitelya'].initial = AP.get('type_podavitelya')
+                        apem_change_form.fields['ip_podavitelya'].initial = AP.get('ip_podavitelya')
+                        apem_change_form.fields['canal_podavitelya'].initial = AP.get('canal_podavitelya')
+                        apem_change_form.fields['usileniye_db'].initial = AP.get('usileniye_db')
+                        xxx = c
+                        if c.get('apem_toshow'):
+                            xx = c['apem_toshow']
+                            c['apem_action_message'] = '{} был отредактирован'.format(c.get('apem_toshow')[0])
+
+                            try:
+                                ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
+                                c['apem_toshow'] = [ApemsNew]
+                            except:
+                                print(c['apem_toshow'][0])
+                            ApemsNew.save()
+                        else:
+                            c['apem_action_message'] = '{} был создан'.format(ApemsNew)
+                            # c['apem_toshow'] = [ApemsNew]
+                            ApemsNew.save()
+
+                else:
+                    apem_toshow = form_apem.cleaned_data.get('apem_toshow')
+                    c['apem_toshow'] = apem_toshow
+                    apem_change_form = ApemsChangingForm()
+                    AP = ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk)
+                    c['apem_action_message'] = 'Редактирование {}'.format(AP)
+                    apem_change_form.fields['freq_podavitelya'].initial = AP.freq_podavitelya
+                    apem_change_form.fields['deg_podavitelya'].initial = AP.deg_podavitelya
+                    apem_change_form.fields['type_podavitelya'].initial = AP.type_podavitelya
+                    apem_change_form.fields['ip_podavitelya'].initial = AP.ip_podavitelya
+                    apem_change_form.fields['canal_podavitelya'].initial = AP.canal_podavitelya
+                    apem_change_form.fields['usileniye_db'].initial = AP.usileniye_db
 
     else:
         form_apem = ApemsConfigurationForm()
@@ -263,8 +307,8 @@ def set_apem(request):
     global c
     if request.method == 'POST':
         c['initial'] = 'True'
+        c['delete_button'] = 'True'
         # form_apem = ApemsConfigurationForm()
-        #
         # if form_apem.is_valid():
         apem_change_form = ApemsChangingForm(request.POST)
         if apem_change_form.is_valid():
@@ -286,19 +330,12 @@ def set_apem(request):
             if c.get('apem_toshow'):
                 xx = c['apem_toshow']
                 c['apem_action_message'] = '{} был отредактирован'.format(c.get('apem_toshow')[0])
-
                 try:
                     ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
                     c['apem_toshow'] = [ApemsNew]
                 except:
                     print(c['apem_toshow'][0])
                 ApemsNew.save()
-            # apem_change_form.fields['freq_podavitelya'].placeholder = AP.get('freq_podavitelya')
-            # apem_change_form.fields['deg_podavitelya'].placeholder = AP.get('deg_podavitelya')
-            # apem_change_form.fields['type_podavitelya'].placeholder = AP.get('type_podavitelya')
-            # apem_change_form.fields['ip_podavitelya'].placeholder = AP.get('ip_podavitelya')
-            # apem_change_form.fields['canal_podavitelya'].placeholder = AP.get('canal_podavitelya')
-            # apem_change_form.fields['usileniye_db'].placeholder = AP.get('usileniye_db')
             else:
                 c['apem_action_message'] = '{} был создан'.format(ApemsNew)
                 # c['apem_toshow'] = [ApemsNew]
@@ -343,16 +380,30 @@ def new_apem(request):
     global c
     if request.method == 'POST':
         c['initial'] = 'False'
+        c['delete_button'] = 'False'
         form_apem = ApemsConfigurationForm(request.POST)
+        apem_change_form = ApemsChangingForm(request.POST)
         if form_apem.is_valid():
-            apem_change_form = ApemsChangingForm()
+            # apem_change_form = ApemsChangingForm()
             c['apem_action_message'] = 'Создание нового блока'
             c['apem_toshow'] = ''
+        if apem_change_form.is_valid():
+            # form_apem = ApemsConfigurationForm()
+            if 'set_apem' in request.POST:
+                AP = apem_change_form.cleaned_data
+                ApemsNew = ApemsConfiguration(freq_podavitelya=AP.get('freq_podavitelya'),
+                                              deg_podavitelya=AP.get('deg_podavitelya'),
+                                              type_podavitelya=AP.get('type_podavitelya'),
+                                              ip_podavitelya=AP.get('ip_podavitelya'),
+                                              canal_podavitelya=AP.get('canal_podavitelya'),
+                                              usileniye_db=AP.get('usileniye_db'))
+                c['apem_action_message'] = '{} был создан'.format(ApemsNew)
+                # c['apem_toshow'] = [ApemsNew]
+                ApemsNew.save()
 
-    else:
-        form_apem = ApemsConfigurationForm()
-        apem_change_form = ApemsChangingForm()
-
+        else:
+            form_apem = ApemsConfigurationForm()
+            apem_change_form = ApemsChangingForm()
 
     c['form_apem'] = form_apem
     c['apem_change_form'] = apem_change_form
@@ -369,23 +420,7 @@ def configuration(request):
         if form_apem.is_valid():
             apem_toshow = form_apem.cleaned_data.get('apem_toshow')
             c['apem_toshow'] = apem_toshow
-            # if len(apem_toshow) != 0:
-            #     DP = apem_toshow[0]
-            #     apem_value = DroneJournal(system_name=DP.system_name,
-            #                                center_freq=DP.center_freq,
-            #                                brandwidth=DP.brandwidth,
-            #                                detection_time=DP.detection_time,
-            #                                comment_string=DP.comment_string,
-            #                                lat=DP.lat,
-            #                                lon=DP.lon,
-            #                                azimuth=DP.azimuth,
-            #                                area_sector_start_grad=DP.area_sector_start_grad,
-            #                                area_sector_end_grad=DP.area_sector_end_grad,
-            #                                area_radius_m=DP.area_radius_m,
-            #                                ip=DP.ip,
-            #                                current_time=DP.current_time,
-            #                                strig_name=DP.strig_name)
-            #     apem_value.save()
+            c['delete_button'] = 'True'
         c['initial'] = 'True'
     else:
         c['initial'] = 'True'
