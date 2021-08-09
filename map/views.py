@@ -228,64 +228,69 @@ def choose_apem_toshow(request):
         c['delete_button'] = 'True'
         if form_apem.is_valid():
             apem_change_form = ApemsChangingForm(request.POST)
-            if True:
-                if apem_change_form.is_valid():
-                    if 'delete_apem' in request.POST:
-                        c['initial'] = 'True'
+            if apem_change_form.is_valid():
+                if 'delete_apem' in request.POST:
+                    c['initial'] = 'True'
+                    if c.get('apem_toshow'):
+                        c['apem_action_message'] = '{} был удален'.format(c.get('apem_toshow')[0])
+                        print(c.get('apem_toshow'))
+                        ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
 
-                        xx = c
-                        if c.get('apem_toshow'):
-                            c['apem_action_message'] = '{} был удален'.format(c.get('apem_toshow')[0])
-                            print(c.get('apem_toshow'))
+                elif 'set_apem' in request.POST:
+                    AP = apem_change_form.cleaned_data
+                    ApemsNew = ApemsConfiguration(strizh_name=AP.get('strizh_name'),
+                                                  freq_podavitelya=AP.get('freq_podavitelya'),
+                                                  deg_podavitelya=AP.get('deg_podavitelya'),
+                                                  type_podavitelya=AP.get('type_podavitelya'),
+                                                  ip_podavitelya=AP.get('ip_podavitelya'),
+                                                  canal_podavitelya=AP.get('canal_podavitelya'),
+                                                  usileniye_db=AP.get('usileniye_db'))
+
+                    apem_change_form.fields['strizh_name'].initial = AP.get('strizh_name')
+                    apem_change_form.fields['freq_podavitelya'].initial = AP.get('freq_podavitelya')
+                    apem_change_form.fields['deg_podavitelya'].initial = AP.get('deg_podavitelya')
+                    apem_change_form.fields['type_podavitelya'].initial = AP.get('type_podavitelya')
+                    apem_change_form.fields['ip_podavitelya'].initial = AP.get('ip_podavitelya')
+                    apem_change_form.fields['canal_podavitelya'].initial = AP.get('canal_podavitelya')
+                    apem_change_form.fields['usileniye_db'].initial = AP.get('usileniye_db')
+                    xxx = c
+                    if c.get('apem_toshow'):
+                        xx = c['apem_toshow']
+                        c['apem_action_message'] = '{} был отредактирован'.format(c.get('apem_toshow')[0])
+
+                        try:
                             ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
+                            c['apem_toshow'] = [ApemsNew]
+                        except:
+                            print(c['apem_toshow'][0])
+                        ApemsNew.save()
+                    else:
+                        c['apem_action_message'] = '{} был создан'.format(ApemsNew)
+                        # c['apem_toshow'] = [ApemsNew]
+                        ApemsNew.save()
 
-                    elif 'set_apem' in request.POST:
-                        AP = apem_change_form.cleaned_data
-                        ApemsNew = ApemsConfiguration(freq_podavitelya=AP.get('freq_podavitelya'),
-                                                      deg_podavitelya=AP.get('deg_podavitelya'),
-                                                      type_podavitelya=AP.get('type_podavitelya'),
-                                                      ip_podavitelya=AP.get('ip_podavitelya'),
-                                                      canal_podavitelya=AP.get('canal_podavitelya'),
-                                                      usileniye_db=AP.get('usileniye_db'))
-
-                        apem_change_form.fields['freq_podavitelya'].initial = AP.get('freq_podavitelya')
-                        apem_change_form.fields['deg_podavitelya'].initial = AP.get('deg_podavitelya')
-                        apem_change_form.fields['type_podavitelya'].initial = AP.get('type_podavitelya')
-                        apem_change_form.fields['ip_podavitelya'].initial = AP.get('ip_podavitelya')
-                        apem_change_form.fields['canal_podavitelya'].initial = AP.get('canal_podavitelya')
-                        apem_change_form.fields['usileniye_db'].initial = AP.get('usileniye_db')
-                        xxx = c
-                        if c.get('apem_toshow'):
-                            xx = c['apem_toshow']
-                            c['apem_action_message'] = '{} был отредактирован'.format(c.get('apem_toshow')[0])
-
-                            try:
-                                ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
-                                c['apem_toshow'] = [ApemsNew]
-                            except:
-                                print(c['apem_toshow'][0])
-                            ApemsNew.save()
-                        else:
-                            c['apem_action_message'] = '{} был создан'.format(ApemsNew)
-                            # c['apem_toshow'] = [ApemsNew]
-                            ApemsNew.save()
-
-                else:
-                    apem_toshow = form_apem.cleaned_data.get('apem_toshow')
-                    c['apem_toshow'] = apem_toshow
-                    apem_change_form = ApemsChangingForm()
-                    AP = ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk)
-                    c['apem_action_message'] = 'Редактирование {}'.format(AP)
-                    apem_change_form.fields['freq_podavitelya'].initial = AP.freq_podavitelya
-                    apem_change_form.fields['deg_podavitelya'].initial = AP.deg_podavitelya
-                    apem_change_form.fields['type_podavitelya'].initial = AP.type_podavitelya
-                    apem_change_form.fields['ip_podavitelya'].initial = AP.ip_podavitelya
-                    apem_change_form.fields['canal_podavitelya'].initial = AP.canal_podavitelya
-                    apem_change_form.fields['usileniye_db'].initial = AP.usileniye_db
+            else:
+                apem_toshow = form_apem.cleaned_data.get('apem_toshow')
+                c['apem_toshow'] = apem_toshow
+                apem_change_form = ApemsChangingForm()
+                AP = ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk)
+                c['apem_action_message'] = 'Редактирование {}'.format(AP)
+                apem_change_form.fields['strizh_name'].initial = AP.strizh_name
+                apem_change_form.fields['freq_podavitelya'].initial = AP.freq_podavitelya
+                apem_change_form.fields['deg_podavitelya'].initial = AP.deg_podavitelya
+                apem_change_form.fields['type_podavitelya'].initial = AP.type_podavitelya
+                apem_change_form.fields['ip_podavitelya'].initial = AP.ip_podavitelya
+                apem_change_form.fields['canal_podavitelya'].initial = AP.canal_podavitelya
+                apem_change_form.fields['usileniye_db'].initial = AP.usileniye_db
 
     else:
         form_apem = ApemsConfigurationForm()
         apem_change_form = ApemsChangingForm()
+
+    if c.get('set_strizh_apem'):
+        form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
+            strizh_name=c['set_strizh_apem'][0])
+
     c['form_apem'] = form_apem
     c['apem_change_form'] = apem_change_form
 
@@ -302,13 +307,15 @@ def set_apem(request):
         apem_change_form = ApemsChangingForm(request.POST)
         if apem_change_form.is_valid():
             AP = apem_change_form.cleaned_data
-            ApemsNew = ApemsConfiguration(freq_podavitelya=AP.get('freq_podavitelya'),
+            ApemsNew = ApemsConfiguration(strizh_name=AP.get('strizh_name'),
+                                          freq_podavitelya=AP.get('freq_podavitelya'),
                                           deg_podavitelya=AP.get('deg_podavitelya'),
                                           type_podavitelya=AP.get('type_podavitelya'),
                                           ip_podavitelya=AP.get('ip_podavitelya'),
                                           canal_podavitelya=AP.get('canal_podavitelya'),
                                           usileniye_db=AP.get('usileniye_db'))
 
+            apem_change_form.fields['strizh_name'].initial = AP.get('strizh_name')
             apem_change_form.fields['freq_podavitelya'].initial = AP.get('freq_podavitelya')
             apem_change_form.fields['deg_podavitelya'].initial = AP.get('deg_podavitelya')
             apem_change_form.fields['type_podavitelya'].initial = AP.get('type_podavitelya')
@@ -330,10 +337,12 @@ def set_apem(request):
                 # c['apem_toshow'] = [ApemsNew]
                 ApemsNew.save()
     else:
-
+        form_apem = ApemsConfigurationForm()
         apem_change_form = ApemsChangingForm()
-
-    # c['form_apem'] = form_apem
+    if c.get('set_strizh_apem'):
+        form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
+            strizh_name=c['set_strizh_apem'][0])
+    c['form_apem'] = form_apem
     c['apem_change_form'] = apem_change_form
 
     return render(request, "configuration.html", context=c)
@@ -358,7 +367,9 @@ def delete_apem(request):
     else:
         form_apem = ApemsConfigurationForm()
         apem_change_form = ApemsChangingForm()
-
+    if c.get('set_strizh_apem'):
+        form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
+            strizh_name=c['set_strizh_apem'][0])
     # c['form_apem'] = form_apem
     # c['apem_change_form'] = apem_change_form
 
@@ -371,16 +382,18 @@ def new_apem(request):
         c['initial'] = 'False'
         c['delete_button'] = 'False'
         form_apem = ApemsConfigurationForm(request.POST)
-        apem_change_form = ApemsChangingForm(request.POST)
+
         if form_apem.is_valid():
             # apem_change_form = ApemsChangingForm()
             c['apem_action_message'] = 'Создание нового блока'
             c['apem_toshow'] = ''
-        if apem_change_form.is_valid():
             # form_apem = ApemsConfigurationForm()
-            if 'set_apem' in request.POST:
+        if 'set_apem' in request.POST:
+            apem_change_form = ApemsChangingForm(request.POST)
+            if apem_change_form.is_valid():
                 AP = apem_change_form.cleaned_data
-                ApemsNew = ApemsConfiguration(freq_podavitelya=AP.get('freq_podavitelya'),
+                ApemsNew = ApemsConfiguration(strizh_name=c.get('set_strizh_apem')[0],
+                                              freq_podavitelya=AP.get('freq_podavitelya'),
                                               deg_podavitelya=AP.get('deg_podavitelya'),
                                               type_podavitelya=AP.get('type_podavitelya'),
                                               ip_podavitelya=AP.get('ip_podavitelya'),
@@ -389,11 +402,16 @@ def new_apem(request):
                 c['apem_action_message'] = '{} был создан'.format(ApemsNew)
                 # c['apem_toshow'] = [ApemsNew]
                 ApemsNew.save()
-
+        elif 'new_apem' in request.POST:
+            apem_change_form = ApemsChangingForm()
+            apem_change_form.fields.get('strizh_name').initial = c['set_strizh_apem'][0]
         else:
             form_apem = ApemsConfigurationForm()
             apem_change_form = ApemsChangingForm()
 
+    if c.get('set_strizh_apem'):
+        form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
+            strizh_name=c['set_strizh_apem'][0])
     c['form_apem'] = form_apem
     c['apem_change_form'] = apem_change_form
 
@@ -402,6 +420,9 @@ def new_apem(request):
 
 def configuration(request):
     global c
+    Strizhes = Strizh.objects.all()
+    c['set_strizh_apem'] = ['None' for _ in range(len(Strizhes))]
+
     if request.method == 'POST':
         form_apem = ApemsConfigurationForm(request.POST)
         # for el_db in DroneJournal.objects.all():
@@ -412,62 +433,24 @@ def configuration(request):
             c['delete_button'] = 'True'
         c['initial'] = 'True'
     else:
+        c['is_strizh_chosen'] = 'False'
         c['initial'] = 'True'
         form_apem = ApemsConfigurationForm()
-    c['form_apem'] = form_apem
+        form_strizh = StrizhForm()
 
-    apems = ApemsConfiguration.objects.order_by('-freq_podavitelya').all()
+    if c.get('set_strizh_apem'):
+        form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
+            strizh_name=c['set_strizh_apem'][0])
 
-    c['apems'] = apems
+    # c['form_apem'] = form_apem
+    c['form_strizh'] = form_strizh
+
+    # apems = ApemsConfiguration.objects.filter(strizh_name=c['set_strizh_apem'][0]).order_by('-freq_podavitelya')
+    #
+    # c['apems'] = apems
 
     return render(request, "configuration.html", context=c)
 
-
-# def butt_skan_all(request):
-#     global c
-#     # nomer_strizha = 0
-#     strizh_names = Strizh.objects.all()
-#     for strizh in strizh_names:
-#         # TODO action 1 button
-#         print('skanirovanie vseh: ', strizh.ip1, strizh.ip2)
-#         scan_on_off(strizh.ip1)
-#         scan_on_off(strizh.ip2)
-#
-#     c["action_strizh"] = "Сканирование всех"
-#     # return redirect(request.META['HTTP_REFERER'])
-#     return render(request, "main.html", context=c)
-#
-#
-# def butt_glush_all(request):
-#     global c
-#     strizh_names = Strizh.objects.all()
-#     print(strizh_names)
-#     for strizh in strizh_names:
-#         print('glushenie vseh: ', strizh.ip1, strizh.ip2)
-#         # jammer_on_off(strizh.ip)
-#
-#     # TODO trace pomenyat
-#
-#     c["action_strizh"] = "Глушение всех"
-#     # return redirect(request.META['HTTP_REFERER'])
-#     return render(request, "main.html", context=c)
-
-# def butt_gps_all(request):
-#     global c
-#     print('gps vseh')
-#     # TODO action 3 button
-#     c["action_strizh"] = "GPS для всех"
-#     # return redirect(request.META['HTTP_REFERER'])
-#     return render(request, "main.html", context=c)
-#
-#
-# def butt_ku_all(request):
-#     global c
-#     print('KU vseh #')
-#     # TODO action 4 button
-#     c["action_strizh"] = "КУ всех"
-#     # return redirect(request.META['HTTP_REFERER'])
-#     return render(request, "main.html", context=c)
 
 def back2main(request):
     return redirect(request.META['HTTP_REFERER'])
@@ -537,6 +520,29 @@ def choose_all_strizhes(request):
     return render(request, "main.html", context=c)
 
 
+def set_strizh(request):
+    global c
+    strizhes = Strizh.objects.order_by('-lon').all()
+    c['set_strizh_apem'] = ['None' for _ in range(len(strizhes))]
+    if request.method == 'POST':
+        form_strizh = StrizhForm(request.POST)
+        if form_strizh.is_valid():
+            set_strizh_apem = form_strizh.cleaned_data.get('chosen_strizh')
+            c['set_strizh_apem'][0] = set_strizh_apem.name
+            form_apem = ApemsConfigurationForm(request.POST)
+
+            form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
+                strizh_name=c['set_strizh_apem'][0])
+            c['is_strizh_chosen'] = 'True'
+    else:
+        form_strizh = StrizhForm()
+        form_apem = ApemsConfigurationForm()
+
+    c['form_strizh'] = form_strizh
+    c['form_apem'] = form_apem
+    return render(request, "configuration.html", context=c)
+
+
 def render_main_page(request):
     global c
     complex_state = ''
@@ -586,7 +592,6 @@ def render_main_page(request):
 
 def butt_skan(request):
     global c
-    xx = c
     strizh_names = Strizh.objects.all()
     c["action_strizh"] = "Сканирование: "
     if c.get("chosen_strizh") != 0:
@@ -603,7 +608,6 @@ def butt_skan(request):
 
 def butt_glush(request):
     global c
-    xx = c
     strizh_names = Strizh.objects.all()
     c["action_strizh"] = "Глушение: "
     if c.get("chosen_strizh") != 0:
@@ -613,7 +617,6 @@ def butt_glush(request):
                 # print(strizh.ip1)
                 c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
 
-    xxx = c
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
 

@@ -9,6 +9,7 @@ from django import forms
 
 from django.forms import IntegerField, TextInput, NumberInput
 
+
 class StrizhForm(ModelForm):
     chosen_strizh = ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
                                      required=False, to_field_name="name",
@@ -27,13 +28,14 @@ class StrizhFilterForm(ModelForm):
                                                  required=False, to_field_name="name",
                                                  label="")
     filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '4',
-                                                })
+                                                     })
+
     class Meta:
         model = Strizh
         fields = ['filtered_strizhes']
         widgets = {
             'filtered_strizhes': SelectMultiple(attrs={'id': 'name', 'width': '300px',
-                                               'class': 'myfieldclass'}),
+                                                       'class': 'myfieldclass'}),
 
         }
 
@@ -45,29 +47,27 @@ class DroneFilterForm(ModelForm):
                                             required=False, to_field_name="pk",
                                             label="")
     drone_toshow.widget = SelectMultiple(attrs={'id': 'detections', 'size': '8',
-                                                     })
+                                                })
+
     class Meta:
         model = Point
         fields = ['drone_toshow']
 
 
-
-
-
-
 class ApemsConfigurationForm(ModelForm):
-
     AllApems = ApemsConfiguration.objects.all().order_by('-freq_podavitelya')
     apem_toshow = ModelMultipleChoiceField(queryset=AllApems,
                                            required=False, to_field_name="pk",
                                            label="",
                                            )
     apem_toshow.widget = SelectMultiple(attrs={'size': 12, 'id': 'block1'
-                           })
+                                               })
 
     class Meta:
         model = ApemsConfiguration
         fields = ['apem_toshow']
+
+
 #         widgets = {
 #             'apem_toshow': Select(attrs={'size': 12, 'id': 'block2'
 #                            })
@@ -79,11 +79,14 @@ class ApemsChangingForm(ModelForm):
     AllApems = ApemsConfiguration.objects.all().order_by('-freq_podavitelya')
 
     class Meta:
+        CHOICES = Strizh.objects.all()
         model = ApemsConfiguration
-        fields = ['freq_podavitelya', 'deg_podavitelya', 'type_podavitelya',
+        fields = ['strizh_name', 'freq_podavitelya', 'deg_podavitelya', 'type_podavitelya',
                   'type_podavitelya', 'ip_podavitelya', 'canal_podavitelya', 'usileniye_db'
                   ]
+
         widgets = {
+            'strizh_name': Select(attrs={'class': 'form-control', 'placeholder': 'Имя стрижа'}),
             'freq_podavitelya': NumberInput(attrs={'class': 'form-control', 'required': 'False',
                                                    'placeholder': 'Частота подавителя'}),
             'deg_podavitelya': NumberInput(attrs={'class': 'form-control',

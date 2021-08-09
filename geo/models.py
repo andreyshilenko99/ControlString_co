@@ -121,6 +121,11 @@ class IntegerRangeField(models.IntegerField):
 
 
 class ApemsConfiguration(models.Model):
+    CHOICES_STRIZH = Strizh.objects.all()
+    strizh_name = models.CharField('Имя стрижа', max_length=500, choices=((x.name, x.name) for x in CHOICES_STRIZH),
+                                   error_messages={'required': ''}
+                                   )
+
     freq_podavitelya = IntegerRangeField('Частота подавителя', default=2400, min_value=2400, max_value=6000,
                                          error_messages={'required': ''}
                                          )

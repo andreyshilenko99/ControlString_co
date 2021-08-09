@@ -68,5 +68,6 @@ urlpatterns = [
     path('set_apem', views.set_apem),
     path('new_apem', views.new_apem),
     path('delete_apem', views.delete_apem),
+    path('set_strizh', views.set_strizh),
 
 ]
