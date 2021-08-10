@@ -79,12 +79,11 @@ function map_init_basic(map, options) {
                             options: {
                                 iconSize: [85, 90],
                                 iconAnchor: [38, 86],
-                                popupAnchor: [0, -80]
+                                popupAnchor: [0, -80],
+                                // className: 'blinking'
                             }
                         });
-                        var logoMarkerStrizh = new logoMarkerStyleStrizh({
-                            iconUrl: 'static/icons/antenna2.png'
-                        });
+
                         // каждые 10 итераций отрисовка стрижа и подписи к нему
                         for (let j = 0; j < len_strizh_data; j++) {
 
@@ -105,6 +104,21 @@ function map_init_basic(map, options) {
                                     opacity: 0.85
                                 })
                                     .setContent(strizh_data.features[j].properties.name);
+
+                                arc1 = L.circle([strizh_data.features[j].properties.lat,
+                                    strizh_data.features[j].properties.lon], {
+                                    color: '#1a1a1a',
+                                    fillColor: "#1a1a1a",
+                                    fillOpacity: 0.1,
+                                    radius: 500
+                                }).addTo(layerStrizhes);
+
+                                var logoMarkerStrizh = new logoMarkerStyleStrizh({
+                                    iconUrl: 'static/icons/strizh_gray.svg'
+                                });
+
+                                console.log( b )
+
 
                                 str1 = L.marker([strizh_data.features[j].properties.lat,
                                     strizh_data.features[j].properties.lon], {icon: logoMarkerStrizh}).addTo(layerStrizhes)

@@ -15,8 +15,7 @@ from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfigur
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm
 
 from ControlString_co.control_trace import scan_on_off, check_state
-from ControlString_co.shelest_jam import jammer_on_off
-
+from ControlString_co.shelest_jam import jammer_on_off, set_gain
 
 chosen_strizh = 0
 start_datetime = "Начало"
@@ -572,6 +571,7 @@ def render_main_page(request):
     c['weather_state_dict'] = weather_state_dict
     c['url_uniping_dict'] = url_uniping_dict
     c['complex_state_dict'] = complex_state_dict
+    c['complex_state_json'] = json.dumps(complex_state_dict)
 
     if not c.get('chosen_strizh'):
         # c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
@@ -633,7 +633,15 @@ def butt_glush(request):
                     scan_on_off(strizh.ip2)
                     time.sleep(0.5)
                     for each_apem in apems.filter(strizh_name=strizh.name):
+                        # TODO test tomorrow and dobavit apem
                         ip = each_apem.ip_podavitelya
+                        if 'Шелест' in each_apem.type_podavitelya:
+                            set_gain(ip, each_apem.usileniye_db)
+                            pass
+                        elif 'АПЕМ' in apems.filter(strizh_name=strizh.name):
+                            set_gain(ip, each_apem.usileniye_db)
+                            pass
+
                         print(ip)
                         jammer_on_off(ip, 'on')
 

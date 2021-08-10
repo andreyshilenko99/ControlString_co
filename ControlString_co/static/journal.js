@@ -46,15 +46,19 @@ function refresh() {
                 $.getJSON('/geo/strizh_view/', function (strizh_data) {
                     let len_strizh_data = strizh_data.features.length;
                     let strizh_map_name = {};
+
+                 // var logoMarkerStrizh = L.icon.pulse({iconSize:[20,20],color:'red', iconUrl: 'static/icons/g3.gif'});
+
                     let logoMarkerStyleStrizh = L.Icon.extend({
                         options: {
-                            iconSize: [85, 90],
-                            iconAnchor: [38, 86],
-                            popupAnchor: [0, -80]
+                            iconSize: [80, 80],
+                            iconAnchor: [40, 75],
+                            popupAnchor: [0, -75]
                         }
                     });
                     var logoMarkerStrizh = new logoMarkerStyleStrizh({
-                        iconUrl: 'static/icons/antenna2.png'
+                        // iconUrl: 'static/icons/strizh_blue_pulse.gif'
+                        iconUrl: 'static/icons/strizh_blue.svg'
                     });
 
                     for (let j = 0; j < len_strizh_data; j++) {
@@ -86,7 +90,7 @@ function refresh() {
                         }
 
                     }
-                    let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/dron_top.png', color: '#ff0000'});
+                    let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/n.gif', color: '#ff0000'});
                     console.log('data ', data)
                     // статичная отрисовка радиуса вокруг стрижа, стрижа и его подписи
                     let radius = parseFloat(data.features[0].properties.area_radius_m);

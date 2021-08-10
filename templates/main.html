@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 {% load leaflet_tags %}
 {% load geojson_tags %}
+{% load mytags %}
+
 
 <html>
 <head>
@@ -10,6 +12,8 @@
     <script src="static/src/jquery-3.2.1.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
     <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
+    <script src="static/src/L.Icon.Pulse.js"></script>
+    <link rel="stylesheet" href="static/src/L.Icon.Pulse.css"/>
     <meta charset=utf-8>
 
     {% leaflet_js plugins="ALL" %}
@@ -19,6 +23,9 @@
     {% csrf_token %}
 
     <script type="text/javascript" src="static/main.js"></script>
+    <script>
+        const  b = JSON.parse("{{ complex_state_json|escapejs }}");
+    </script>
 
 
 </head>
@@ -62,7 +69,7 @@
                     <h3 style="margin-top: 4%"> Информация о засечках </h3>
                     <div id="detections" style="margin: 10px 0;
                     width: 100%; height: 230px">
-                        {% load mytags %}
+
                         <table>
                             <thead>
                             <tr>
@@ -202,6 +209,7 @@
                             <span style="color: #a10202"> {{ complex_state_dict|getkey:striz }} </span>
                             {% endif %}
                         </h5>
+
                         {% endif %}
                         {% endfor %}
                     </form>
