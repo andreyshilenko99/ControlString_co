@@ -14,7 +14,9 @@ from django.core.serializers import serialize
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm
 
-from ControlString_co.control_trace import jammer_on_off, scan_on_off
+from ControlString_co.control_trace import scan_on_off, check_state
+from ControlString_co.shelest_jam import jammer_on_off
+
 
 chosen_strizh = 0
 start_datetime = "Начало"
@@ -609,13 +611,36 @@ def butt_skan(request):
 def butt_glush(request):
     global c
     strizh_names = Strizh.objects.all()
+    apems = ApemsConfiguration.objects.all()
     c["action_strizh"] = "Глушение: "
     if c.get("chosen_strizh") != 0:
         print('glushenie dlya strizha #', c.get('chosen_strizh'))
         for strizh in strizh_names:
+
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
                 # print(strizh.ip1)
                 c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
+                if check_state(strizh.ip1) == 'scan_on':
+                    scan_on_off(strizh.ip1)
+                if check_state(strizh.ip2) == 'scan_on':
+                    scan_on_off(strizh.ip2)
+
+                if check_state(strizh.ip1) == 'all_stop' and check_state(strizh.ip2) == 'all_stop':
+                    scan_on_off(strizh.ip1)
+                    scan_on_off(strizh.ip2)
+                    time.sleep(0.5)
+                    scan_on_off(strizh.ip1)
+                    scan_on_off(strizh.ip2)
+                    time.sleep(0.5)
+                    for each_apem in apems.filter(strizh_name=strizh.name):
+                        ip = each_apem.ip_podavitelya
+                        print(ip)
+                        jammer_on_off(ip, 'on')
+
+                print(check_state(strizh.ip1))
+                print(check_state(strizh.ip2))
+                # jammer_on_off(strizh.ip1, 'on')
+
 
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)

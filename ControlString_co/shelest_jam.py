@@ -57,7 +57,7 @@ def get_state(host):
 
 def jammer_on_off(host, value):
     sock = socket(AF_INET, SOCK_STREAM)
-    sock.connect((host, 1201))
+    sock.connect((str(host), 1201))
     jam_on = bytearray(b'\xe4\x03\x01\x00\x00\xfc\x02\xfe\xff')
     jam_off = bytearray(b'\xe4\x03\x01\x00\x00\xfc\x00\x00\x00')
     global data_resp
@@ -79,7 +79,9 @@ def jammer_on_off(host, value):
         i += 1
     return 0
 
-# # jammer_on_off('192.168.2.102','on')
-# get_state('192.168.2.102')
-# kk = b'\x01R8\x80\xf5\xfe'
-# print(kk[0])
+if __name__ == "__main__":
+    pass
+    # jammer_on_off('192.168.2.102','off')
+    # get_state('192.168.2.102')
+    # kk = b'\x01R8\x80\xf5\xfe'
+    # print(kk[0])

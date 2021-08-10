@@ -24,12 +24,6 @@ def scan_on_off(host):
                 return "scan_on"
             else:
                 return "error"
-        elif check_state(host) == "jammer_on":
-            state = check_state(host)
-            while state == "jammer_on":
-                jammer_on_off(host)
-                time.sleep(1)
-                state = check_state(host)
 
         elif check_state(host) == "scan_on":
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
