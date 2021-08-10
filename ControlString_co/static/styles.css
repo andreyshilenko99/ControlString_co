@@ -398,5 +398,34 @@
     left: -70px;
 }
 
+table ,tr td{
+    background-color: rgb(255,255,255);
+    border:1px solid #575757
+}
+tbody {
+    text-align: center;
+
+    display:block;
+    height:200px;
+    overflow:auto;
+    overflow-y:scroll;
+}
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}
+thead {
+    text-align: center;
+    width: calc( 100% - 1em )
+}
+table {
+
+}
+
+
+/*border="1" width="100%" cellpadding="5"*/
+
+
 /*60.014340, 30.452578*/
 /*60.012439, 30.447278*/
