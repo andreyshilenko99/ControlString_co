@@ -14,8 +14,8 @@ from django.core.serializers import serialize
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm
 
-from ControlString_co.control_trace import scan_on_off, check_state
-from ControlString_co.shelest_jam import jammer_on_off, set_gain
+from ControlString_co.control_trace import scan_on_off, check_state, jammer_on_off
+from ControlString_co.shelest_jam import set_gain
 
 chosen_strizh = 0
 start_datetime = "Начало"
@@ -93,7 +93,7 @@ def filter_all(request):
                                  start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
     strizh_value.save()
 
-    if request.method == 'POST':
+    if request.method == 'GET':
         form_drone = DroneFilterForm(request.POST)
         form_filter = StrizhFilterForm(request.POST)
         if form_drone.is_valid():
@@ -129,7 +129,6 @@ def filter_all(request):
                                             minute=int(ts33[1]), second=59)
         else:
             time_end_datetime = now
-
         drones_pk = []
         for drone in all_drones:
             if time_start_datetime < get_datetime_drone(drone.detection_time) < time_end_datetime:
@@ -141,15 +140,9 @@ def filter_all(request):
         form_drone = DroneFilterForm()
         if len(names_str) != 0:
             names_arr = names_str.split(';; ')
-            form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(
-                queryset=drones_filtered_time.filter(strig_name__in=names_arr),
-                required=False, to_field_name="pk",
-                label="")
+            form_drone.AllDrones = drones_filtered_time.filter(strig_name__in=names_arr)
         else:
-            form_drone.fields['drone_toshow'] = ModelMultipleChoiceField(queryset=drones_filtered_time,
-                                                                         required=False, to_field_name="pk",
-                                                                         label="")
-
+            form_drone.AllDrones = drones_filtered_time
         form_filter = StrizhFilterForm()
     c['form_drone'] = form_drone
     c['form_filter'] = form_filter
@@ -162,7 +155,6 @@ def journal(request):
 
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
-
     if request.method == 'POST':
         form_drone = DroneFilterForm(request.POST)
         form_filter = StrizhFilterForm(request.POST)
@@ -193,30 +185,29 @@ def filter_nomer_strizha(request):
 
 def choose_drone_toshow(request):
     global c
+    xx = c
     if request.method == 'POST':
-        form_drone = DroneFilterForm(request.POST)
+        dron_id = request.POST['detection_id']
+        DP = Point.objects.filter(pk=dron_id)[0]
         for el_db in DroneJournal.objects.all():
             el_db.delete()
-        if form_drone.is_valid():
-            drone_toshow = form_drone.cleaned_data.get('drone_toshow')
-            c['drone_toshow'] = drone_toshow
-            if len(drone_toshow) != 0:
-                DP = drone_toshow[0]
-                drone_value = DroneJournal(system_name=DP.system_name,
-                                           center_freq=DP.center_freq,
-                                           brandwidth=DP.brandwidth,
-                                           detection_time=DP.detection_time,
-                                           comment_string=DP.comment_string,
-                                           lat=DP.lat,
-                                           lon=DP.lon,
-                                           azimuth=DP.azimuth,
-                                           area_sector_start_grad=DP.area_sector_start_grad,
-                                           area_sector_end_grad=DP.area_sector_end_grad,
-                                           area_radius_m=DP.area_radius_m,
-                                           ip=DP.ip,
-                                           current_time=DP.current_time,
-                                           strig_name=DP.strig_name)
-                drone_value.save()
+
+        drone_value = DroneJournal(system_name=DP.system_name,
+                                   center_freq=DP.center_freq,
+                                   brandwidth=DP.brandwidth,
+                                   detection_time=DP.detection_time,
+                                   comment_string=DP.comment_string,
+                                   lat=DP.lat,
+                                   lon=DP.lon,
+                                   azimuth=DP.azimuth,
+                                   area_sector_start_grad=DP.area_sector_start_grad,
+                                   area_sector_end_grad=DP.area_sector_end_grad,
+                                   area_radius_m=DP.area_radius_m,
+                                   ip=DP.ip,
+                                   current_time=DP.current_time,
+                                   strig_name=DP.strig_name)
+        drone_value.save()
+    # else:
 
     return render(request, "journal.html", context=c)
 
@@ -618,8 +609,8 @@ def butt_scan(request):
                 mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
                 c['complex_mode_dict'][strizh.name] = complex_mode
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
-                scan_on_off(strizh.ip1)
-                scan_on_off(strizh.ip2)
+                # scan_on_off(strizh.ip1)
+                # scan_on_off(strizh.ip2)
 
     return render(request, "main.html", context=c)
 
@@ -636,35 +627,36 @@ def butt_glush(request):
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
                 # print(strizh.ip1)
                 c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
-                if check_state(strizh.ip1) == 'scan_on':
-                    scan_on_off(strizh.ip1)
-                if check_state(strizh.ip2) == 'scan_on':
-                    scan_on_off(strizh.ip2)
+                # if check_state(strizh.ip1) == 'scan_on':
+                #     scan_on_off(strizh.ip1)
+                # if check_state(strizh.ip2) == 'scan_on':
+                #     scan_on_off(strizh.ip2)
+                #
+                # if check_state(strizh.ip1) == 'all_stop' and check_state(strizh.ip2) == 'all_stop':
+                #     scan_on_off(strizh.ip1)
+                #     scan_on_off(strizh.ip2)
+                #     time.sleep(0.5)
+                #     scan_on_off(strizh.ip1)
+                #     scan_on_off(strizh.ip2)
+                #     time.sleep(0.5)
+                #     for each_apem in apems.filter(strizh_name=strizh.name):
+                #         # TODO test tomorrow and dobavit apem
+                #         ip = each_apem.ip_podavitelya
+                #         if 'Шелест' in each_apem.type_podavitelya:
+                #             set_gain(ip, each_apem.usileniye_db)
+                #         elif 'АПЕМ' in apems.filter(strizh_name=strizh.name):
+                #             set_gain(ip, each_apem.usileniye_db)
+                #         print(ip)
 
-                if check_state(strizh.ip1) == 'all_stop' and check_state(strizh.ip2) == 'all_stop':
-                    scan_on_off(strizh.ip1)
-                    scan_on_off(strizh.ip2)
-                    time.sleep(0.5)
-                    scan_on_off(strizh.ip1)
-                    scan_on_off(strizh.ip2)
-                    time.sleep(0.5)
-                    for each_apem in apems.filter(strizh_name=strizh.name):
-                        # TODO test tomorrow and dobavit apem
-                        ip = each_apem.ip_podavitelya
-                        if 'Шелест' in each_apem.type_podavitelya:
-                            set_gain(ip, each_apem.usileniye_db)
-                        elif 'АПЕМ' in apems.filter(strizh_name=strizh.name):
-                            set_gain(ip, each_apem.usileniye_db)
-                        print(ip)
-                        jammer_on_off(ip, 'on')
+                jammer_on_off(strizh.ip1)
                 mode_ips = [check_state(strizh.ip1), check_state(strizh.ip2)]
                 complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-                complex_mode = 'jammer_on' if all([True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+                complex_mode = 'jammer_on' if all(
+                    [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
                 print(complex_mode)
                 c['complex_mode_dict'][strizh.name] = complex_mode
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
                 # jammer_on_off(strizh.ip1, 'on')
-
 
     # return redirect(request.META['HTTP_REFERER'])
     return render(request, "main.html", context=c)
@@ -855,7 +847,8 @@ def turn_on_bp(request):
                 result_get = 'ошибка соединения с uniping'
                 collect_logs(strizh_name + ': ' + result_get)
                 continue
-            temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t, high_border=high_t)
+            temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
+                                                high_border=high_t)
             if temperature_state != 0:
                 print('температура не в порядке')
                 set_correct_temperature(url, strizh_name, temperature_state)

@@ -26,7 +26,8 @@ class Point(models.Model):
         arr_strings = [str(el) for el in arr_to_return]
 
         str_to_return = ', '.join(arr_strings)
-        return str_to_return
+        # return str_to_return
+        return str(self.detection_time)
 
     class Meta:
         verbose_name_plural = 'Дроны'

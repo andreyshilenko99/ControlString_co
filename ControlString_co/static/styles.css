@@ -413,7 +413,6 @@ table, tr td {
 
 tbody {
     text-align: center;
-
     display: block;
     height: 200px;
     overflow: auto;

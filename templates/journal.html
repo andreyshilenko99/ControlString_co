@@ -2,11 +2,13 @@
 
 {% load leaflet_tags %}
 {% load geojson_tags %}
+{% load mytags %}
+
 
 <html>
 <head>
     <title>Journal page</title>
-
+    <script type="text/javascript" src="static/journal.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="static/src/jquery-3.2.1.min.js"></script>
@@ -18,22 +20,12 @@
     <script src="static/src/bootstrap-datetimepicker.min.js"></script>
     <script src="static/src/datepicker-widget.js"></script>
 
-    <script src="/static/node_modules/@ansur/leaflet-pulse-icon/dist/L.Icon.Pulse.js"> </script>
-    <link rel="stylesheet" href="/static/node_modules/@ansur/leaflet-pulse-icon/dist/L.Icon.Pulse.css" />
-
-    <script type="text/javascript" src="static/journal.js"></script>
 
     <meta charset=utf-8>
     <link rel="stylesheet" href="/static/styles.css"/>
 
     <style>
-        .round_form {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            height: 25px;
-            width: 200px;
-            margin: 10px 10px 10px 0;
-        }
+
     </style>
 
     {% leaflet_js plugins="ALL" %}
@@ -75,48 +67,6 @@
                         {% leaflet_map "map" callback="window.map_init_basic" %}
                     </div>
 
-
-                </div>
-                <div class="information-bottom-left" style="height: 30vh; margin-top: 4%; border: 0.5vh">
-                    <form action="filter_all" method='GET'>
-                        <h3 style="margin-top: 4%"> Выбрать засечку для отображения
-
-                            <button class="button-blue-small">
-                                Обновить
-                            </button>
-                        </h3>
-                    </form>
-
-
-                    <form action="choose_drone_toshow" method="post">
-                        <div class="row">
-                            <div class="col-11 ">
-
-                                <div id="detections" class="box-scroll">
-
-                                    {% csrf_token %}
-                                    {% if form_drone.fields.drone_toshow.queryset.count != 0 %}
-
-                                    {% for field in form_drone %}
-                                    {{field}}
-
-                                    {% endfor %}
-
-                                    {% else %}
-                                    По выбранным критериям ничего не найдено
-                                    {% endif %}
-
-                                </div>
-                            </div>
-                            <div class="col-1 ">
-                                <button class="button-green-small">
-                                    Выбор
-                                </button>
-
-
-                            </div>
-                        </div>
-                    </form>
 
                 </div>
 
@@ -254,16 +204,84 @@
                                 </form>
                             </div>
                             <div class="col-4">
-                                <form action="filter_all" method='GET'>
+                                <form action="filter_all" method='POST'>
+                                    {% csrf_token %}
                                     <button class="button-blue-filter"> Фильтр
                                     </button>
                                 </form>
                             </div>
                         </div>
 
+                        <!--                        <form action="filter_all" method='GET'>-->
+                        <!--                            <h3 style="margin-top: 60px; margin-left: 20px">-->
+                        <!--                                Выбрать засечку для отображения-->
+                        <!--                                <button class="button-blue-small">-->
+                        <!--                                    Обновить-->
+                        <!--                                </button>-->
+                        <!--                            </h3>-->
+                        <!--                        </form>-->
+
                     </div>
 
                 </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="information-bottom-left" style="height: 30vh; width:100%; margin-top: 60px; border: 0.5vh">
+
+                <form action="choose_drone_toshow" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 ">
+
+                            {% if form_drone.fields.drone_toshow.queryset.count != 0 %}
+                            <div id="detections" style="margin: 10px 0;
+                    width: 100%; height: 230px">
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>Время</th>
+                                        <th>Имя дрона</th>
+                                        <th>Хост</th>
+                                        <th>Имя поста</th>
+                                        <th>Радиус, м</th>
+                                        <th>Азимут</th>
+                                        <th>Комментарий</th>
+                                        <th>Показать</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for dron in form_drone.AllDrones %}
+                                    <tr>
+                                        <td>{{dron.detection_time}}</td>
+                                        <td>{{dron.system_name}}</td>
+                                        <td>{{dron.ip}}</td>
+                                        <td>{{dron.strig_name}}</td>
+                                        <td>{% widthratio dron.area_radius_m 1 1 %}</td>
+                                        <td>{{ dron.azimuth|get_int }}</td>
+                                        <td>{{dron.comment_string}}</td>
+                                        <td>
+                                            <button type="submit" class="btn btn-primary" name="detection_id"
+                                                    value="{{ dron.pk }}"> Показать
+                                            </button>
+
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <h2 style="align:center">
+                                По выбранным критериям ничего не найдено
+                            </h2>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                </form>
 
             </div>
 
@@ -274,4 +292,5 @@
 
 
 </body>
+
 </html>

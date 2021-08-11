@@ -79,6 +79,7 @@ def jammer_on_off(host, value):
         i += 1
     return 0
 
+
 if __name__ == "__main__":
     pass
     # jammer_on_off('192.168.2.102','off')
