@@ -24,7 +24,12 @@
 
     <script type="text/javascript" src="static/main.js"></script>
     <script>
-        const  b = JSON.parse("{{ complex_state_json|escapejs }}");
+        const complex_state = JSON.parse("{{ complex_state_json|escapejs }}");
+        const complex_mode = JSON.parse("{{ complex_mode_json|escapejs }}");
+        var btn_green = document.getElementById("btn_green");
+        btn_green.addEventListener("click", function () {
+            this.classList.add("active");
+        });
     </script>
 
 
@@ -148,14 +153,14 @@
                         <div class="strizh-each" style="margin-left: 0.5%">
                             <div class="row">
 
-                                <form action='butt_skan' method='GET'>
+                                <form action='butt_scan' method='GET'>
                                     <button class="button-green" type='submit'> Сканирование</button>
                                 </form>
                                 <form action='butt_glush' method='GET'>
                                     <button class="button-green">Глуш.</button>
                                 </form>
                                 <form action='butt_gps' method='GET'>
-                                    <button class="button-green"> GPS глуш.</button>
+                                    <button id="btn_green" class="button-green"> GPS глуш.</button>
                                 </form>
                                 <form action='butt_ku' method='GET'>
                                     <button class="button-green">КУ глуш.</button>

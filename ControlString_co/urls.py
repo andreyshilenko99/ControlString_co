@@ -53,7 +53,7 @@ urlpatterns = [
     # path(r'get_drones', views.get_drones),
 
     # path(r'update_nomer_strizha', views.update_nomer_strizha),
-    path('butt_skan', views.butt_skan),
+    path('butt_scan', views.butt_scan),
     path('butt_glush', views.butt_glush),
     path('butt_gps', views.butt_gps),
     path('butt_ku', views.butt_ku),

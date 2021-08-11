@@ -556,6 +556,7 @@ def render_main_page(request):
     weather_state_dict = {}
     url_uniping_dict = {}
     complex_state_dict = {}
+    c['complex_mode_dict'] = {}
 
     strizhes = Strizh.objects.order_by('-lon').all()
     for strizh in strizhes:
@@ -563,8 +564,14 @@ def render_main_page(request):
 
         temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name], = \
             return_conditions(url_uniping_dict[strizh.name])
-
         complex_state_dict[strizh.name] = get_complex_state(url_uniping_dict[strizh.name])
+
+        mode_ips = [check_state(strizh.ip1), check_state(strizh.ip2)]
+        complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+        complex_mode = 'jammer_on' if all([True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+        print(complex_mode)
+        c['complex_mode_dict'][strizh.name] = complex_mode
+        c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
     c['temperature_dict'] = temperature_dict
     xx = c
     c['humidity_dict'] = humidity_dict
@@ -592,7 +599,7 @@ def render_main_page(request):
     return render(request, "main.html", context=c)
 
 
-def butt_skan(request):
+def butt_scan(request):
     global c
     strizh_names = Strizh.objects.all()
     c["action_strizh"] = "Сканирование: "
@@ -600,8 +607,17 @@ def butt_skan(request):
         print('Сканирование dlya strizha #', c.get('chosen_strizh'))
         for strizh in strizh_names:
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
-                # print(strizh.ip1)
                 c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
+                mode_ip1 = scan_on_off(strizh.ip1)
+                mode_ip2 = scan_on_off(strizh.ip2)
+                mode_ips = [mode_ip1, mode_ip2]
+                complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+                complex_mode = 'jammer_on' if all(
+                    [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+                print(complex_mode)
+                mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
+                c['complex_mode_dict'][strizh.name] = complex_mode
+                c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
                 scan_on_off(strizh.ip1)
                 scan_on_off(strizh.ip2)
 
@@ -637,16 +653,16 @@ def butt_glush(request):
                         ip = each_apem.ip_podavitelya
                         if 'Шелест' in each_apem.type_podavitelya:
                             set_gain(ip, each_apem.usileniye_db)
-                            pass
                         elif 'АПЕМ' in apems.filter(strizh_name=strizh.name):
                             set_gain(ip, each_apem.usileniye_db)
-                            pass
-
                         print(ip)
                         jammer_on_off(ip, 'on')
-
-                print(check_state(strizh.ip1))
-                print(check_state(strizh.ip2))
+                mode_ips = [check_state(strizh.ip1), check_state(strizh.ip2)]
+                complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+                complex_mode = 'jammer_on' if all([True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+                print(complex_mode)
+                c['complex_mode_dict'][strizh.name] = complex_mode
+                c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
                 # jammer_on_off(strizh.ip1, 'on')
 
 
@@ -830,21 +846,19 @@ def set_correct_temperature(url, strizh_name, temperature_state):
 def turn_on_bp(request):
     global c, comlex_state, logs
     c['action_strizh'] = ''
-    for striz in c.get('chosen_strizh'):
-        if striz != 'None':
-            url = c['url_uniping_dict'][striz]
-
+    for strizh_name in c.get('chosen_strizh'):
+        if strizh_name != 'None':
+            url = c['url_uniping_dict'][strizh_name]
             try:
                 requests.get(url, auth=auth, timeout=0.2)
             except:
                 result_get = 'ошибка соединения с uniping'
-                collect_logs(striz + ': ' + result_get)
+                collect_logs(strizh_name + ': ' + result_get)
                 continue
-
-            temperature_state = check_condition(c['temperature_dict'][striz], low_border=low_t, high_border=high_t)
+            temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t, high_border=high_t)
             if temperature_state != 0:
                 print('температура не в порядке')
-                set_correct_temperature(url, striz, temperature_state)
+                set_correct_temperature(url, strizh_name, temperature_state)
             elif temperature_state == 0:
                 # turn everything on
                 state0 = obtain_state(url, 'датчик потока')
@@ -874,8 +888,9 @@ def turn_on_bp(request):
                     send_impulse(url, 'ЭВМ2', time_pulse=3, action='вкл')
 
                 complex_state = get_complex_state(url)
-                c['complex_state'] = complex_state
-                str_log = striz + ': ' + complex_state
+                c['complex_state_dict'][strizh_name] = complex_state
+                c['complex_state_json'] = json.dumps(c['complex_state_dict'])
+                str_log = strizh_name + ': ' + complex_state
                 collect_logs(str_log)
                 c['logs_list'] = logs_list
                 # render(request, "main.html", context=c)
@@ -886,15 +901,15 @@ def turn_on_bp(request):
 def turn_off_bp(request):
     global c
     c['action_strizh'] = ''
-    for striz in c.get('chosen_strizh'):
-        if striz != 'None':
-            url = c['url_uniping_dict'][striz]
+    for strizh_name in c.get('chosen_strizh'):
+        if strizh_name != 'None':
+            url = c['url_uniping_dict'][strizh_name]
 
             try:
                 requests.get(url, auth=auth, timeout=0.2)
             except:
                 result_get = 'ошибка соединения с uniping'
-                collect_logs(striz + ': ' + result_get)
+                collect_logs(strizh_name + ': ' + result_get)
                 continue
 
             state4 = obtain_state(url, 'ЭВМ1')
@@ -922,8 +937,9 @@ def turn_off_bp(request):
             time.sleep(1)
             send_impulse(url, 'РЕЗЕТ', time_pulse=6, action='выкл')
 
-            complex_state = 'выкл'
-            c['complex_state'] = complex_state
+            complex_state = get_complex_state(url)
+            c['complex_state_dict'][strizh_name] = complex_state
+            c['complex_state_json'] = json.dumps(c['complex_state_dict'])
             c['logs'] = logs
             c['logs_list'] = logs_list
     # render(request, "main.html", context=c)

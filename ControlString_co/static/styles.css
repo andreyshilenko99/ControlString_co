@@ -1,6 +1,6 @@
 
 .button-green {
-    background-color: #04AA6D;
+    background: #04AA6D;
     border: none;
     color: white;
     padding: 20px;
@@ -8,12 +8,20 @@
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    /*margin: 4px 2px;*/
     margin-left: 10px;
     border-radius: 10px;
 
-
+    cursor: pointer;
+    user-select: none;
+    /*outline: none;*/
+    /*transition: background 9999999s;*/
 }
+
+.button-green:active {
+    background: red;
+    /*transition: background 0s;*/
+}
+
 
 .button-green-csv {
     background-color: #04AA6D;
@@ -398,27 +406,31 @@
     left: -70px;
 }
 
-table ,tr td{
-    background-color: rgb(255,255,255);
-    border:1px solid #575757
+table, tr td {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #575757
 }
+
 tbody {
     text-align: center;
 
-    display:block;
-    height:200px;
-    overflow:auto;
-    overflow-y:scroll;
+    display: block;
+    height: 200px;
+    overflow: auto;
+    overflow-y: scroll;
 }
+
 thead, tbody tr {
-    display:table;
-    width:100%;
-    table-layout:fixed;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
+
 thead {
     text-align: center;
-    width: calc( 100% - 1em )
+    width: calc(100% - 1em)
 }
+
 table {
 
 }

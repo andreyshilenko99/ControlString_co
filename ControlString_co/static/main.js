@@ -50,6 +50,7 @@ function map_init_basic(map, options) {
     // var counter_drone_period = 0
     var drone_counter = {};
     var drone_layers = {};
+    var strizh_layers = {};
 
 
     function refreshMarkers() {
@@ -86,15 +87,20 @@ function map_init_basic(map, options) {
 
                         // каждые 10 итераций отрисовка стрижа и подписи к нему
                         for (let j = 0; j < len_strizh_data; j++) {
+                            var strizh_name = strizh_data.features[j].properties.name;
+                            var strizh_coords = [strizh_data.features[j].properties.lat,
+                                strizh_data.features[j].properties.lon]
 
                             strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
                                 strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
                             console.log('counter_periodic', counter_periodic)
 
 
-                            if (counter_periodic === 10) {
+                            if (counter_periodic === 2) {
                                 counter_periodic = 0;
-                                layerStrizhes.clearLayers();
+                                for (let i=0; i < len_strizh_data; i++) {
+                                    strizh_layers[strizh_data.features[j].properties.name].clearLayers();
+                                }
                             }
                             if (counter_periodic === 0) {
                                 var tooltip = L.tooltip({
@@ -103,28 +109,50 @@ function map_init_basic(map, options) {
                                     permanent: true,
                                     opacity: 0.85
                                 })
-                                    .setContent(strizh_data.features[j].properties.name);
+                                    .setContent(strizh_name);
+                                console.log(complex_state[strizh_name])
+                                console.log(complex_mode)
+                                if (!strizh_layers[strizh_name]) {
+                                    strizh_layers[strizh_name] = L.layerGroup().addTo(map);
+                                }
+                                if (complex_state[strizh_name] === 'включен') {
+                                    if (complex_mode[strizh_name] === 'scan_on') {
+                                        // on and scan on, jammer off (3)
+                                        var col = '#17bd04'
+                                        icon_url = 'static/icons/strizh_markers/green.png'
+                                    }
+                                    else if (complex_mode[strizh_name] === 'jammer_on') {
+                                        // scan off and jammer on (5)
+                                        var col = '#e5de14'
+                                        icon_url = 'static/icons/strizh_markers/yellow.png'
+                                    }
+                                    else {
+                                        // on but not active (2)
+                                        var col = '#2f80ed'
+                                        icon_url = 'static/icons/strizh_markers/blue.png'
+                                    }
+                                    // icon_url = 'static/icons/strizh_green_pulse.gif'
+                                } else {
+                                    // all off or not working (1)
+                                    var col = '#4f4f4f'
+                                    var icon_url = 'static/icons/strizh_markers/gray.png'
+                                }
 
-                                arc1 = L.circle([strizh_data.features[j].properties.lat,
-                                    strizh_data.features[j].properties.lon], {
-                                    color: '#1a1a1a',
-                                    fillColor: "#1a1a1a",
+                                arc1 = L.circle(strizh_coords, {
+                                    color: col,
+                                    fillColor: col,
                                     fillOpacity: 0.1,
                                     radius: 500
-                                }).addTo(layerStrizhes);
-
+                                }).addTo(strizh_layers[strizh_name]);
                                 var logoMarkerStrizh = new logoMarkerStyleStrizh({
-                                    iconUrl: 'static/icons/strizh_gray.svg'
+                                    iconUrl: icon_url
                                 });
-
-                                console.log( b )
-
-
                                 str1 = L.marker([strizh_data.features[j].properties.lat,
-                                    strizh_data.features[j].properties.lon], {icon: logoMarkerStrizh}).addTo(layerStrizhes)
+                                    strizh_data.features[j].properties.lon], {icon: logoMarkerStrizh})
+                                    .addTo(strizh_layers[strizh_name])
                                     .bindTooltip(tooltip).openTooltip();
                             }
-                            map.addLayer(layerStrizhes)
+                            map.addLayer(strizh_layers[strizh_name])
                         }
                         let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/dron_top.png'});
 

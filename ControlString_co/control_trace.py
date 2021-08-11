@@ -90,7 +90,7 @@ def check_state(host):
     s.connect((host, port))
     s.send(bytearray(lel))
     data = s.recv(1024)
-    s.close()
+    # s.close()
     # signal = con.TraceRemoteMessage()
     print(data)
     # data = signal.ParseFromString(data)
