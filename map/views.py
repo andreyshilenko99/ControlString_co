@@ -604,6 +604,7 @@ def butt_scan(request):
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
                 c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
                 mode_ip1 = scan_on_off(strizh.ip1)
+                mode_ip2 = scan_on_off(strizh.ip2)
                 # try:
                 #
                 #     mode_ip2 = scan_on_off(strizh.ip2)

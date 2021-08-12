@@ -1,5 +1,10 @@
 var last_id = 0;
 
+function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}
+
+
 function refresh() {
     $.getJSON('/geo/data/', function (data) {
         var current_id = data.features[0].properties.pk;
@@ -47,7 +52,7 @@ function map_init_basic(map, options) {
     var ids_drawn = new Set();
     var initial_draw = 0;
     // var counter_periodic = -1;
-    let flag_state = 0;
+    var flag_state = {};
     // var counter_drone_period = 0
     var drone_counter = {};
     var drone_layers = {};
@@ -98,12 +103,16 @@ function map_init_basic(map, options) {
                                 strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
 
 
-                            if (flag_state === 0) {
+                            console.log('flag_state', flag_state);
+                            if (!flag_state[strizh_name] || isEmpty(flag_state[strizh_name])) {
                                 for (let i = 0; i < len_strizh_data; i++) {
+                                    flag_state[strizh_name] = {};
                                     if (strizh_layers[strizh_name]) {
                                         strizh_layers[strizh_name].clearLayers();
                                     }
                                 }
+                            }
+                            if (isEmpty(flag_state[strizh_name])) {
                                 var tooltip = L.tooltip({
                                     direction: 'bottom',
                                     noWrap: true,
@@ -112,11 +121,12 @@ function map_init_basic(map, options) {
                                 })
                                     .setContent(strizh_name);
                                 console.log(complex_mode)
+
                                 if (!strizh_layers[strizh_name]) {
                                     strizh_layers[strizh_name] = L.layerGroup().addTo(map);
                                 }
                                 if (complex_state[strizh_name] === 'включен') {
-                                    if (complex_mode[strizh_name] === 'scan_on' && flag_state !== 4) {
+                                    if (complex_mode[strizh_name] === 'scan_on') {
                                         // on and scan on, jammer off (3)
                                         col = '#17bd04'
                                         icon_url = 'static/icons/strizh_markers/green.png'
@@ -124,7 +134,7 @@ function map_init_basic(map, options) {
                                         // scan off and jammer on (5)
                                         col = '#ff1414'
                                         icon_url = 'static/icons/strizh_markers/red.png'
-                                    } else if (flag_state !== 4) {
+                                    } else {
                                         // on but not active (2)
                                         col = '#2f80ed'
                                         icon_url = 'static/icons/strizh_markers/blue.png'
@@ -149,15 +159,13 @@ function map_init_basic(map, options) {
                                     strizh_data.features[j].properties.lon], {icon: logoMarkerStrizh})
                                     .addTo(strizh_layers[strizh_name])
                                     .bindTooltip(tooltip).openTooltip();
+                                map.addLayer(strizh_layers[strizh_name])
                             }
-                            map.addLayer(strizh_layers[strizh_name])
                         }
                         let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/drons/dron_top.png'});
-
+                        var len_arr = 20;
                         if (data.features.length < 20) {
-                            var len_arr = data.features.length;
-                        } else {
-                            var len_arr = 20;
+                            len_arr = data.features.length;
                         }
                         let arr_drones = [];
 
@@ -184,7 +192,8 @@ function map_init_basic(map, options) {
                                 if (Object.keys(dron_colors).includes(data.features[i].properties.system_name)) {
                                     if (data_drawn.has(data.features[i].properties.system_name)) {
                                         // counter_drone_period = 3;
-                                        drone_counter[d_id] = DRONE_COUNTER;
+                                        drone_counter[d_id] = [DRONE_COUNTER, strizh_name];
+
                                     }
                                 }
                                 // не задан цвет
@@ -192,7 +201,7 @@ function map_init_basic(map, options) {
                                     dron_colors[data.features[i].properties.system_name] = getRandomColor();
                                 }
                                 // counter_drone_period = 0;
-                                drone_counter[d_id] = 0;
+                                drone_counter[d_id] = [0, strizh_name];
                             }
                             data_drawn.add(data.features[i].properties.system_name);
                             ids_drawn.add(data.features[i].properties.pk);
@@ -206,7 +215,10 @@ function map_init_basic(map, options) {
                             let r_x = 0.008892 * 4 / 5
                             // scan on, glushenie off  (4)
                             if (complex_mode[strizh_name] === 'scan_on') {
-                                flag_state = 4;
+
+                                flag_state[strizh_name][d_id] = 1;
+
+                                // flag_state[strizh_name] = 4;
                                 strizh_layers[strizh_name].clearLayers()
                                 if (!drone_layers[d_id]) {
                                     drone_layers[d_id] = L.layerGroup().addTo(map);
@@ -292,19 +304,28 @@ function map_init_basic(map, options) {
         // console.log('counter_drone_period', counter_drone_period)
         console.log('drone_counter', drone_counter);
         console.log('drone_layers', drone_layers);
+
         // new cycle to iterate through layers
         for (const [key, value] of Object.entries(drone_counter)) {
-            if (value === DRONE_COUNTER) {
+            let name = value[1];
+            let dron_id = parseInt(key);
+
+            console.log('flag_state[name][dron_id]', flag_state[name][dron_id]);
+            console.log('value', value[0]);
+
+            if (value[0] === DRONE_COUNTER) {
+                delete flag_state[name][dron_id];
+                delete drone_counter[key];
+                delete drone_layers[key];
+
                 if (drone_layers[key]) {
-                    flag_state = 0;
                     drone_layers[key].clearLayers();
                 }
-                delete drone_counter[key] ;
             } else {
                 if (drone_layers[key]) {
-                    map.addLayer(drone_layers[key])
+                    map.addLayer(drone_layers[key]);
                 }
-                drone_counter[key] += 1;
+                drone_counter[key][0] += 1;
             }
         }
     }
