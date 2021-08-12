@@ -3,13 +3,13 @@ var last_id = 0;
 function refresh() {
     $.getJSON('/geo/data/', function (data) {
         var current_id = data.features[0].properties.pk;
-        if (last_id !== current_id && last_id !== 0) {
+        // if (last_id !== current_id && last_id !== 0) {
+        if (true) {
             last_id = current_id;
-            console.log('new_drone')
             $.ajax({
                 url: "main",
                 success: function (data) {
-                    $('#detections').replaceWith($('#detections', data)); // NOTE this
+                    $("#detections").load("main #detections");
                 }
             });
         }
@@ -18,8 +18,8 @@ function refresh() {
 
 }
 
-var SECONDS_WAIT = 5; // seconds, edit here
-var DRONE_COUNTER = 15 // number of iterations to clear drone
+var SECONDS_WAIT = 3; // seconds, edit here
+var DRONE_COUNTER = 5 // number of iterations to clear drone
 // drone display time before clearing = SECONDS_WAIT*DRONE_COUNTER
 setInterval(refresh, SECONDS_WAIT * 1000);
 
@@ -46,22 +46,25 @@ function map_init_basic(map, options) {
     var data_drawn = new Set();
     var ids_drawn = new Set();
     var initial_draw = 0;
-    var counter_periodic = -1;
+    // var counter_periodic = -1;
+    let flag_state = 0;
     // var counter_drone_period = 0
     var drone_counter = {};
     var drone_layers = {};
     var strizh_layers = {};
+    var col = '#2f80ed';
+    var icon_url = 'static/icons/strizh_markers/blue.png';
 
 
     function refreshMarkers() {
 
-        counter_periodic = counter_periodic + 1;
+        // counter_periodic = counter_periodic + 1;
 
         console.log('REFRESHED')
 
         $.getJSON('/geo/data/', function (data) {
                 let arc1;
-                let circle1;
+                let sector1;
                 let str1;
                 let name1;
                 let logoMarkerStyle = L.Icon.extend({
@@ -93,16 +96,14 @@ function map_init_basic(map, options) {
 
                             strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
                                 strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
-                            console.log('counter_periodic', counter_periodic)
 
 
-                            if (counter_periodic === 2) {
-                                counter_periodic = 0;
-                                for (let i=0; i < len_strizh_data; i++) {
-                                    strizh_layers[strizh_data.features[j].properties.name].clearLayers();
+                            if (flag_state === 0) {
+                                for (let i = 0; i < len_strizh_data; i++) {
+                                    if (strizh_layers[strizh_name]) {
+                                        strizh_layers[strizh_name].clearLayers();
+                                    }
                                 }
-                            }
-                            if (counter_periodic === 0) {
                                 var tooltip = L.tooltip({
                                     direction: 'bottom',
                                     noWrap: true,
@@ -110,32 +111,29 @@ function map_init_basic(map, options) {
                                     opacity: 0.85
                                 })
                                     .setContent(strizh_name);
-                                console.log(complex_state[strizh_name])
                                 console.log(complex_mode)
                                 if (!strizh_layers[strizh_name]) {
                                     strizh_layers[strizh_name] = L.layerGroup().addTo(map);
                                 }
                                 if (complex_state[strizh_name] === 'включен') {
-                                    if (complex_mode[strizh_name] === 'scan_on') {
+                                    if (complex_mode[strizh_name] === 'scan_on' && flag_state !== 4) {
                                         // on and scan on, jammer off (3)
-                                        var col = '#17bd04'
+                                        col = '#17bd04'
                                         icon_url = 'static/icons/strizh_markers/green.png'
-                                    }
-                                    else if (complex_mode[strizh_name] === 'jammer_on') {
+                                    } else if (complex_mode[strizh_name] === 'jammer_on') {
                                         // scan off and jammer on (5)
-                                        var col = '#e5de14'
-                                        icon_url = 'static/icons/strizh_markers/yellow.png'
-                                    }
-                                    else {
+                                        col = '#ff1414'
+                                        icon_url = 'static/icons/strizh_markers/red.png'
+                                    } else if (flag_state !== 4) {
                                         // on but not active (2)
-                                        var col = '#2f80ed'
+                                        col = '#2f80ed'
                                         icon_url = 'static/icons/strizh_markers/blue.png'
                                     }
                                     // icon_url = 'static/icons/strizh_green_pulse.gif'
                                 } else {
                                     // all off or not working (1)
-                                    var col = '#4f4f4f'
-                                    var icon_url = 'static/icons/strizh_markers/gray.png'
+                                    col = '#4f4f4f'
+                                    icon_url = 'static/icons/strizh_markers/gray.png'
                                 }
 
                                 arc1 = L.circle(strizh_coords, {
@@ -154,7 +152,7 @@ function map_init_basic(map, options) {
                             }
                             map.addLayer(strizh_layers[strizh_name])
                         }
-                        let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/dron_top.png'});
+                        let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/drons/dron_top.png'});
 
                         if (data.features.length < 20) {
                             var len_arr = data.features.length;
@@ -174,9 +172,9 @@ function map_init_basic(map, options) {
                             let area_sector_end_grad = parseFloat(data.features[i].properties.area_sector_end_grad);
                             let strizh_center = [strizh_map_name[data.features[i].properties.strig_name][0],
                                 strizh_map_name[data.features[i].properties.strig_name][1]];
+                            let strizh_name = data.features[i].properties.strig_name;
 
                             // дрон нарисован
-                            console.log('ids_drawn', ids_drawn)
                             if (ids_drawn.has(data.features[i].properties.pk)) {
                                 return
                             }
@@ -187,7 +185,6 @@ function map_init_basic(map, options) {
                                     if (data_drawn.has(data.features[i].properties.system_name)) {
                                         // counter_drone_period = 3;
                                         drone_counter[d_id] = DRONE_COUNTER;
-
                                     }
                                 }
                                 // не задан цвет
@@ -207,36 +204,60 @@ function map_init_basic(map, options) {
                             // Отрисовка сектора с обновлением + layer Drones
                             let r_y = 0.004499 * 4 / 5
                             let r_x = 0.008892 * 4 / 5
+                            // scan on, glushenie off  (4)
+                            if (complex_mode[strizh_name] === 'scan_on') {
+                                flag_state = 4;
+                                strizh_layers[strizh_name].clearLayers()
+                                if (!drone_layers[d_id]) {
+                                    drone_layers[d_id] = L.layerGroup().addTo(map);
+                                }
+                                col = '#ffc900';
+                                icon_url = 'static/icons/strizh_markers/yellow.png';
+                                logoMarkerStrizh = new logoMarkerStyleStrizh({
+                                    iconUrl: icon_url
+                                });
+                                str1 = L.marker(strizh_center, {icon: logoMarkerStrizh})
+                                    .addTo(strizh_layers[strizh_name])
+                                    .bindTooltip(tooltip).openTooltip();
 
-                            if (area_sector_start_grad === -1 && area_sector_end_grad === -1) {
-                                let angle = (90 - (area_sector_start_grad)) / 180 * Math.PI;
-                                var d_y = 0.004499 * Math.sin(angle);
-                                var d_x = 0.008892 * Math.cos(angle);
+                                // var logoMarkerStrizh = new logoMarkerStyleStrizh({
+                                //     iconUrl: icon_url
+                                // });
+                                //
+                                // str1 = L.marker(strizh_center, {icon: logoMarkerStrizh})
+                                //     .addTo(drone_layers[d_id])
+                                //     .bindTooltip(tooltip).openTooltip();
+
                                 arc1 = L.circle(strizh_center, {
-                                    color: '#0062ea',
-                                    fillColor: "#e0aa4e",
+                                    color: '#ffc900',
+                                    fillColor: "#ffc900",
                                     fillOpacity: 0.2,
                                     radius: radius
                                 });
                                 // arc1.addTo(layerDrones);
-                                if (!drone_layers[d_id]) {
-                                    drone_layers[d_id] = L.layerGroup().addTo(map);
-                                }
+
                                 arc1.addTo(drone_layers[d_id]);
-                            } else {
-                                let angle = (90 - (area_sector_start_grad + 30)) / 180 * Math.PI;
-                                var d_y = r_y * Math.sin(angle);
-                                var d_x = r_x * Math.cos(angle);
-                                circle1 = L.circle(strizh_center, {
-                                    radius: radius,
-                                    startAngle: area_sector_start_grad,
-                                    endAngle: area_sector_end_grad
-                                });
-                                // circle1.addTo(layerDrones);
-                                if (!drone_layers[d_id]) {
-                                    drone_layers[d_id] = L.layerGroup().addTo(map);
+
+                                if (area_sector_start_grad === -1 && area_sector_end_grad === -1) {
+                                    let angle = (90 - (area_sector_start_grad)) / 180 * Math.PI;
+                                    var d_y = 0.004499 * Math.sin(angle);
+                                    var d_x = 0.008892 * Math.cos(angle);
+
+                                } else {
+                                    let angle = (90 - (area_sector_start_grad + 30)) / 180 * Math.PI;
+                                    var d_y = r_y * Math.sin(angle);
+                                    var d_x = r_x * Math.cos(angle);
+                                    sector1 = L.circle(strizh_center, {
+                                        color: '#ffc900',
+                                        radius: radius,
+                                        startAngle: area_sector_start_grad,
+                                        endAngle: area_sector_end_grad
+                                    });
+                                    if (!drone_layers[d_id]) {
+                                        drone_layers[d_id] = L.layerGroup().addTo(map);
+                                    }
+                                    sector1.addTo(drone_layers[d_id]);
                                 }
-                                circle1.addTo(drone_layers[d_id]);
                             }
 
                             // Отрисовка подписи к дрону в секторе + layer Drones
@@ -275,10 +296,10 @@ function map_init_basic(map, options) {
         for (const [key, value] of Object.entries(drone_counter)) {
             if (value === DRONE_COUNTER) {
                 if (drone_layers[key]) {
-
+                    flag_state = 0;
                     drone_layers[key].clearLayers();
                 }
-                drone_counter[key] = 0;
+                delete drone_counter[key] ;
             } else {
                 if (drone_layers[key]) {
                     map.addLayer(drone_layers[key])

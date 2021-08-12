@@ -557,11 +557,15 @@ def render_main_page(request):
             return_conditions(url_uniping_dict[strizh.name])
         complex_state_dict[strizh.name] = get_complex_state(url_uniping_dict[strizh.name])
 
-        mode_ips = [check_state(strizh.ip1), check_state(strizh.ip2)]
+        try:
+            mode_ips = [check_state(strizh.ip1), check_state(strizh.ip2)]
+        except:
+            mode_ips = ['all_stop' for _ in range(2)]
         complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
         complex_mode = 'jammer_on' if all([True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
         print(complex_mode)
-        c['complex_mode_dict'][strizh.name] = complex_mode
+        # c['complex_mode_dict'][strizh.name] = complex_mode
+        c['complex_mode_dict'][strizh.name] = mode_ips[0]
         c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
     c['temperature_dict'] = temperature_dict
     xx = c
@@ -600,14 +604,19 @@ def butt_scan(request):
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
                 c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
                 mode_ip1 = scan_on_off(strizh.ip1)
-                mode_ip2 = scan_on_off(strizh.ip2)
-                mode_ips = [mode_ip1, mode_ip2]
-                complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+                # try:
+                #
+                #     mode_ip2 = scan_on_off(strizh.ip2)
+                #     mode_ips = [mode_ip1, mode_ip2]
+                # except:
+                mode_ips = [mode_ip1, mode_ip1]
+                complex_mode = 'scan_on' if all(
+                    [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
                 complex_mode = 'jammer_on' if all(
                     [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
                 print(complex_mode)
-                mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
-                c['complex_mode_dict'][strizh.name] = complex_mode
+                # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
+                c['complex_mode_dict'][strizh.name] = mode_ips[0]
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
                 # scan_on_off(strizh.ip1)
                 # scan_on_off(strizh.ip2)

@@ -90,7 +90,7 @@ function map_init_basic(map, options) {
                     }
 
                 }
-                let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/dron_top.png', color: '#ff0000'});
+                let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/drons/dron_top.png', color: '#ff0000'});
                 console.log('data ', data)
                 // статичная отрисовка радиуса вокруг стрижа, стрижа и его подписи
                 let radius = parseFloat(data.features[0].properties.area_radius_m);

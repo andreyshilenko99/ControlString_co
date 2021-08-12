@@ -44,7 +44,8 @@
                 <div class="map-box" style="height: 60vh; width:98%; solid:#ffffff">
                     <div class="row" style="margin: 1%">
                         <a href="menu">
-                            <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">
+<!--                            <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">-->
+                            <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
                         </a>
 
                         <form action="menu" method='GET'>
@@ -74,7 +75,7 @@
                     <h3 style="margin-top: 4%"> Информация о засечках </h3>
                     <div id="detections" style="margin: 10px 0;
                     width: 100%; height: 230px">
-                        <table>
+                        <table id="detections_table">
                             <thead>
                             <tr>
                                 <th>Время</th>
@@ -231,7 +232,7 @@
                                         {{ weather_state_dict|getkey:striz }}
                                     </h5>
                                     {% elif complex_state_dict|getkey:striz == 'выключен' %}
-                                    <h5 style="color: #de6b1e">
+                                    <h5 style="color: #aa0505">
                                         {{striz}}:
                                         {{ complex_state_dict|getkey:striz }}
                                     </h5>
