@@ -44,7 +44,7 @@
                 <div class="map-box" style="height: 60vh; width:98%; solid:#ffffff">
                     <div class="row" style="margin: 1%">
                         <a href="menu">
-<!--                            <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">-->
+                            <!--                            <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">-->
                             <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
                         </a>
 
@@ -152,10 +152,15 @@
 
                         <div class="strizh-each" style="margin-left: 0.5%">
                             <div class="row">
-
+                                {% if button_complex != 'red' %}
                                 <form action='butt_scan' method='GET'>
                                     <button class="button-green" type='submit'> Сканирование</button>
                                 </form>
+                                {% else %}
+                                <form action='butt_scan' method='GET'>
+                                    <button class="button-green" type='submit' style="background: #db0909"> Сканирование</button>
+                                </form>
+                                {% endif %}
                                 <form action='butt_glush' method='GET'>
                                     <button class="button-green">Глуш.</button>
                                 </form>
@@ -166,13 +171,10 @@
                                     <button class="button-green">КУ глуш.</button>
                                 </form>
                             </div>
-
                         </div>
-
-
                     </div>
-
                 </div>
+
                 <div class="information-bottom"
                      style="height: 65%; margin-top: 5px;">
                     <!--                    border: 0.5vh solid rgb(255,255,255)">-->
@@ -192,7 +194,7 @@
                         {% endif %}
                         {% endfor %}
                         <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
-                            Включен режим: </h4>
+                            Режим </h4>
                         <!--                        &nbsp;-->
                         <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
                             {{action_strizh}}

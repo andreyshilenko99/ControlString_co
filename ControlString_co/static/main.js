@@ -316,11 +316,10 @@ function map_init_basic(map, options) {
             if (value[0] === DRONE_COUNTER) {
                 delete flag_state[name][dron_id];
                 delete drone_counter[key];
-                delete drone_layers[key];
-
                 if (drone_layers[key]) {
                     drone_layers[key].clearLayers();
                 }
+                delete drone_layers[key];
             } else {
                 if (drone_layers[key]) {
                     map.addLayer(drone_layers[key]);

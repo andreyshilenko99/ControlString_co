@@ -17,10 +17,10 @@
     /*transition: background 9999999s;*/
 }
 
-.button-green:active {
-    background: red;
-    /*transition: background 0s;*/
-}
+/*.button-green:active {*/
+/*    background: red;*/
+/*    !*transition: background 0s;*!*/
+/*}*/
 
 
 .button-green-csv {

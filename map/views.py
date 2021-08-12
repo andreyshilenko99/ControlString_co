@@ -564,9 +564,30 @@ def render_main_page(request):
         complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
         complex_mode = 'jammer_on' if all([True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
         print(complex_mode)
+
+        complex_mode = 'scan_on' if all(
+            [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+        complex_mode = 'jammer_on' if all(
+            [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+        print(complex_mode)
+
+        if 'on' in complex_mode:
+            action_complex = 'включено'
+            button_complex = 'red'
+            complex_mode_rus = 'сканирование: ' if complex_mode == 'scan_on' else 'глушение'
+        else:
+            action_complex = 'выключено'
+            button_complex = 'green'
+            complex_mode_rus = 'сканирование и глушение: '
+        c["action_strizh"] = complex_mode_rus + strizh.name + ' ' + action_complex
+        # ', '.join(str(_) for _ in mode_ips)
+        c["button_complex"] = button_complex
+
         # c['complex_mode_dict'][strizh.name] = complex_mode
         c['complex_mode_dict'][strizh.name] = mode_ips[0]
         c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
+
+
     c['temperature_dict'] = temperature_dict
     xx = c
     c['humidity_dict'] = humidity_dict
@@ -597,27 +618,32 @@ def render_main_page(request):
 def butt_scan(request):
     global c
     strizh_names = Strizh.objects.all()
-    c["action_strizh"] = "Сканирование: "
+
     if c.get("chosen_strizh") != 0:
         print('Сканирование dlya strizha #', c.get('chosen_strizh'))
         for strizh in strizh_names:
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
-                c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
                 mode_ip1 = scan_on_off(strizh.ip1)
+                time.sleep(1)
                 mode_ip2 = scan_on_off(strizh.ip2)
                 # try:
                 #
                 #     mode_ip2 = scan_on_off(strizh.ip2)
                 #     mode_ips = [mode_ip1, mode_ip2]
                 # except:
-                mode_ips = [mode_ip1, mode_ip1]
+                mode_ips = [mode_ip1, mode_ip2]
                 complex_mode = 'scan_on' if all(
                     [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
                 complex_mode = 'jammer_on' if all(
                     [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
                 print(complex_mode)
+                action_complex = 'включено' if complex_mode == 'scan_on' else 'выключено'
+                button_complex = 'red' if complex_mode == 'scan_on' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
-                c['complex_mode_dict'][strizh.name] = mode_ips[0]
+                c["action_strizh"] = 'сканирование: ' + strizh.name + ' ' + action_complex
+                                     # ', '.join(str(_) for _ in mode_ips)
+                c["button_complex"] = button_complex
+                c['complex_mode_dict'][strizh.name] = complex_mode
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
                 # scan_on_off(strizh.ip1)
                 # scan_on_off(strizh.ip2)
@@ -664,6 +690,11 @@ def butt_glush(request):
                 complex_mode = 'jammer_on' if all(
                     [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
                 print(complex_mode)
+                action_complex = 'включено' if complex_mode == 'jammer_on' else 'выключено'
+                button_complex = 'red' if complex_mode == 'jammer_on' else 'green'
+                # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
+                c["action_strizh"] = 'глушение: ' + strizh.name + ' ' + action_complex
+                c["button_complex"] = button_complex
                 c['complex_mode_dict'][strizh.name] = complex_mode
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
                 # jammer_on_off(strizh.ip1, 'on')
