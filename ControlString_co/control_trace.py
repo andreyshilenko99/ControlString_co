@@ -4,7 +4,35 @@ import time
 from Trace import trace_remote_pb2 as con
 
 
-def scan_on_off(host):
+def check_state(host):
+    # TODO Исключения
+    message = con.TraceRemoteMessage()
+    message.message_type = 7
+
+    lel = message.SerializeToString()
+    print(message)
+
+    port = 10100  # The same port as used by the server
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((host, port))
+    s.send(bytearray(lel))
+    data = s.recv(1024)
+    # signal = con.TraceRemoteMessage()
+    print(data)
+    # data = signal.ParseFromString(data)
+    data = data[9:-8]
+    print(data)
+    s.close()
+    print(data)
+    if data == b'\x00\x10\x00':
+        return "all_stop"
+    elif data == b'\x01\x10\x00':
+        return "scan_on"
+    elif data == b'\x00\x10\x01':
+        return "jammer_on"
+
+
+def scan_on_off(host, value):
     # TODO Исключения
     message = con.TraceRemoteMessage()
     message.message_type = 0
@@ -12,7 +40,7 @@ def scan_on_off(host):
     print(message)
     port = 10100  # The same port as used by the server
     _try = 0
-    while True:
+    while _try < 3:
         if check_state(host) == "all_stop":
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
@@ -27,8 +55,11 @@ def scan_on_off(host):
                 return "error"
             else:
                 _try += 1
+        else:
+            return
 
-        elif check_state(host) == "scan_on":
+    while _try < 3:
+        if check_state(host) == "scan_on":
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(bytearray(mes))
@@ -42,6 +73,8 @@ def scan_on_off(host):
                 return "error"
             else:
                 _try += 1
+        else:
+            return
 
 
 def jammer_on_off(host):
@@ -81,34 +114,6 @@ def jammer_on_off(host):
                 return "all_stop"
             else:
                 return "error"
-
-
-def check_state(host):
-    # TODO Исключения
-    message = con.TraceRemoteMessage()
-    message.message_type = 7
-
-    lel = message.SerializeToString()
-    print(message)
-
-    port = 10100  # The same port as used by the server
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
-    s.send(bytearray(lel))
-    data = s.recv(1024)
-    # signal = con.TraceRemoteMessage()
-    print(data)
-    # data = signal.ParseFromString(data)
-    data = data[9:-8]
-    print(data)
-    s.close()
-    print(data)
-    if data == b'\x00\x10\x00':
-        return "all_stop"
-    elif data == b'\x01\x10\x00':
-        return "scan_on"
-    elif data == b'\x00\x10\x01':
-        return "jammer_on"
 
 
 # Примеры ответов Trace
