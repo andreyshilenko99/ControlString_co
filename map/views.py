@@ -643,7 +643,7 @@ def butt_scan(request):
                 print('complex_mode: ', complex_mode)
                 print('mode_ips: ', mode_ips)
                 action_complex = 'включено' if complex_mode == 'scan_on' else 'выключено'
-                button_complex = 'red' if complex_mode == 'scan_on' else 'green'
+                button_complex = 'red_scan' if complex_mode == 'scan_on' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
                 c["action_strizh"][strizh.name] = 'Сканирование: ' + strizh.name + ' ' + action_complex
                                      # ', '.join(str(_) for _ in mode_ips)
@@ -687,18 +687,29 @@ def butt_glush(request):
                 #             set_gain(ip, each_apem.usileniye_db)
                 #         print(ip)
 
-                jammer_on_off(strizh.ip1)
-                mode_ips = [check_state(strizh.ip1), check_state(strizh.ip2)]
-                complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-                complex_mode = 'jammer_on' if all(
-                    [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
-                print(complex_mode)
-                action_complex = 'включено' if complex_mode == 'jammer_on' else 'выключено'
-                button_complex = 'red' if complex_mode == 'jammer_on' else 'green'
+                # mode1 = check_state(strizh.ip1)
+                # mode2 = check_state(strizh.ip2)
+                # modes = [mode1, mode2]
+                # complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+                # complex_mode = 'jammer_on' if all(
+                #     [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+
+                for ip_host in [strizh.ip1, strizh.ip2]:
+                    mode_ = check_state(ip_host)
+                    if mode_ == 'scan_on':
+                        # while check_state(strizh.ip2) != 'all_stop':
+                        scan_on_off(ip_host)
+                mode = check_state(strizh.ip1)
+                print(mode)
+                if mode != 'scan_on':
+                    jammer_on_off(strizh.ip1)
+                mode = check_state(strizh.ip1)
+                action_complex = 'включено' if mode == 'jammer_on' else 'выключено'
+                button_complex = 'red_jammer' if mode == 'jammer_on' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
                 c["action_strizh"][strizh.name] = 'глушение: ' + strizh.name + ' ' + action_complex
                 c["button_complex"] = button_complex
-                c['complex_mode_dict'][strizh.name] = complex_mode
+                c['complex_mode_dict'][strizh.name] = mode
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
                 # jammer_on_off(strizh.ip1, 'on')
 

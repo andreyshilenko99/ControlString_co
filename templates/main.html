@@ -152,7 +152,7 @@
 
                         <div class="strizh-each" style="margin-left: 0.5%">
                             <div class="row">
-                                {% if button_complex != 'red' %}
+                                {% if button_complex != 'red_scan' %}
                                 <form action='butt_scan' method='GET'>
                                     <button class="button-green" type='submit'> Сканирование</button>
                                 </form>
@@ -163,9 +163,15 @@
                                     </button>
                                 </form>
                                 {% endif %}
+                                {% if button_complex != 'red_jammer' %}
                                 <form action='butt_glush' method='GET'>
                                     <button class="button-green">Глуш.</button>
                                 </form>
+                                {% else %}
+                                <form action='butt_glush' method='GET'>
+                                    <button class="button-green" style="background: #db0909">Глуш.</button>
+                                </form>
+                                {% endif %}
                                 <form action='butt_gps' method='GET'>
                                     <button id="btn_green" class="button-green"> GPS глуш.</button>
                                 </form>
@@ -271,14 +277,14 @@
                             <form action='turn_off_bp' method='GET'>
                                 {% if chosen_strizh != all_strizhes %}
                                 {% for striz in chosen_strizh %}
-                                    {% if striz != 'None' %}
+                                {% if striz != 'None' %}
                                 <button class="button-red">
                                     <!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
                                     Выключение {{striz}}
 
                                 </button>
                                 {% endif %}
-                                    {% endfor %}
+                                {% endfor %}
                                 {% else %}
                                 <button class="button-red">Выключение комплекса</button>
                                 {% endif %}
