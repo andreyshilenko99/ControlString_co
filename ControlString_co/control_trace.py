@@ -18,10 +18,11 @@ def check_state(host):
     s.send(bytearray(lel))
     data = s.recv(1024)
     # signal = con.TraceRemoteMessage()
-    print(data)
+    # print(data)
+
     # data = signal.ParseFromString(data)
     data = data[9:-8]
-    print(data)
+    # print(data)
     s.close()
     print(data)
     if data == b'\x00\x10\x00':
@@ -32,7 +33,7 @@ def check_state(host):
         return "jammer_on"
 
 
-def scan_on_off(host, value):
+def scan_on_off(host):
     # TODO Исключения
     message = con.TraceRemoteMessage()
     message.message_type = 0
@@ -121,4 +122,4 @@ def jammer_on_off(host):
 # scan_on = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x01\x10\x00\x18\x01"\x04\x08\x00\x10\x00'
 # jammer_on = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x00\x10\x01\x18\x01"\x04\x08\x00\x10\x00'
 
-check_state('192.168.2.241')
+# check_state('192.168.2.241')

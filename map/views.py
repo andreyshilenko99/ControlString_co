@@ -560,6 +560,7 @@ def render_main_page(request):
 
         try:
             mode_ips = [check_state(strizh.ip1), check_state(strizh.ip2)]
+
         except:
             mode_ips = ['all_stop' for _ in range(2)]
 
@@ -567,7 +568,7 @@ def render_main_page(request):
             [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
         complex_mode = 'jammer_on' if all(
             [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
-        print(complex_mode)
+        print(mode_ips)
 
         if 'on' in complex_mode:
             action_complex = 'включено'
@@ -622,8 +623,11 @@ def butt_scan(request):
         for strizh in strizh_names:
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
                 mode_ip1 = scan_on_off(strizh.ip1)
-                time.sleep(1)
+                # time.sleep(1)
                 mode_ip2 = scan_on_off(strizh.ip2)
+                if mode_ip1 != mode_ip2:
+                    mode_ip2 = scan_on_off(strizh.ip2)
+
                 # try:
                 #
                 #     mode_ip2 = scan_on_off(strizh.ip2)
@@ -634,7 +638,8 @@ def butt_scan(request):
                     [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
                 complex_mode = 'jammer_on' if all(
                     [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
-                print(complex_mode)
+                print('complex_mode: ', complex_mode)
+                print('mode_ips: ', mode_ips)
                 action_complex = 'включено' if complex_mode == 'scan_on' else 'выключено'
                 button_complex = 'red' if complex_mode == 'scan_on' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
