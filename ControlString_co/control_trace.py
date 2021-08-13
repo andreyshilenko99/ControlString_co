@@ -81,6 +81,12 @@ def jammer_on_off(host):
     print(message)
     port = 10100  # The same port as used by the server
     _try = 0
+    if check_state(host) == "scan_on":
+        state = check_state(host)
+        while state == "scan_on":
+            scan_on_off(host)
+            time.sleep(1)
+            state = check_state(host)
     if check_state(host) == "all_stop":
         while _try < 3:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -95,14 +101,6 @@ def jammer_on_off(host):
                 return "error"
             else:
                 _try += 1
-
-    elif check_state(host) == "scan_on":
-        state = check_state(host)
-        while state == "scan_on":
-            scan_on_off(host)
-            time.sleep(1)
-            state = check_state(host)
-
     elif check_state(host) == "jammer_on":
         while _try < 3:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -117,5 +115,3 @@ def jammer_on_off(host):
                 return "error"
             else:
                 _try += 1
-
-
