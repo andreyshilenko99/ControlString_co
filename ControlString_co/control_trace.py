@@ -32,7 +32,7 @@ def check_state(host):
         return "jammer_on"
 
 
-def scan_on_off(host, value):
+def scan_on_off(host):
     # TODO Исключения
     message = con.TraceRemoteMessage()
     message.message_type = 0
@@ -40,8 +40,8 @@ def scan_on_off(host, value):
     print(message)
     port = 10100  # The same port as used by the server
     _try = 0
-    while _try < 3:
-        if check_state(host) == "all_stop":
+    if check_state(host) == "all_stop":
+        while _try < 3:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(bytearray(mes))
@@ -55,11 +55,9 @@ def scan_on_off(host, value):
                 return "error"
             else:
                 _try += 1
-        else:
-            return
 
-    while _try < 3:
-        if check_state(host) == "scan_on":
+    elif check_state(host) == "scan_on":
+        while _try < 3:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(bytearray(mes))
@@ -73,8 +71,6 @@ def scan_on_off(host, value):
                 return "error"
             else:
                 _try += 1
-        else:
-            return
 
 
 def jammer_on_off(host):
@@ -84,8 +80,9 @@ def jammer_on_off(host):
     mes = message.SerializeToString()
     print(message)
     port = 10100  # The same port as used by the server
-    while True:
-        if check_state(host) == "all_stop":
+    _try = 0
+    if check_state(host) == "all_stop":
+        while _try < 3:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(bytearray(mes))
@@ -94,16 +91,20 @@ def jammer_on_off(host):
             s.close()
             if data and check_state(host) == "jammer_on":
                 return "jammer_on"
-            else:
+            elif _try > 3:
                 return "error"
-        elif check_state(host) == "scan_on":
-            state = check_state(host)
-            while state == "scan_on":
-                scan_on_off(host)
-                time.sleep(1)
-                state = check_state(host)
+            else:
+                _try += 1
 
-        elif check_state(host) == "jammer_on":
+    elif check_state(host) == "scan_on":
+        state = check_state(host)
+        while state == "scan_on":
+            scan_on_off(host)
+            time.sleep(1)
+            state = check_state(host)
+
+    elif check_state(host) == "jammer_on":
+        while _try < 3:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(bytearray(mes))
@@ -112,13 +113,9 @@ def jammer_on_off(host):
             s.close()
             if data and check_state(host) == "all_stop":
                 return "all_stop"
-            else:
+            elif _try > 3:
                 return "error"
+            else:
+                _try += 1
 
 
-# Примеры ответов Trace
-# all_stop = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x00\x10\x00\x18\x01"\x04\x08\x00\x10\x00'
-# scan_on = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x01\x10\x00\x18\x01"\x04\x08\x00\x10\x00'
-# jammer_on = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x00\x10\x01\x18\x01"\x04\x08\x00\x10\x00'
-
-check_state('192.168.2.241')
