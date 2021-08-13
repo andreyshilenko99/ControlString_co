@@ -26,7 +26,8 @@ function refresh() {
 var SECONDS_WAIT = 3; // seconds, edit here
 var DRONE_COUNTER = 5 // number of iterations to clear drone
 // drone display time before clearing = SECONDS_WAIT*DRONE_COUNTER
-setInterval(refresh, SECONDS_WAIT * 1000);
+
+// setInterval(refresh, SECONDS_WAIT * 1000);
 
 function map_init_basic(map, options) {
 

@@ -185,8 +185,8 @@
                         {% for striz in chosen_strizh %}
                         {% if striz != 'None' %}
                         {% if complex_state_dict|getkey:striz == 'включен' %}
-<!--                        <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">-->
-<!--                            Режим </h4>-->
+                        <!--                        <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">-->
+                        <!--                            Режим </h4>-->
                         <!--                        &nbsp;-->
                         <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
                             {{action_strizh|getkey:striz}}
@@ -254,16 +254,14 @@
                         <div class="col-6">
                             <form action='turn_on_bp' method='GET'>
                                 {% if chosen_strizh != all_strizhes %}
+                                {% for striz in chosen_strizh %}
+                                {% if striz != 'None' %}
                                 <button class="button-green-on">
-                                    {% for striz in chosen_strizh %}
-                                    {% if striz != 'None' %}
                                     <!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
                                     Включение {{striz}}
-
-                                    {% endif %}
-                                    {% endfor %}
-
                                 </button>
+                                {% endif %}
+                                {% endfor %}
                                 {% else %}
                                 <button class="button-green-on">Включение комплекса</button>
                                 {% endif %}
@@ -272,16 +270,15 @@
                         <div class="col-6">
                             <form action='turn_off_bp' method='GET'>
                                 {% if chosen_strizh != all_strizhes %}
-                                <button class="button-red">
-                                    {% for striz in chosen_strizh %}
+                                {% for striz in chosen_strizh %}
                                     {% if striz != 'None' %}
+                                <button class="button-red">
                                     <!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
                                     Выключение {{striz}}
 
-                                    {% endif %}
-                                    {% endfor %}
-
                                 </button>
+                                {% endif %}
+                                    {% endfor %}
                                 {% else %}
                                 <button class="button-red">Выключение комплекса</button>
                                 {% endif %}

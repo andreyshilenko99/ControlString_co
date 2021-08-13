@@ -461,7 +461,9 @@ def choose_nomer_strizha(request):
         form = StrizhForm(request.POST)
         if form.is_valid():
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
-            c['chosen_strizh'][0] = chosen_strizh.name
+            if chosen_strizh:
+                c['chosen_strizh'][0] = chosen_strizh.name
+
             for strizh in strizhes:
                 if c['chosen_strizh'][0] == strizh.name:
                     c['url_uniping_dict'][strizh.name] = 'http://' + strizh.uniping_ip + '/'
