@@ -18,7 +18,7 @@
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/huy" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.7 (DjangoTestProject)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.6 (ControlString_co)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">

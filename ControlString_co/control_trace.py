@@ -4,38 +4,44 @@ import time
 from Trace import trace_remote_pb2 as con
 
 
-
-def scan_on_off(host):
+def scan_on_off(host, value):
     # TODO Исключения
     message = con.TraceRemoteMessage()
     message.message_type = 0
     mes = message.SerializeToString()
     print(message)
     port = 10100  # The same port as used by the server
+    _try = 0
     while True:
-        if check_state(host) == "all_stop":
+        if check_state(host) == "all_stop" and value == 'scan':
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(bytearray(mes))
             data = s.recv(1024)
             print(data)
             s.close()
+            time.sleep(1)
             if data and check_state(host) == "scan_on":
                 return "scan_on"
-            else:
+            elif _try > 3:
                 return "error"
+            else:
+                _try += 1
 
-        elif check_state(host) == "scan_on":
+        elif check_state(host) == "scan_on" and value == 'stop':
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(bytearray(mes))
             data = s.recv(1024)
             print(data)
             s.close()
+            time.sleep(1)
             if data and check_state(host) == "all_stop":
                 return "all_stop"
-            else:
+            elif _try > 3:
                 return "error"
+            else:
+                _try += 1
 
 
 def jammer_on_off(host):
@@ -90,11 +96,11 @@ def check_state(host):
     s.connect((host, port))
     s.send(bytearray(lel))
     data = s.recv(1024)
-    s.close()
     # signal = con.TraceRemoteMessage()
     print(data)
     # data = signal.ParseFromString(data)
     data = data[9:-8]
+    print(data)
     s.close()
     print(data)
     if data == b'\x00\x10\x00':
@@ -104,9 +110,10 @@ def check_state(host):
     elif data == b'\x00\x10\x01':
         return "jammer_on"
 
+
 # Примеры ответов Trace
 # all_stop = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x00\x10\x00\x18\x01"\x04\x08\x00\x10\x00'
 # scan_on = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x01\x10\x00\x18\x01"\x04\x08\x00\x10\x00'
 # jammer_on = b'\x10\x00\x00\x00\x08\x072\x0c\x08\x00\x10\x01\x18\x01"\x04\x08\x00\x10\x00'
 
-# scan_on_off('192.168.2.241')
+check_state('192.168.2.241')

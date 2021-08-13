@@ -41,23 +41,28 @@ def get_gain(host):
     return data_resp[7]
 
 
+
 def get_state(host):
     sock = socket(AF_INET, SOCK_STREAM)
     sock.connect((host, 1201))
-    stat = bytearray(b'\xe4\x01\x00\x00\x00\xff\x00\x00')
+    stat = bytearray(b'\xe4\x01\x00\x00\x01\xfe\x00\x00')
     sock.send(stat)
     i = 0  # TODO change loop
-    while i < 2:
+    ll = b'\xe4\x01\x04\x00\x00\xfb\x01\x10:\x805\xff'
+    lol = b'\xe4\x01\x04\x00\x00\xfb\x01\x10:\x805\xff'
+    while i < 3:
         stat[4] += 1
         stat[5] -= 1
         i += 1
         data_resp = sock.recv(1024)
-        print(data_resp[6])
+        print(data_resp)
 
 
 def jammer_on_off(host, value):
     sock = socket(AF_INET, SOCK_STREAM)
     sock.connect((str(host), 1201))
+    kk = b'\xe4\x03\x01\x00\x00\xfc\x05\xfb\xff\xe4\x03\x01\x00\x00\xfc\x01\xff\xff'
+    ll = b'\xe4\x03\x01\x00\x00\xfc\x05\xfb\xff\xe4\x03\x01\x00\x00\xfc\x01\xff\xff'
     jam_on = bytearray(b'\xe4\x03\x01\x00\x00\xfc\x02\xfe\xff')
     jam_off = bytearray(b'\xe4\x03\x01\x00\x00\xfc\x00\x00\x00')
     global data_resp
@@ -80,8 +85,9 @@ def jammer_on_off(host, value):
     return 0
 
 if __name__ == "__main__":
-    pass
-    # jammer_on_off('192.168.2.102','off')
-    # get_state('192.168.2.102')
-    # kk = b'\x01R8\x80\xf5\xfe'
-    # print(kk[0])
+    jammer_on_off('192.168.2.102','off')
+    get_state('192.168.2.102')
+    b'\xe4\x03\x01\x00\x00\xfc\x05\xfb\xff\xe4\x03\x01\x00\x00\xfc\x01\xff\xff'
+    b'\xe4\x03\x01\x00\x00\xfc\x05\xfb\xff\xe4\x03\x01\x00\x00\xfc\x01\xff\xff'
+    b'\xe4\x01\x04\x00\x01\xfa\x01R?\x80\xee\xfe'
+    

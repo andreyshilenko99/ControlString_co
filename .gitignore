@@ -1,5 +1,0 @@
-# Project exclude paths
-/venv/
-/ControlString_co/static/Tiles/
-.idea
-*.pyc

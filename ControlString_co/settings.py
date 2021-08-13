@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'geo',
     'djgeojson',
+    'pysnmp',
 
 ]
 
@@ -97,6 +98,15 @@ DATABASES = {
         'HOST': '192.168.1.66',
         'PORT': '5432', }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': '555',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432', }
+# }
 
 # DATABASES = {
 #     'default': {
@@ -131,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
