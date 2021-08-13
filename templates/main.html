@@ -158,7 +158,9 @@
                                 </form>
                                 {% else %}
                                 <form action='butt_scan' method='GET'>
-                                    <button class="button-green" type='submit' style="background: #db0909"> Сканирование</button>
+                                    <button class="button-green" type='submit' style="background: #db0909">
+                                        Сканирование
+                                    </button>
                                 </form>
                                 {% endif %}
                                 <form action='butt_glush' method='GET'>
@@ -179,12 +181,16 @@
                      style="height: 65%; margin-top: 5px;">
                     <!--                    border: 0.5vh solid rgb(255,255,255)">-->
 
-                    {% if action_strizh %}
                     <div class="row" style="margin-left: 3%">
                         {% for striz in chosen_strizh %}
                         {% if striz != 'None' %}
                         {% if complex_state_dict|getkey:striz == 'включен' %}
-
+<!--                        <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">-->
+<!--                            Режим </h4>-->
+                        <!--                        &nbsp;-->
+                        <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
+                            {{action_strizh|getkey:striz}}
+                        </h4>
 
                         {% else %}
                         <h4 style="font-weight:600; font-family: Calibri,
@@ -193,14 +199,9 @@
                         {% endif %}
                         {% endif %}
                         {% endfor %}
-                        <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
-                            Режим </h4>
-                        <!--                        &nbsp;-->
-                        <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
-                            {{action_strizh}}
-                        </h4>
+
                     </div>
-                    {% endif %}
+
 
                     {% if chosen_strizh != all_strizhes %}
                     <form action='main' style="margin: 2.5% 35px" method='GET'>

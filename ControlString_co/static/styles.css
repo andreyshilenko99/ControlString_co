@@ -209,6 +209,8 @@
     font-size: 24px;
     margin: 1% 1%;
     align-content: center;
+    vertical-align: middle;
+
     /*top: 50%;*/
     /*transform: translateY(-50%);*/
 }
@@ -217,9 +219,9 @@
     visibility: hidden;
     width: 700px;
     height: 100px;
-    background-color: rgba(40, 40, 40, 0.93);
+    background-color: rgba(45, 45, 45, 0.87);
     color: #fff;
-    text-align: center;
+    text-align: left;
     border-radius: 6px;
     padding: 20px 20px;
     position: absolute;
@@ -230,7 +232,9 @@
     opacity: 0;
     transition: opacity 0.2s;
     font-size: 20px;
-    /*margin: 0px 0px;*/
+    display: inline-block;
+    vertical-align: center;
+     /*margin: 0px 0px;*/
 }
 
 .tooltip .tooltiptext::after {
@@ -241,6 +245,7 @@
     border-width: 5px;
     border-style: solid;
     border-color: #555 transparent transparent transparent;
+
 }
 
 .tooltip:hover .tooltiptext {

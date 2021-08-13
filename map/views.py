@@ -457,7 +457,7 @@ def choose_nomer_strizha(request):
     humidity_dict = {}
     weather_state_dict = {}
     if request.method == 'POST':
-        c['action_strizh'] = ''
+        # c['action_strizh'] = {}
         form = StrizhForm(request.POST)
         if form.is_valid():
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
@@ -483,7 +483,7 @@ def choose_all_strizhes(request):
 
     strizhes = Strizh.objects.order_by('-lon').all()
     if request.method == 'POST':
-        c['action_strizh'] = ''
+        # c['action_strizh'] = {}
         c['chosen_strizh'] = [strizh.name for strizh in strizhes]
 
         temperature_dict = {}
@@ -548,6 +548,7 @@ def render_main_page(request):
     url_uniping_dict = {}
     complex_state_dict = {}
     c['complex_mode_dict'] = {}
+    c['action_strizh'] = {}
 
     strizhes = Strizh.objects.order_by('-lon').all()
     for strizh in strizhes:
@@ -561,9 +562,6 @@ def render_main_page(request):
             mode_ips = [check_state(strizh.ip1), check_state(strizh.ip2)]
         except:
             mode_ips = ['all_stop' for _ in range(2)]
-        complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-        complex_mode = 'jammer_on' if all([True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
-        print(complex_mode)
 
         complex_mode = 'scan_on' if all(
             [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
@@ -574,17 +572,17 @@ def render_main_page(request):
         if 'on' in complex_mode:
             action_complex = 'включено'
             button_complex = 'red'
-            complex_mode_rus = 'сканирование: ' if complex_mode == 'scan_on' else 'глушение'
+            complex_mode_rus = 'Сканирование: ' if complex_mode == 'scan_on' else 'глушение'
         else:
             action_complex = 'выключено'
             button_complex = 'green'
-            complex_mode_rus = 'сканирование и глушение: '
-        c["action_strizh"] = complex_mode_rus + strizh.name + ' ' + action_complex
+            complex_mode_rus = 'Сканирование и глушение: '
+        c["action_strizh"][strizh.name] = complex_mode_rus + strizh.name + ' ' + action_complex
         # ', '.join(str(_) for _ in mode_ips)
         c["button_complex"] = button_complex
 
-        # c['complex_mode_dict'][strizh.name] = complex_mode
-        c['complex_mode_dict'][strizh.name] = mode_ips[0]
+        c['complex_mode_dict'][strizh.name] = complex_mode
+        # c['complex_mode_dict'][strizh.name] = mode_ips[0]
         c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
 
 
@@ -640,7 +638,7 @@ def butt_scan(request):
                 action_complex = 'включено' if complex_mode == 'scan_on' else 'выключено'
                 button_complex = 'red' if complex_mode == 'scan_on' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
-                c["action_strizh"] = 'сканирование: ' + strizh.name + ' ' + action_complex
+                c["action_strizh"][strizh.name] = 'Сканирование: ' + strizh.name + ' ' + action_complex
                                      # ', '.join(str(_) for _ in mode_ips)
                 c["button_complex"] = button_complex
                 c['complex_mode_dict'][strizh.name] = complex_mode
@@ -655,14 +653,12 @@ def butt_glush(request):
     global c
     strizh_names = Strizh.objects.all()
     apems = ApemsConfiguration.objects.all()
-    c["action_strizh"] = "Глушение: "
+
     if c.get("chosen_strizh") != 0:
         print('glushenie dlya strizha #', c.get('chosen_strizh'))
         for strizh in strizh_names:
 
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
-                # print(strizh.ip1)
-                c["action_strizh"] = c["action_strizh"] + strizh.name + ' '
                 # if check_state(strizh.ip1) == 'scan_on':
                 #     scan_on_off(strizh.ip1)
                 # if check_state(strizh.ip2) == 'scan_on':
@@ -693,7 +689,7 @@ def butt_glush(request):
                 action_complex = 'включено' if complex_mode == 'jammer_on' else 'выключено'
                 button_complex = 'red' if complex_mode == 'jammer_on' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
-                c["action_strizh"] = 'глушение: ' + strizh.name + ' ' + action_complex
+                c["action_strizh"][strizh.name] = 'глушение: ' + strizh.name + ' ' + action_complex
                 c["button_complex"] = button_complex
                 c['complex_mode_dict'][strizh.name] = complex_mode
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
@@ -878,7 +874,7 @@ def set_correct_temperature(url, strizh_name, temperature_state):
 
 def turn_on_bp(request):
     global c, comlex_state, logs
-    c['action_strizh'] = ''
+    c['action_strizh'] = {}
     for strizh_name in c.get('chosen_strizh'):
         if strizh_name != 'None':
             url = c['url_uniping_dict'][strizh_name]
@@ -934,11 +930,10 @@ def turn_on_bp(request):
 
 def turn_off_bp(request):
     global c
-    c['action_strizh'] = ''
+    c['action_strizh'] = {}
     for strizh_name in c.get('chosen_strizh'):
         if strizh_name != 'None':
             url = c['url_uniping_dict'][strizh_name]
-
             try:
                 requests.get(url, auth=auth, timeout=0.2)
             except:

@@ -7,9 +7,10 @@
     <link rel="stylesheet" href="/static/styles.css"/>
 </head>
 <!--<body style="background-color: #c2b9cb; ">-->
-<body style="background: rgba(217,206,184,0.86) url(static/icons/strizh_images/strizh6.png); " >
+<body style="background: rgba(217,206,184,0.86) url(static/icons/strizh_images/strizh6.png); ">
 
-<h1 style="font-family:'Calibri'; margin: 1%; color: rgba(50,50,50,0.8)">Вы находитесь в меню. Наведите на кнопки, чтобы увидеть подробную
+<h1 style="font-family:'Calibri'; margin: 1%; color: rgba(50,50,50,0.8)">Вы находитесь в меню. Наведите на кнопки, чтобы
+    увидеть подробную
     информацию</h1>
 
 <div class="row" style="margin: 1%">
@@ -21,7 +22,8 @@
                 <span class="tooltiptext">
                         Просмотр карты. Вывод засечённых дронов. <br>
                     Управление всеми стрижами, а также каждым по отдельности. <br>
-            Включение/выключение комплекса. <br>
+            Включение/выключение комплекса.
+            Управление режимами. <br>
                     Вывод логов и служебной информации.
                     </span>
             </button>
@@ -41,23 +43,6 @@
             </div>
         </div>
     </form>
-    <!--    <form action="configuration" method='GET'>-->
-    <!--        <button class="button-blue-big"> Конфигуратор</button>-->
-    <!--    </form>-->
-    <div class="row">
-        <form action="admin" method='GET'>
-
-            <div class="tooltip">
-                <button class="button-blue-big">
-                    Администратор
-                    <span class="tooltiptext">
-                        Внесение и изменение информации о расположении стрижей
-                    </span>
-
-                </button>
-            </div>
-        </form>
-    </div>
     <div class="row">
         <form action="configuration" method='GET'>
 
@@ -74,7 +59,20 @@
         </form>
 
     </div>
+    <div class="row">
+        <form action="admin" method='GET'>
 
+            <div class="tooltip">
+                <button class="button-blue-big">
+                    Администратор
+                    <span class="tooltiptext">
+                        Внесение и изменение информации о расположении стрижей
+                    </span>
+
+                </button>
+            </div>
+        </form>
+    </div>
 
 
 </div>
