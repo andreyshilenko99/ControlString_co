@@ -572,10 +572,14 @@ def render_main_page(request):
             [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
         print(mode_ips)
 
-        if 'on' in complex_mode:
+        if 'jammer_on' in complex_mode:
             action_complex = 'включено'
-            button_complex = 'red'
-            complex_mode_rus = 'Сканирование: ' if complex_mode == 'scan_on' else 'глушение'
+            button_complex = 'red_jammer'
+            complex_mode_rus = 'Глушение: '
+        elif 'scan_on' in complex_mode:
+            action_complex = 'включено'
+            button_complex = 'red_scan'
+            complex_mode_rus = 'Сканирование: '
         else:
             action_complex = 'выключено'
             button_complex = 'green'
@@ -892,7 +896,7 @@ def set_correct_temperature(url, strizh_name, temperature_state):
 
 def turn_on_bp(request):
     global c, comlex_state, logs
-    c['action_strizh'] = {}
+
     for strizh_name in c.get('chosen_strizh'):
         if strizh_name != 'None':
             url = c['url_uniping_dict'][strizh_name]
@@ -948,7 +952,7 @@ def turn_on_bp(request):
 
 def turn_off_bp(request):
     global c
-    c['action_strizh'] = {}
+
     for strizh_name in c.get('chosen_strizh'):
         if strizh_name != 'None':
             url = c['url_uniping_dict'][strizh_name]

@@ -10,18 +10,38 @@
     font-size: 16px;
     margin-left: 10px;
     border-radius: 10px;
-
     cursor: pointer;
     user-select: none;
-    /*outline: none;*/
-    /*transition: background 9999999s;*/
+    outline: none;
+    transition: background 9999999s;
 }
 
-/*.button-green:active {*/
-/*    background: red;*/
-/*    !*transition: background 0s;*!*/
-/*}*/
+.button-green-red {
+    background: #db0909;
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    transition: background 9999999s;
+}
 
+.button-green:active {
+    background: #d4a702;
+    transition: background 0s;
+}
+
+.button-green-red:active {
+    background: #d4a702;
+    transition: background 0s;
+}
 
 .button-green-csv {
     background-color: #04AA6D;
