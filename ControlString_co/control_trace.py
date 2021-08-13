@@ -4,7 +4,7 @@ import time
 from Trace import trace_remote_pb2 as con
 
 
-def scan_on_off(host, value):
+def scan_on_off(host):
     # TODO Исключения
     message = con.TraceRemoteMessage()
     message.message_type = 0
@@ -13,7 +13,7 @@ def scan_on_off(host, value):
     port = 10100  # The same port as used by the server
     _try = 0
     while True:
-        if check_state(host) == "all_stop" and value == 'scan':
+        if check_state(host) == "all_stop":
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(bytearray(mes))
@@ -28,7 +28,7 @@ def scan_on_off(host, value):
             else:
                 _try += 1
 
-        elif check_state(host) == "scan_on" and value == 'stop':
+        elif check_state(host) == "scan_on":
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(bytearray(mes))
