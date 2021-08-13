@@ -18,14 +18,14 @@
     {% csrf_token %}
 
 </head>
-<body style="text-align: left;  background: rgba(113,129,132,0.14) url(static/icons/strizh.png); ">
+<body style="text-align: left;  background: rgba(113,129,132,0.14) url(static/icons/strizh_images/strizh.png); ">
 <div class="everything" style="margin: 1%">
     <div class="row">
         <div class="col-8 ">
             <div class="map-box" style="width:98%; solid:#ffffff">
                 <div class="row" style="margin: 1%">
                     <a href="menu">
-                        <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">
+                        <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
                     </a>
 
                     <form action="menu" method='GET'>
@@ -138,13 +138,13 @@
                 </div>
                 {% if initial != 'True' %}
                 <div class="row" style="margin-left: 50px">
-                    <div class="col-6">
+                    <div class="col-3">
                         <button type="submit" name="set_apem" class="button-config">
                             Ввод
                         </button>
                     </div>
                     {% if delete_button != 'False' %}
-                    <div class="col-6">
+                    <div class="col-3">
                         <button type="submit" name="delete_apem" class="button-delete">
                             Удалить
                         </button>

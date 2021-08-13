@@ -24,7 +24,12 @@
 
     <script type="text/javascript" src="static/main.js"></script>
     <script>
-        const  b = JSON.parse("{{ complex_state_json|escapejs }}");
+        const complex_state = JSON.parse("{{ complex_state_json|escapejs }}");
+        const complex_mode = JSON.parse("{{ complex_mode_json|escapejs }}");
+        var btn_green = document.getElementById("btn_green");
+        btn_green.addEventListener("click", function () {
+            this.classList.add("active");
+        });
     </script>
 
 
@@ -39,7 +44,8 @@
                 <div class="map-box" style="height: 60vh; width:98%; solid:#ffffff">
                     <div class="row" style="margin: 1%">
                         <a href="menu">
-                            <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">
+                            <!--                            <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">-->
+                            <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
                         </a>
 
                         <form action="menu" method='GET'>
@@ -69,8 +75,7 @@
                     <h3 style="margin-top: 4%"> Информация о засечках </h3>
                     <div id="detections" style="margin: 10px 0;
                     width: 100%; height: 230px">
-
-                        <table>
+                        <table id="detections_table">
                             <thead>
                             <tr>
                                 <th>Время</th>
@@ -147,37 +152,45 @@
 
                         <div class="strizh-each" style="margin-left: 0.5%">
                             <div class="row">
-
-                                <form action='butt_skan' method='GET'>
+                                {% if button_complex != 'red' %}
+                                <form action='butt_scan' method='GET'>
                                     <button class="button-green" type='submit'> Сканирование</button>
                                 </form>
+                                {% else %}
+                                <form action='butt_scan' method='GET'>
+                                    <button class="button-green" type='submit' style="background: #db0909">
+                                        Сканирование
+                                    </button>
+                                </form>
+                                {% endif %}
                                 <form action='butt_glush' method='GET'>
                                     <button class="button-green">Глуш.</button>
                                 </form>
                                 <form action='butt_gps' method='GET'>
-                                    <button class="button-green"> GPS глуш.</button>
+                                    <button id="btn_green" class="button-green"> GPS глуш.</button>
                                 </form>
                                 <form action='butt_ku' method='GET'>
                                     <button class="button-green">КУ глуш.</button>
                                 </form>
                             </div>
-
                         </div>
-
-
                     </div>
-
                 </div>
+
                 <div class="information-bottom"
                      style="height: 65%; margin-top: 5px;">
                     <!--                    border: 0.5vh solid rgb(255,255,255)">-->
 
-                    {% if action_strizh %}
                     <div class="row" style="margin-left: 3%">
                         {% for striz in chosen_strizh %}
                         {% if striz != 'None' %}
                         {% if complex_state_dict|getkey:striz == 'включен' %}
-
+<!--                        <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">-->
+<!--                            Режим </h4>-->
+                        <!--                        &nbsp;-->
+                        <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
+                            {{action_strizh|getkey:striz}}
+                        </h4>
 
                         {% else %}
                         <h4 style="font-weight:600; font-family: Calibri,
@@ -186,14 +199,9 @@
                         {% endif %}
                         {% endif %}
                         {% endfor %}
-                        <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
-                            Включен режим: </h4>
-                        <!--                        &nbsp;-->
-                        <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
-                            {{action_strizh}}
-                        </h4>
+
                     </div>
-                    {% endif %}
+
 
                     {% if chosen_strizh != all_strizhes %}
                     <form action='main' style="margin: 2.5% 35px" method='GET'>
@@ -227,7 +235,7 @@
                                         {{ weather_state_dict|getkey:striz }}
                                     </h5>
                                     {% elif complex_state_dict|getkey:striz == 'выключен' %}
-                                    <h5 style="color: #de6b1e">
+                                    <h5 style="color: #aa0505">
                                         {{striz}}:
                                         {{ complex_state_dict|getkey:striz }}
                                     </h5>

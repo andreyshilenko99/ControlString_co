@@ -166,7 +166,7 @@ LEAFLET_CONFIG = {
     'SPATIAL_EXTENT': (30.415, 59.999, 30.477, 60.022),
     'DEFAULT_CENTER': (60.013674, 30.452474),
     'RESET_VIEW': False,
-    'DEFAULT_ZOOM': 16,
+    'DEFAULT_ZOOM': 15,
     'MIN_ZOOM': 10,
     'MAX_ZOOM': 18,
     'TILES': [('lol', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; ASB Production'})],
