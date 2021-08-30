@@ -2,19 +2,15 @@ var last_id = 0;
 
 function refresh() {
     $.getJSON('/geo/journal_view/', function (data) {
-
         var current_id = data.features[0].properties.pk;
         console.log('data ', data)
         console.log('last_id ', last_id)
         console.log('current_id ', current_id)
         if (last_id === 0) {
-            // if (true) {
             last_id = current_id;
         } else if (last_id !== current_id) {
-
             $.ajax({
                 url: "journal",
-
                 success: function (data) {
                     $("#detections").load("journal #detections");
                     // $('#detections').replaceWith($('#detections', data));
@@ -24,17 +20,6 @@ function refresh() {
         }
     })
 }
-
-
-// function refresh() {
-//     $.ajax({
-//         url: "journal",
-//         success: function (data) {
-//             $('#detections').replaceWith($('#detections', data)); // NOTE this
-//         }
-//     });
-// }
-
 
 var seconds_wait = 3; // seconds, edit here
 setInterval(refresh, seconds_wait * 1000);

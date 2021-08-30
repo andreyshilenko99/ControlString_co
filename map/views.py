@@ -147,6 +147,7 @@ def filter_all(request):
             form_drone.AllDrones = drones_filtered_time
         form_filter = StrizhFilterForm()
     c['form_drone'] = form_drone
+    c['form_drone_alldrones'] = form_drone.AllDrones.order_by('-detection_time')
     c['form_filter'] = form_filter
 
     return render(request, "journal.html", context=c)
@@ -172,7 +173,8 @@ def journal(request):
             form_drone = DroneFilterForm()
 
             c['form_drone'] = form_drone
-        form_drone_alldrones = Point.objects.all().order_by('-detection_time')
+        # form_drone_alldrones = Point.objects.all().order_by('-detection_time')
+        form_drone_alldrones = c.get('form_drone').AllDrones.order_by('-detection_time')
         c['form_drone_alldrones'] = form_drone_alldrones
         form_filter = StrizhFilterForm()
     c['form_filter'] = form_filter
@@ -499,6 +501,7 @@ def choose_nomer_strizha(request):
         xx = c
 
     return render(request, "main.html", context=c)
+    # return HttpResponse(c)
 
 
 def choose_all_strizhes(request):
@@ -797,6 +800,7 @@ def reset_filter(request):
     if request.method == 'POST':
         form_filter = StrizhFilterForm(request.POST)
         form_drone = DroneFilterForm(request.POST)
+        form_drone_alldrones = Point.objects.all().order_by('-detection_time')
 
         for strizh in StrizhJournal.objects.all():
             strizh.delete()
@@ -804,6 +808,7 @@ def reset_filter(request):
         form_filter = StrizhFilterForm()
         form_drone = DroneFilterForm()
     c['form_filter'] = form_filter
+    c['form_drone_alldrones'] = form_drone_alldrones
     c['form_drone'] = form_drone
 
     c['end_datetime'] = 'Конец'
