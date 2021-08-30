@@ -27,22 +27,21 @@
                     <a href="menu">
                         <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
                     </a>
-
-                    <form action="menu" method='GET'>
+                    <a href="menu">
                         <button class="button-black" style="margin-left: 10px"> Меню</button>
-                    </form>
-                    <form action="main" method='GET'>
+                    </a>
+                    <a href="main">
                         <button class="button-black"> Главная</button>
-                    </form>
-                    <form action="journal" method='GET'>
+                    </a>
+                    <a href="journal" method='GET'>
                         <button class="button-black"> Журнал</button>
-                    </form>
-                    <form action="configuration" method='GET'>
+                    </a>
+                    <a href="configuration" method='GET'>
                         <button class="button-black"> Конфигуратор</button>
-                    </form>
-                    <form action="admin" method='GET'>
+                    </a>
+                    <a href="admin" method='GET'>
                         <button class="button-black"> Администратор</button>
-                    </form>
+                    </a>
                 </div>
             </div>
         </div>
@@ -77,9 +76,9 @@
                 <h5 style="text-align: center; ">
                     {% if is_strizh_chosen != 'False' %}
                     {% for striz in set_strizh_apem %}
-                        {% if striz != 'None' %}
-                        Выбран {{ striz }}
-                        {% endif %}
+                    {% if striz != 'None' %}
+                    Выбран {{ striz }}
+                    {% endif %}
                     {% endfor%}
                     {% else %}
                     Стриж не выбран

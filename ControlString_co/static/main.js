@@ -8,8 +8,9 @@ function isEmpty(obj) {
 function refresh() {
     $.getJSON('/geo/data/', function (data) {
         var current_id = data.features[0].properties.pk;
-        // if (last_id !== current_id && last_id !== 0) {
-        if (true) {
+        if (last_id === 0) {
+            last_id = current_id;
+        } else if (last_id !== current_id && last_id !== 0) {
             last_id = current_id;
             $.ajax({
                 url: "main",
@@ -19,15 +20,13 @@ function refresh() {
             });
         }
     })
-
-
 }
 
 var SECONDS_WAIT = 3; // seconds, edit here
 var DRONE_COUNTER = 5 // number of iterations to clear drone
 // drone display time before clearing = SECONDS_WAIT*DRONE_COUNTER
 
-// setInterval(refresh, SECONDS_WAIT * 1000);
+setInterval(refresh, SECONDS_WAIT * 1000);
 
 function map_init_basic(map, options) {
 
@@ -61,6 +60,15 @@ function map_init_basic(map, options) {
     var col = '#2f80ed';
     var icon_url = 'static/icons/strizh_markers/blue.png';
 
+    var logoMarkerStyle = L.Icon.extend({
+        options: {
+            iconSize: [46, 46],
+            iconAnchor: [23, 23],
+            popupAnchor: [0, -46],
+            className: 'blinking'
+        }
+    });
+
 
     function refreshMarkers() {
 
@@ -73,14 +81,7 @@ function map_init_basic(map, options) {
                 let sector1;
                 let str1;
                 let name1;
-                let logoMarkerStyle = L.Icon.extend({
-                    options: {
-                        iconSize: [46, 46],
-                        iconAnchor: [23, 23],
-                        popupAnchor: [0, -46],
-                        className: 'blinking'
-                    }
-                });
+
 
                 $.getJSON('/geo/strizh_view/', function (strizh_data) {
                         let len_strizh_data = strizh_data.features.length;
@@ -216,6 +217,13 @@ function map_init_basic(map, options) {
                             let r_x = 0.008892 * 4 / 5
                             // scan on, glushenie off  (4)
                             if (complex_mode[strizh_name] === 'scan_on') {
+                                var tooltip = L.tooltip({
+                                    direction: 'bottom',
+                                    noWrap: true,
+                                    permanent: true,
+                                    opacity: 0.85
+                                })
+                                    .setContent(strizh_name);
 
                                 flag_state[strizh_name][d_id] = 1;
 
@@ -230,7 +238,7 @@ function map_init_basic(map, options) {
                                     iconUrl: icon_url
                                 });
                                 str1 = L.marker(strizh_center, {icon: logoMarkerStrizh})
-                                    .addTo(strizh_layers[strizh_name])
+                                    .addTo(drone_layers[d_id])
                                     .bindTooltip(tooltip).openTooltip();
 
                                 // var logoMarkerStrizh = new logoMarkerStyleStrizh({

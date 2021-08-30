@@ -7,7 +7,7 @@
 
 <html>
 <head>
-    <title>Journal page</title>
+    <title>Журнал</title>
     <script type="text/javascript" src="static/journal.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -46,21 +46,21 @@
                             <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
                         </a>
 
-                        <form action="menu" method='GET'>
+                        <a href="menu">
                             <button class="button-black" style="margin-left: 10px"> Меню</button>
-                        </form>
-                        <form action="main" method='GET'>
+                        </a>
+                        <a href="main">
                             <button class="button-black"> Главная</button>
-                        </form>
-                        <form action="journal" method='GET'>
+                        </a>
+                        <a href="journal" method='GET'>
                             <button class="button-black"> Журнал</button>
-                        </form>
-                        <form action="configuration" method='GET'>
+                        </a>
+                        <a href="configuration" method='GET'>
                             <button class="button-black"> Конфигуратор</button>
-                        </form>
-                        <form action="admin" method='GET'>
+                        </a>
+                        <a href="admin" method='GET'>
                             <button class="button-black"> Администратор</button>
-                        </form>
+                        </a>
                     </div>
                     <div class="leaflet-container" style="border: 0.5vh ">
 
@@ -231,61 +231,62 @@
             <div class="information-bottom-left" style="height: 30vh; width:100%; margin-top: 60px; border: 0.5vh">
 
                 <form action="choose_drone_toshow" method="post">
+                    <!--                <form action="" method="post">-->
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-12 ">
-
-                            {% if form_drone.AllDrones.count != 0 %}
-                            <div id="detections" style="margin: 10px 0;
+                            <div>
+                                <div id="detections" style="margin: 10px 0;
                     width: 100%; height: 230px">
-                                <table>
-                                    <thead>
-                                    <tr>
-                                        <th>Время</th>
-                                        <th>Имя дрона</th>
-                                        <th>Хост</th>
-                                        <th>Имя поста</th>
-                                        <th>Радиус, м</th>
-                                        <th>Азимут</th>
-                                        <th>Комментарий</th>
-                                        <th>Показать</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for dron in form_drone.AllDrones %}
-                                    <tr>
-                                        <td>{{dron.detection_time}}</td>
-                                        <td>{{dron.system_name}}</td>
-                                        <td>{{dron.ip}}</td>
-                                        <td>{{dron.strig_name}}</td>
-                                        <td>{% widthratio dron.area_radius_m 1 1 %}</td>
-                                        <td>{{ dron.azimuth|get_int }}</td>
-                                        <td>{{dron.comment_string}}</td>
-                                        <td>
-                                            <button type="submit" class="btn btn-primary" name="detection_id"
-                                                    value="{{ dron.pk }}"> Показать
-                                            </button>
+                                    {% if form_drone.AllDrones.count != 0 %}
 
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
+                                    <table id="detections_table">
+                                        <thead>
+                                        <tr>
+                                            <th>Время</th>
+                                            <th>Имя дрона</th>
+                                            <th>Хост</th>
+                                            <th>Имя поста</th>
+                                            <th>Радиус, м</th>
+                                            <th>Азимут</th>
+                                            <th>Комментарий</th>
+                                            <th>Показать</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for dron in form_drone_alldrones %}
+                                        <tr>
+                                            <td>{{dron.detection_time}}</td>
+                                            <td>{{dron.system_name}}</td>
+                                            <td>{{dron.ip}}</td>
+                                            <td>{{dron.strig_name}}</td>
+                                            <td>{% widthratio dron.area_radius_m 1 1 %}</td>
+                                            <td>{{ dron.azimuth|get_int }}</td>
+                                            <td>{{dron.comment_string}}</td>
+                                            <td>
+                                                <!--                                            <button type="submit" name="detection_id" class="btn btn-primary"-->
+                                                <!--                                                    value="{{ dron.pk }}"> Показать-->
+                                                <!--                                            </button>-->
+
+                                                <button type="submit" class="btn btn-primary" name="detection_id"
+                                                        value="{{ dron.pk }}"> Показать
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                             {% else %}
                             <h2 style="color: #3b3b3b;text-align:  center; margin-top: 40px">
                                 По выбранным критериям ничего не найдено
                             </h2>
                             {% endif %}
-
                         </div>
-
                     </div>
                 </form>
-
             </div>
-
-
         </div>
     </div>
 </div>

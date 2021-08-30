@@ -7,9 +7,11 @@ import csv
 
 import requests
 from django.forms import ModelMultipleChoiceField
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.core.serializers import serialize
+from django.views.decorators.csrf import csrf_exempt
 
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm
@@ -164,10 +166,15 @@ def journal(request):
         if form_filter.is_valid():
             filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
             c['filtered_strizhes'] = filtered_strizhes
+        c['form_drone'] = form_drone
     else:
-        form_drone = DroneFilterForm()
+        if not c.get('form_drone'):
+            form_drone = DroneFilterForm()
+
+            c['form_drone'] = form_drone
+        form_drone_alldrones = Point.objects.all().order_by('-detection_time')
+        c['form_drone_alldrones'] = form_drone_alldrones
         form_filter = StrizhFilterForm()
-    c['form_drone'] = form_drone
     c['form_filter'] = form_filter
     return render(request, "journal.html", context=c)
 
@@ -181,6 +188,20 @@ def filter_nomer_strizha(request):
             c['filtered_strizhes'] = filtered_strizhes
 
     return render(request, "journal.html", context=c)
+
+
+def journal_view(request):
+    global c
+    # geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-pk'))
+    x = Point.objects.all().order_by('-detection_time')
+    try:
+        y = c.get('form_drone').AllDrones.order_by('-detection_time')
+        geom_as_geojson = serialize('geojson', y)
+    except AttributeError:
+        geom_as_geojson = ''
+    # geom_as_geojson1 = serialize('geojson', Point.objects.all().order_by('-detection_time'))
+
+    return HttpResponse(geom_as_geojson, content_type='geojson')
 
 
 def choose_drone_toshow(request):
@@ -207,8 +228,6 @@ def choose_drone_toshow(request):
                                    current_time=DP.current_time,
                                    strig_name=DP.strig_name)
         drone_value.save()
-    # else:
-
     return render(request, "journal.html", context=c)
 
 
@@ -453,6 +472,7 @@ def choose_nomer_strizha(request):
 
     strizhes = Strizh.objects.order_by('-lon').all()
     c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
+    url_uniping_dict = {}
     temperature_dict = {}
     humidity_dict = {}
     weather_state_dict = {}
@@ -466,9 +486,10 @@ def choose_nomer_strizha(request):
 
             for strizh in strizhes:
                 if c['chosen_strizh'][0] == strizh.name:
-                    c['url_uniping_dict'][strizh.name] = 'http://' + strizh.uniping_ip + '/'
+                    url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
                     temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
                         return_conditions(c['url_uniping_dict'][strizh.name])
+            c['url_uniping_dict'] = url_uniping_dict
             c['temperature_dict'] = temperature_dict
             c['humidity_dict'] = humidity_dict
             c['weather_state_dict'] = weather_state_dict
@@ -592,7 +613,6 @@ def render_main_page(request):
         # c['complex_mode_dict'][strizh.name] = mode_ips[0]
         c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
 
-
     c['temperature_dict'] = temperature_dict
     xx = c
     c['humidity_dict'] = humidity_dict
@@ -628,9 +648,15 @@ def butt_scan(request):
         print('Сканирование dlya strizha #', c.get('chosen_strizh'))
         for strizh in strizh_names:
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
-                mode_ip1 = scan_on_off(strizh.ip1)
-                # time.sleep(1)
-                mode_ip2 = scan_on_off(strizh.ip2)
+                try:
+                    mode_ip1 = scan_on_off(strizh.ip1)
+                    # time.sleep(1)
+                    mode_ip2 = scan_on_off(strizh.ip2)
+                except:
+                    # если не включен трэйс
+                    mode_ip1 = "all_stop"
+                    mode_ip2 = "all_stop"
+
                 if mode_ip1 != mode_ip2:
                     mode_ip2 = scan_on_off(strizh.ip2)
 
@@ -650,7 +676,7 @@ def butt_scan(request):
                 button_complex = 'red_scan' if complex_mode == 'scan_on' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
                 c["action_strizh"][strizh.name] = 'Сканирование: ' + strizh.name + ' ' + action_complex
-                                     # ', '.join(str(_) for _ in mode_ips)
+                # ', '.join(str(_) for _ in mode_ips)
                 c["button_complex"] = button_complex
                 c['complex_mode_dict'][strizh.name] = complex_mode
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])

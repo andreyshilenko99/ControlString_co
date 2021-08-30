@@ -7,9 +7,12 @@ from djgeojson.views import GeoJSONLayerView
 from geo import models
 
 from geo.views import geojson_view, drone_journal_view, strizh_coords, strizh_view
+from map.views import journal_view, filter_all
 
 urlpatterns = [
     url(r'data/', geojson_view, name='data_json'),
+    url(r'filter_all/', filter_all, name='filter_all'),
+    url(r'journal_view/', journal_view, name='datajournal_json'),
     url(r'drone_journal/', drone_journal_view, name='drone_journal'),
     url(r'strizh_view/', strizh_view, name='strizh_view'),
     url(r'strizh_coords/', strizh_coords, name='strizh_coords_json'),

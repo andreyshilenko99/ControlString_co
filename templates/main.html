@@ -7,8 +7,7 @@
 <html>
 <head>
 
-
-    <title>Main page</title>
+    <title>Главная страница</title>
     <script src="static/src/jquery-3.2.1.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
     <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
@@ -32,7 +31,6 @@
         });
     </script>
 
-
 </head>
 <body style="background-color:rgba(113,129,132,0.14);">
 <!--<body style="text-align: left;  background: rgba(113,129,132,0.14) url(static/icons/strizh3.png); ">-->
@@ -44,32 +42,28 @@
                 <div class="map-box" style="height: 60vh; width:98%; solid:#ffffff">
                     <div class="row" style="margin: 1%">
                         <a href="menu">
-                            <!--                            <img src="static/icons/asb2.png" alt="on" style="max-width: 40px;">-->
                             <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
                         </a>
-
-                        <form action="menu" method='GET'>
+                        <a href="menu">
                             <button class="button-black" style="margin-left: 10px"> Меню</button>
-                        </form>
-                        <form action="main" method='GET'>
+                        </a>
+                        <a href="main">
                             <button class="button-black"> Главная</button>
-                        </form>
-                        <form action="journal" method='GET'>
+                        </a>
+                        <a href="journal" method='GET'>
                             <button class="button-black"> Журнал</button>
-                        </form>
-                        <form action="configuration" method='GET'>
+                        </a>
+                        <a href="configuration" method='GET'>
                             <button class="button-black"> Конфигуратор</button>
-                        </form>
-                        <form action="admin" method='GET'>
+                        </a>
+                        <a href="admin" method='GET'>
                             <button class="button-black"> Администратор</button>
-                        </form>
+                        </a>
                     </div>
                     <div class="leaflet-container" style="border: 0.5vh ">
 
                         {% leaflet_map "map" callback="window.map_init_basic" %}
                     </div>
-
-
                 </div>
                 <div class="information-bottom-left" style="height: 30vh; margin-top: 10px; border: 0.5vh">
                     <h3 style="margin-top: 4%"> Информация о засечках </h3>
