@@ -1,44 +1,43 @@
 <!DOCTYPE html>
-
 {% load leaflet_tags %}
 {% load geojson_tags %}
 {% load mytags %}
 
 
-<html>
+<html lang="en">
+
+
 <head>
-    <meta charset=utf-8>
-    <title>Журнал</title>
-    <script type="text/javascript" src="static/journal.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="static/src/jquery-3.2.1.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
-    <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
-    <script src="static/src/popper.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="static/src/css/bootstrap-datetimepicker.css">
-
-    <script src="static/src/moment-with-locales.min.js"></script>
-    <script src="static/src/bootstrap-datetimepicker.min.js"></script>
-
-
-    <script src="static/src/datepicker-widget.js"></script>
-    <link rel="stylesheet" href="static/datepicker-widget.css">
-    <script src="static/src/L.Realtime.js"></script>
-    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-
-    <link rel="stylesheet" href="/static/styles.css"/>
-
-    <style>
-
-    </style>
-
     {% leaflet_js plugins="ALL" %}
-    {% leaflet_css plugins="ALL" %}
     {% leaflet_js %}
+    {% leaflet_css plugins="ALL" %}
     {% leaflet_css %}
     {% csrf_token %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Журнал</title>
+
+    <!--    <link rel="stylesheet" type="text/css" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">-->
+
+    <!--    <link rel="stylesheet" type="text/css" href="/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css">-->
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+
+
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap-4.0.0/css/bootstrap.min.css">
+    <script src="/static/src/jquery-3.2.1.min.js"></script>
+    <script src="/static/src/popper.min.js"></script>
+    <script src="/static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/src/css/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="/static/datepicker-widget.css">
+    <script src="/static/src/moment-with-locales.min.js"></script>
+    <script src="/static/src/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/src/datepicker-widget.js"></script>
+
+    <script type="text/javascript" src="/static/journal.js"></script>
+    <!--    <link rel="stylesheet" href="/static/styles.css"/>-->
+
+
 </head>
 <!--<body style="background-color:rgba(113,129,132,0.14);">-->
 <body style="text-align: left;  background: rgba(113,129,132,0.14) url(static/icons/strizh_images/strizh3.png); ">
@@ -69,7 +68,6 @@
                         </a>
                     </div>
                     <div class="leaflet-container" style="border: 0.5vh ">
-
                         {% leaflet_map "map" callback="window.map_init_basic" %}
                     </div>
 
@@ -141,25 +139,26 @@
                             {% csrf_token %}
                             <h3> Период </h3>
 
-                            <div class="form-group">
+                            <div class="form-group" id="datetimepicker2">
                                 <h4 style="color: #72849e">
                                     <label for="id_start_datetime">Начало</label>
                                 </h4>
                                 <div class="input-group date" style="height: 48px; width: 90%">
+
                                     <input type="text" name="start_datetime" value="Начало"
                                            class="form-control" placeholder="{{start_datetime}}"
-                                           required="" id="id_start_datetime"
+                                           required id="id_start_datetime"
                                            dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
-                                    <div class="input-group-addon input-group-append"
-                                         data-target="#datepicker" data-toggle="datetimepickerv">
+                                    <div class="input-group-addon input-group-append" data-target="#datetimepicker1"
+                                         data-toggle="datetimepickerv">
                                         <div class="input-group-text">
                                             <i class="glyphicon glyphicon-calendar"></i>
                                         </div>
                                     </div>
+
                                     <button class="button-blue-small" type='submit'> Применить</button>
                                 </div>
                             </div>
-                            </h4>
 
                         </form>
 
@@ -176,7 +175,7 @@
                                            required="" id="id_end_datetime"
                                            dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
                                     <div class="input-group-addon input-group-append"
-                                         data-target="#datepicker" data-toggle="datetimepickerv">
+                                         data-target="#datetimepicker2" data-toggle="datetimepicker2">
                                         <div class="input-group-text">
                                             <i class="glyphicon glyphicon-calendar"></i>
                                         </div>
@@ -187,14 +186,6 @@
                             </h4>
 
                         </form>
-
-                        <script>
-                            $(function () {
-                                $("#datepicker").datepicker({
-                                    format: 'DD/MM/YYYY HH:mm',
-                                });
-                            });
-                        </script>
 
                         <div class="row" style="margin-left: -2%; margin-top: 30px">
                             <div class="col-4">
@@ -273,7 +264,6 @@
                                                 <!--                                            <button type="submit" name="detection_id" class="btn btn-primary"-->
                                                 <!--                                                    value="{{ dron.pk }}"> Показать-->
                                                 <!--                                            </button>-->
-
                                                 <button type="submit" class="btn btn-primary" name="detection_id"
                                                         value="{{ dron.pk }}"> Показать
                                                 </button>
@@ -297,6 +287,9 @@
     </div>
 </div>
 
+<script>
+
+</script>
 
 </body>
 

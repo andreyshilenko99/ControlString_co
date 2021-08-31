@@ -67,7 +67,7 @@ function map_init_basic(map, options) {
                     options: {
                         iconSize: [80, 80],
                         iconAnchor: [40, 75],
-                        popupAnchor: [0, -75]
+                        popupAnchor: [0, -80]
                     }
                 });
                 var logoMarkerStrizh = new logoMarkerStyleStrizh({

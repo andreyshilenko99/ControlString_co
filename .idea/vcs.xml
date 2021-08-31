@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/ControlString_co/pyshark" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ControlString_co/static/bootstrap-datetimepicker" vcs="Git" />
   </component>
 </project>

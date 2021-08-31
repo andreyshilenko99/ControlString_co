@@ -14,7 +14,7 @@ from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
 
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
-from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm
+from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm, TimeForm
 
 from ControlString_co.control_trace import scan_on_off, check_state, jammer_on_off
 from ControlString_co.shelest_jam import set_gain
@@ -171,13 +171,14 @@ def journal(request):
     else:
         if not c.get('form_drone'):
             form_drone = DroneFilterForm()
-
             c['form_drone'] = form_drone
         # form_drone_alldrones = Point.objects.all().order_by('-detection_time')
         form_drone_alldrones = c.get('form_drone').AllDrones.order_by('-detection_time')
         c['form_drone_alldrones'] = form_drone_alldrones
+        timeform = TimeForm
         form_filter = StrizhFilterForm()
     c['form_filter'] = form_filter
+    c['timeform'] = timeform
     return render(request, "journal.html", context=c)
 
 
@@ -818,9 +819,9 @@ def reset_filter(request):
 def export_csv(request):
     global c
     c['saved_table'] = False
-    time_start = c['start_datetime']
-    time_end = c['end_datetime']
-    strizhes = c['filtered_strizhes']
+    time_start = '01/01/2000-00:01' if c.get('start_datetime')=='Начало' else c.get('start_datetime')
+    time_end = '01/01/2100-00:01' if c.get('end_datetime')=='Конец' else c.get('end_datetime')
+    strizhes = Strizh.objects.all() if not c.get('filtered_strizhes') else c.get('filtered_strizhes')
 
     now = datetime.datetime.now()
     ts1 = time_start.split('/')
@@ -834,7 +835,6 @@ def export_csv(request):
     ts33 = ts22[-1].split(':')
     time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
                                     minute=int(ts33[1]), second=59)
-    print(time_end_datetime > time_start_datetime)
 
     strizhes_ip = []
     for strizh in strizhes:
@@ -859,9 +859,7 @@ def export_csv(request):
                 row = dr.system_name, dr.center_freq, dr.brandwidth, dr.detection_time, \
                       dr.comment_string, dr.lat, dr.lon, dr.azimuth, \
                       dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip
-
                 writer.writerow(row)
-
     return render(request, "journal.html", context=c)
 
 

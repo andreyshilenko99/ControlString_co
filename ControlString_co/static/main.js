@@ -88,8 +88,8 @@ function map_init_basic(map, options) {
                         let strizh_map_name = {};
                         let logoMarkerStyleStrizh = L.Icon.extend({
                             options: {
-                                iconSize: [85, 90],
-                                iconAnchor: [38, 86],
+                                iconSize: [80, 80],
+                                iconAnchor: [40, 75],
                                 popupAnchor: [0, -80],
                                 // className: 'blinking'
                             }
