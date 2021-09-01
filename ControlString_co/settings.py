@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-g*kuum+*d!@-s(h8&0*#ald#4rsf-6r3z=d@fwai2a29xlhbx(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "db"]
 
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 #
@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'geo',
     'djgeojson',
     'pysnmp',
+    'bootstrap_datepicker_plus'
 
 ]
 
@@ -89,34 +90,41 @@ CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 CELERY_TIMEZONE = 'Europe/Moscow'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'stuff',
-        'USER': 'dron',
-        'PASSWORD': '555',
-        'HOST': '192.168.1.66',
-        'PORT': '5432', }
-}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
+#         'NAME': 'stuff',
+#         'USER': 'dron',
 #         'PASSWORD': '555',
-#         'HOST': '127.0.0.1',
+#         'HOST': '192.168.1.66',
 #         'PORT': '5432', }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': '555',
-#         'HOST': '127.0.0.1',
-#         'PORT': '5432', }
-# }
+
+DATABASES = {
+    'default': {
+        # 'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': '555',
+        # 'HOST': '127.0.0.1',
+        'HOST': 'localhost',
+        'PORT': '5432', }
+}
+
+
+# import environ
+# BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+#
+# env = environ.Env()
+# READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+# if READ_DOT_ENV_FILE:
+#     # OS environment variables take precedence over variables from .env
+#     env.read_env(str(BASE_DIR / ".env"))
+#
+# DATABASES = {"default": env.db("DATABASE_URL")}
+# DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -169,15 +177,21 @@ LEAFLET_CONFIG = {
     'DEFAULT_ZOOM': 15,
     'MIN_ZOOM': 10,
     'MAX_ZOOM': 18,
-    'TILES': [('lol', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; ASB Production'})],
+    'TILES': [('lol', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'})],
     'PLUGINS': {
         'draw': {
             'css': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.css',
                     '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css',
                     '/static/src/L.Icon.Pulse.css',
                     '/static/styles.css',
-                    '/static/datepicker-widget.css',
                     ],
+
+            #
+            #
+            # '/static/datepicker-widget.css',
+            # '/static/bootstrap-4.0.0/css/bootstrap.min.css',
+            # '/static/src/css/bootstrap-datetimepicker.css',
+            # ],
             'js': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.js',
                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js',
                    '/static/src/leaflet.sector.js',

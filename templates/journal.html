@@ -8,12 +8,14 @@
 
 
 <head>
-    {% leaflet_js plugins="ALL" %}
-    {% leaflet_js %}
-    {% leaflet_css plugins="ALL" %}
-    {% leaflet_css %}
+
+
     {% csrf_token %}
     <meta charset="UTF-8">
+    {% leaflet_js plugins="ALL" %}
+    {% leaflet_css plugins="ALL" %}
+    {% leaflet_js %}
+    {% leaflet_css %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Журнал</title>
@@ -34,8 +36,23 @@
     <script src="/static/src/bootstrap-datetimepicker.min.js"></script>
     <script src="/static/src/datepicker-widget.js"></script>
 
-    <script type="text/javascript" src="/static/journal.js"></script>
-    <!--    <link rel="stylesheet" href="/static/styles.css"/>-->
+    <!--    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"-->
+    <!--        rel="stylesheet">-->
+    <!--    <script crossorigin="anonymous" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>-->
+    <!--    <script crossorigin="anonymous" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>-->
+    <!--    <script crossorigin="anonymous" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
+
+    <!--    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css" type="text/css"-->
+    <!--        media="all" rel="stylesheet" />-->
+    <!--&lt;!&ndash;    <link href="datepicker-widget.css" type="text/css" media="all" rel="stylesheet" />&ndash;&gt;-->
+    <!--    <link href="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/css/datepicker-widget.css"-->
+    <!--        type="text/css" media="all" rel="stylesheet" />-->
+    <!--    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>-->
+    <!--    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>-->
+    <!--    <script type="text/javascript" src="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>-->
+
+
+        <script type="text/javascript" src="/static/journal.js"></script>
 
 
 </head>
@@ -155,6 +172,17 @@
                                             <i class="glyphicon glyphicon-calendar"></i>
                                         </div>
                                     </div>
+<!--                                    <input type="text" name="start_datetime" value="05/16/2018 12:31"-->
+<!--                                           class="form-control" placeholder="Start datetime" title=""-->
+<!--                                           required id="id_start_datetime"-->
+<!--                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}"-->
+<!--                                    />-->
+<!--                                    <div class="input-group-addon input-group-append" data-target="#datetimepicker1"-->
+<!--                                         data-toggle="datetimepickerv">-->
+<!--                                        <div class="input-group-text">-->
+<!--                                            <i class="glyphicon glyphicon-calendar"></i>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
 
                                     <button class="button-blue-small" type='submit'> Применить</button>
                                 </div>
