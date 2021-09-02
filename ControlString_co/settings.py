@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-g*kuum+*d!@-s(h8&0*#ald#4rsf-6r3z=d@fwai2a29xlhbx(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "db"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "postgres"]
 
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 #
@@ -101,15 +101,26 @@ CELERY_TIMEZONE = 'Europe/Moscow'
 # }
 
 
+# DATABASES = {
+#     'default': {
+#         # 'ENGINE': 'django.db.backends.postgresql',
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': '555',
+#         # 'HOST': '127.0.0.1',
+#         'HOST': 'localhost',
+#         'PORT': '5432', }
+# }
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.postgresql',
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': '555',
+        'ENGINE': 'django.db.backends.postgresql',
+        # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'project',
+        'USER': 'bGbyNuHrWWtzFIzYSwYiUrBPOgwDWyBn',
+        'PASSWORD': 'lbjZrLDFyKdUvajjVN4881wRfN4GcGlq3GaOA6gfltJeqpfeedveyLxlIy4nKNuk',
         # 'HOST': '127.0.0.1',
-        'HOST': 'localhost',
+        'HOST': 'postgres',
         'PORT': '5432', }
 }
 

@@ -270,7 +270,7 @@ tags
 
 ### Project template
 
-project_django/media/
+project/media/
 
 .pytest_cache/
 
