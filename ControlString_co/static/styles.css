@@ -1,6 +1,6 @@
 
 .button-green {
-    background: #04AA6D;
+    background: #26a042;
     border: none;
     color: white;
     padding: 20px;
@@ -43,19 +43,6 @@
     transition: background 0s;
 }
 
-.button-green-csv {
-    background-color: #04AA6D;
-    border: none;
-    color: white;
-    padding: 20px 35px;
-    /*text-align: center;*/
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    /*margin: 4px 2px;*/
-    border-radius: 10px;
-}
-
 .button-blue-filter {
     background-color: #059ccd;
     border: none;
@@ -69,11 +56,24 @@
     border-radius: 10px;
 }
 
+.button-green-csv {
+    background-color: #04AA6D;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    /*text-align: center;*/
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    /*margin: 4px 2px;*/
+    border-radius: 10px;
+}
+
 .button-red-sbros {
     background-color: #ff3c3c;
     border: none;
     color: white;
-    padding: 20px 35px;
+    padding: 20px 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -153,9 +153,18 @@
     display: inline-block;
     margin: 5px 5px;
     font-size: 18px;
-    border-radius: 10px;
+    border-radius: 3px;
 }
 
+#journal_button1 {
+    font-size: 17px;
+}
+#journal_button2 {
+    font-size: 17px;
+}
+#journal_button3 {
+    font-size: 17px;
+}
 
 .button-csv {
     /*background-color: #ef9900;*/
@@ -211,7 +220,7 @@
 
 .leaflet-container { /* all maps */
     width: 100%;
-    height: 100%;
+    height: 69vh
 }
 
 /*width: 80%;*/
@@ -433,7 +442,8 @@
 
 table, tr td {
     background-color: rgb(255, 255, 255);
-    border: 1px solid #575757
+    border: 1px solid #575757;
+    font-size: 14px;
 }
 
 tbody {

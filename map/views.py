@@ -19,6 +19,7 @@ from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigura
 from ControlString_co.control_trace import scan_on_off, check_state, jammer_on_off
 from ControlString_co.shelest_jam import set_gain
 
+DEGREE_SIGN = u"\u2103"
 chosen_strizh = 0
 start_datetime = "Начало"
 end_datetime = "Конец"
@@ -38,7 +39,7 @@ def index(request):
 
 
 def return_conditions(url):
-    global low_t, high_t, low_h, high_h, humidity, c
+    global low_t, high_t, low_h, high_h, c
     global auth
     temperature = ''
     try:
@@ -46,25 +47,27 @@ def return_conditions(url):
         temp_str = temp.content.decode("utf-8")
         temp_list = re.findall('[0-9]+', temp_str)
         if len(temp_list) > 0:
-            temperature = '.'.join(temp_list)
+            temperature = '.'.join(temp_list) + DEGREE_SIGN
     except:
-        temperature = 'ошибка соединения с uniping'
+        temperature = 'ошибка uniping'
     try:
         hum = requests.get(url + 'relhum.cgi?h1', auth=auth, timeout=0.05)
         hum_str = hum.content.decode("utf-8")
         hum_list = re.findall('[0-9]+', hum_str)
         if len(hum_list) > 1:
-            humidity = hum_list[0]
+            humidity = hum_list[0] + ' %'
     except:
-        humidity = 'ошибка соединения с uniping'
+        humidity = 'ошибка uniping'
 
     if 'ошибка' not in temperature and 'ошибка' not in humidity:
-        if low_t < float(temperature) < high_t and low_h < float(humidity) < high_h:
+        temperature_val = re.findall("[-+]?\d*\.\d+|\d+", temperature)[0]
+        humidity_val = re.findall("[-+]?\d*\.\d+|\d+", humidity)[0]
+        if low_t < float(temperature_val) < high_t and low_h < float(humidity_val) < high_h:
             weather_state = "OK"
         else:
             weather_state = "NOT OK !!!"
     else:
-        weather_state = "ошибка соединения с uniping"
+        weather_state = "ошибка uniping"
 
     return temperature, humidity, weather_state
 
@@ -470,6 +473,39 @@ def back2main(request):
     return redirect(request.META['HTTP_REFERER'])
 
 
+def get_info_main(ip1, ip2, name):
+    try:
+        # mode_ips = [check_state(ip1), check_state(ip2)]
+        mode_ips = ['all_stop' for _ in range(2)]
+    except:
+        mode_ips = ['all_stop' for _ in range(2)]
+
+    complex_mode = 'scan_on' if all(
+        [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+    complex_mode = 'jammer_on' if all(
+        [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+    print(complex_mode)
+
+    if 'jammer_on' in complex_mode:
+        # if 'jammer_on' in mode_ips:
+        action_complex = 'включено'
+        button_complex = 'red_jammer'
+        complex_mode_rus = 'Глушение: '
+    elif 'scan_on' in complex_mode:
+        # elif 'scan_on' in mode_ips:
+        action_complex = 'включено'
+        button_complex = 'red_scan'
+        complex_mode_rus = 'Сканирование: '
+    else:
+        action_complex = 'выключено'
+        button_complex = 'green'
+        complex_mode_rus = 'Сканирование и глушение: '
+
+    action_strizh = complex_mode_rus + name + ' ' + action_complex
+
+    return complex_mode, button_complex, action_strizh
+
+
 def choose_nomer_strizha(request):
     global c
 
@@ -491,7 +527,14 @@ def choose_nomer_strizha(request):
                 if c['chosen_strizh'][0] == strizh.name:
                     url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
                     temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-                        return_conditions(c['url_uniping_dict'][strizh.name])
+                        return_conditions(url_uniping_dict[strizh.name])
+
+                    complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+
+                    c["button_complex"] = button_complex
+                    c['complex_mode_dict'][strizh.name] = complex_mode
+                    c["action_strizh"][strizh.name] = action_strizh
+
             c['url_uniping_dict'] = url_uniping_dict
             c['temperature_dict'] = temperature_dict
             c['humidity_dict'] = humidity_dict
@@ -562,6 +605,7 @@ def set_strizh(request):
     return render(request, "configuration.html", context=c)
 
 
+
 def render_main_page(request):
     global c
     complex_state = ''
@@ -585,31 +629,9 @@ def render_main_page(request):
             return_conditions(url_uniping_dict[strizh.name])
         complex_state_dict[strizh.name] = get_complex_state(url_uniping_dict[strizh.name])
 
-        try:
-            mode_ips = [check_state(strizh.ip1), check_state(strizh.ip2)]
+        complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
 
-        except:
-            mode_ips = ['all_stop' for _ in range(2)]
-
-        complex_mode = 'scan_on' if all(
-            [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-        complex_mode = 'jammer_on' if all(
-            [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
-        print(mode_ips)
-
-        if 'jammer_on' in complex_mode:
-            action_complex = 'включено'
-            button_complex = 'red_jammer'
-            complex_mode_rus = 'Глушение: '
-        elif 'scan_on' in complex_mode:
-            action_complex = 'включено'
-            button_complex = 'red_scan'
-            complex_mode_rus = 'Сканирование: '
-        else:
-            action_complex = 'выключено'
-            button_complex = 'green'
-            complex_mode_rus = 'Сканирование и глушение: '
-        c["action_strizh"][strizh.name] = complex_mode_rus + strizh.name + ' ' + action_complex
+        c["action_strizh"][strizh.name] = action_strizh
         # ', '.join(str(_) for _ in mode_ips)
         c["button_complex"] = button_complex
 
@@ -932,7 +954,7 @@ def turn_on_bp(request):
             try:
                 requests.get(url, auth=auth, timeout=0.2)
             except:
-                result_get = 'ошибка соединения с uniping'
+                result_get = 'ошибка uniping'
                 collect_logs(strizh_name + ': ' + result_get)
                 continue
             temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
@@ -988,7 +1010,7 @@ def turn_off_bp(request):
             try:
                 requests.get(url, auth=auth, timeout=0.2)
             except:
-                result_get = 'ошибка соединения с uniping'
+                result_get = 'ошибка uniping'
                 collect_logs(strizh_name + ': ' + result_get)
                 continue
 
@@ -1073,6 +1095,7 @@ def obtain_state(url, line_name, to_collect_logs=False):
     try:
         stroka = requests.get(url + 'io.cgi?io{}'.format(line), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
+
     except:
         stroka = 'err in connection to uniping'
 
@@ -1110,6 +1133,7 @@ def get_datetime_drone(time_dron):
 def check_condition(value, low_border, high_border, condition="температура"):
     assert low_border < high_border, 'error in defining low or high border'
     try:
+        value = re.findall(r"[-+]?\d*\.\d+|\d+", value)[0]
         value = float(value)
         if low_border < value < high_border:
             return 0
@@ -1151,7 +1175,7 @@ def send_line_command(url, line_name, arg):
         result_get = requests.get(url + 'io.cgi?io{}={}'.format(line, arg), auth=auth, timeout=0.05) \
             .content.decode("utf-8")
     except:
-        result_get = 'ошибка соединения с uniping'
+        result_get = 'ошибка uniping'
     if 'ok' in result_get:
         collect_logs("{}".format(log_str))
     else:

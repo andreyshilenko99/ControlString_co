@@ -80,6 +80,7 @@ function map_init_basic(map, options) {
                 let arc1;
                 let sector1;
                 let str1;
+                let str_radius;
                 let name1;
 
 
@@ -102,8 +103,16 @@ function map_init_basic(map, options) {
                                 strizh_data.features[j].properties.lon]
 
                             strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
-                                strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
+                                strizh_data.features[j].properties.lon, strizh_data.features[j].properties.radius];
+                            let radius = strizh_data.features[j].properties.radius;
 
+                            let dx_radius = radius / 105636.364816363886;
+                            // let dx_radius = 0.0183;
+                            let radius_x = strizh_map_name[strizh_data.features[j].properties.name][0] - dx_radius;
+                            var strizh_radius_coords = [radius_x, strizh_map_name[strizh_data.features[j].properties.name][1]];
+                            console.log('strizh_radius_coords', strizh_radius_coords)
+                            console.log('coords', [strizh_data.features[j].properties.lat,
+                                strizh_data.features[j].properties.lon])
 
                             console.log('flag_state', flag_state);
                             if (!flag_state[strizh_name] || isEmpty(flag_state[strizh_name])) {
@@ -120,9 +129,15 @@ function map_init_basic(map, options) {
                                     noWrap: true,
                                     permanent: true,
                                     opacity: 0.85
-                                })
-                                    .setContent(strizh_name);
+                                }).setContent(strizh_name);
                                 console.log(complex_mode)
+
+                                var tooltip_radius = L.tooltip({
+                                    direction: 'bottom',
+                                    noWrap: true,
+                                    permanent: true,
+                                    opacity: 0.85
+                                }).setContent(radius);
 
                                 if (!strizh_layers[strizh_name]) {
                                     strizh_layers[strizh_name] = L.layerGroup().addTo(map);
@@ -131,7 +146,7 @@ function map_init_basic(map, options) {
                                     if (complex_mode[strizh_name] === 'scan_on') {
                                         // on and scan on, jammer off (3)
                                         col = '#17bd04'
-                                        icon_url = 'static/icons/strizh_markers/green.png'
+                                        icon_url = 'static/icons/strizh_markers/green_pulse.gif'
                                     } else if (complex_mode[strizh_name] === 'jammer_on') {
                                         // scan off and jammer on (5)
                                         col = '#ff1414'
@@ -151,8 +166,8 @@ function map_init_basic(map, options) {
                                 arc1 = L.circle(strizh_coords, {
                                     color: col,
                                     fillColor: col,
-                                    fillOpacity: 0.1,
-                                    radius: 500
+                                    fillOpacity: 0.01,
+                                    radius: radius
                                 }).addTo(strizh_layers[strizh_name]);
                                 var logoMarkerStrizh = new logoMarkerStyleStrizh({
                                     iconUrl: icon_url
@@ -161,6 +176,14 @@ function map_init_basic(map, options) {
                                     strizh_data.features[j].properties.lon], {icon: logoMarkerStrizh})
                                     .addTo(strizh_layers[strizh_name])
                                     .bindTooltip(tooltip).openTooltip();
+
+                                // str_radius = L.marker(strizh_radius_coords, {
+                                //     icon: L.divIcon({
+                                //         className: 'text-labels',   // Set class for CSS styling
+                                //         html: radius
+                                //     })
+                                // }).addTo(strizh_layers[strizh_name]).bindTooltip(tooltip).openTooltip();
+
                                 map.addLayer(strizh_layers[strizh_name])
                             }
                         }
@@ -177,12 +200,13 @@ function map_init_basic(map, options) {
 
                         for (let i = 0; i < len_arr; i++) {
                             var d_id = data.features[i].properties.pk;
-                            let radius = parseFloat(data.features[i].properties.area_radius_m);
+                            // let radius = parseFloat(data.features[i].properties.area_radius_m);
                             let area_sector_start_grad = parseFloat(data.features[i].properties.area_sector_start_grad);
                             let area_sector_end_grad = parseFloat(data.features[i].properties.area_sector_end_grad);
                             let strizh_center = [strizh_map_name[data.features[i].properties.strig_name][0],
                                 strizh_map_name[data.features[i].properties.strig_name][1]];
                             let strizh_name = data.features[i].properties.strig_name;
+                            let radius = strizh_map_name[data.features[i].properties.strig_name][2];
 
                             // дрон нарисован
                             if (ids_drawn.has(data.features[i].properties.pk)) {
@@ -240,14 +264,6 @@ function map_init_basic(map, options) {
                                 str1 = L.marker(strizh_center, {icon: logoMarkerStrizh})
                                     .addTo(drone_layers[d_id])
                                     .bindTooltip(tooltip).openTooltip();
-
-                                // var logoMarkerStrizh = new logoMarkerStyleStrizh({
-                                //     iconUrl: icon_url
-                                // });
-                                //
-                                // str1 = L.marker(strizh_center, {icon: logoMarkerStrizh})
-                                //     .addTo(drone_layers[d_id])
-                                //     .bindTooltip(tooltip).openTooltip();
 
                                 arc1 = L.circle(strizh_center, {
                                     color: '#ffc900',

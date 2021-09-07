@@ -52,7 +52,7 @@
     <!--    <script type="text/javascript" src="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>-->
 
 
-        <script type="text/javascript" src="/static/journal.js"></script>
+    <script type="text/javascript" src="/static/journal.js"></script>
 
 
 </head>
@@ -61,8 +61,8 @@
 <div class="everything">
     <div class="map-info" style="margin: 1%">
         <div class="row">
-            <div class="col-8 ">
-                <div class="map-box" style="height: 60vh; width:98%; solid:#ffffff">
+            <div class="col-9 ">
+                <div class="map-box" style="height: 70vh; width:100%; solid:#ffffff">
                     <div class="row" style="margin: 1%">
                         <a href="menu">
                             <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
@@ -92,7 +92,7 @@
                 </div>
 
             </div>
-            <div class="col-4">
+            <div class="col-3">
                 <div class="filters-all" style="height: 80%;">
 
                     <!--                </div> border: 0.5vh solid #dedddd">-->
@@ -107,13 +107,14 @@
                                             Выбор стрижей
                                         </h3>
                                     </div>
-                                    <div class="row" style="margin-left: 3% ">
+                                    <div class="row" style="margin-left: 0 ">
                                         <div class="col-6">
                                             {{ form_filter }}
                                         </div>
                                         <div class="col-1">
 
-                                            <button class="button-blue-small" style="margin: 0px 20px">
+<!--                                            <button class="button-blue-small" style="margin: 0px 20px">-->
+                                            <button class="btn btn-primary" style="margin: 0px 1%; font-size: 16px">
                                                 выбор
                                             </button>
                                         </div>
@@ -160,7 +161,7 @@
                                 <h4 style="color: #72849e">
                                     <label for="id_start_datetime">Начало</label>
                                 </h4>
-                                <div class="input-group date" style="height: 48px; width: 90%">
+                                <div class="input-group date" style="height: 48px; width: 80%">
 
                                     <input type="text" name="start_datetime" value="Начало"
                                            class="form-control" placeholder="{{start_datetime}}"
@@ -172,19 +173,19 @@
                                             <i class="glyphicon glyphicon-calendar"></i>
                                         </div>
                                     </div>
-<!--                                    <input type="text" name="start_datetime" value="05/16/2018 12:31"-->
-<!--                                           class="form-control" placeholder="Start datetime" title=""-->
-<!--                                           required id="id_start_datetime"-->
-<!--                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}"-->
-<!--                                    />-->
-<!--                                    <div class="input-group-addon input-group-append" data-target="#datetimepicker1"-->
-<!--                                         data-toggle="datetimepickerv">-->
-<!--                                        <div class="input-group-text">-->
-<!--                                            <i class="glyphicon glyphicon-calendar"></i>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
+                                    <!--                                    <input type="text" name="start_datetime" value="05/16/2018 12:31"-->
+                                    <!--                                           class="form-control" placeholder="Start datetime" title=""-->
+                                    <!--                                           required id="id_start_datetime"-->
+                                    <!--                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}"-->
+                                    <!--                                    />-->
+                                    <!--                                    <div class="input-group-addon input-group-append" data-target="#datetimepicker1"-->
+                                    <!--                                         data-toggle="datetimepickerv">-->
+                                    <!--                                        <div class="input-group-text">-->
+                                    <!--                                            <i class="glyphicon glyphicon-calendar"></i>-->
+                                    <!--                                        </div>-->
+                                    <!--                                    </div>-->
 
-                                    <button class="button-blue-small" type='submit'> Применить</button>
+                                    <button class="btn btn-primary" type='submit' style="margin-left: 1%;font-size: 16px"> Применить</button>
                                 </div>
                             </div>
 
@@ -197,7 +198,7 @@
                                 <h4 style="color: #72849e">
                                     <label for="id_end_datetime">Конец</label>
                                 </h4>
-                                <div class="input-group date" style="height: 48px; width: 90%">
+                                <div class="input-group date" style="height: 48px; width: 80%">
                                     <input type="text" name="end_datetime" value="Конец"
                                            class="form-control" placeholder="{{end_datetime}}"
                                            required="" id="id_end_datetime"
@@ -208,30 +209,36 @@
                                             <i class="glyphicon glyphicon-calendar"></i>
                                         </div>
                                     </div>
-                                    <button class="button-blue-small" type='submit'> Применить</button>
+                                    <button class="btn btn-primary" type='submit' style="margin-left: 1%;font-size: 16px"> Применить</button>
                                 </div>
                             </div>
                             </h4>
 
                         </form>
 
-                        <div class="row" style="margin-left: -2%; margin-top: 30px">
-                            <div class="col-4">
+                        <div class="row"
+                             style="margin-left: -3%; margin-top: 30px; width:85%; justify-content: center;">
+                            <div style="margin-left: 0; margin-top: 1%">
+                                <!--                            <div class="col-4">-->
                                 <form action='reset_filter' method='post'>
                                     {% csrf_token %}
-                                    <button class="button-red-sbros" type='submit'> Сбросить</button>
+                                    <button class="btn btn-danger" id="journal_button1" type='submit'> Сбросить</button>
                                 </form>
                             </div>
-                            <div class="col-4">
+                            <div style="margin-left: 2%; margin-top: 1%;">
+                                <!--                            <div class="col-4">-->
                                 <form action="export_csv" method='GET'>
-                                    <button class="button-green-csv"> Экспорт CSV
+                                    <!--                                    <button class="button-green-csv"> Экспорт CSV-->
+                                    <button class="btn btn-success" id="journal_button2"> Экспорт CSV
                                     </button>
                                 </form>
                             </div>
-                            <div class="col-4">
+                            <div style="margin-left: 2%; margin-top: 1%">
+                                <!--                            <div class="col-4">-->
                                 <form action="filter_all" method='POST'>
                                     {% csrf_token %}
-                                    <button class="button-blue-filter"> Фильтр
+                                    <!--                                    <button class="button-blue-filter"> Фильтр-->
+                                    <button class="btn btn-primary" id="journal_button3"> Фильтр
                                     </button>
                                 </form>
                             </div>
@@ -262,7 +269,7 @@
                         <div class="col-12 ">
                             <div>
                                 <div id="detections" style="margin: 10px 0;
-                    width: 100%; height: 230px">
+                    width: 100%; height: 5%">
                                     {% if form_drone.AllDrones.count != 0 %}
 
                                     <table id="detections_table">

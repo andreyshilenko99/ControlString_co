@@ -48,10 +48,10 @@ INSTALLED_APPS = [
     'leaflet',
     'map',
     'django.contrib.gis',
-    'geo',
     'djgeojson',
     'pysnmp',
-    'bootstrap_datepicker_plus'
+    'bootstrap_datepicker_plus',
+    'geo',
 
 ]
 
@@ -93,6 +93,7 @@ CELERY_TIMEZONE = 'Europe/Moscow'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         # 'ENGINE': 'django.db.backends.postgresql',
 #         'NAME': 'stuff',
 #         'USER': 'dron',
 #         'PASSWORD': '555',
@@ -100,6 +101,16 @@ CELERY_TIMEZONE = 'Europe/Moscow'
 #         'PORT': '5432', }
 # }
 
+DATABASES = {
+    'default': {
+        # 'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': '555',
+        'HOST': 'localhost',
+        'PORT': '5432', }
+}
 
 # DATABASES = {
 #     'default': {
@@ -108,21 +119,21 @@ CELERY_TIMEZONE = 'Europe/Moscow'
 #         'NAME': 'postgres',
 #         'USER': 'postgres',
 #         'PASSWORD': '555',
-#         # 'HOST': '127.0.0.1',
 #         'HOST': 'localhost',
 #         'PORT': '5432', }
 # }
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'project',
-        'USER': 'bGbyNuHrWWtzFIzYSwYiUrBPOgwDWyBn',
-        'PASSWORD': 'lbjZrLDFyKdUvajjVN4881wRfN4GcGlq3GaOA6gfltJeqpfeedveyLxlIy4nKNuk',
-        # 'HOST': '127.0.0.1',
-        'HOST': 'postgres',
-        'PORT': '5432', }
-}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'NAME': 'project',
+#         'USER': 'bGbyNuHrWWtzFIzYSwYiUrBPOgwDWyBn',
+#         'PASSWORD': 'lbjZrLDFyKdUvajjVN4881wRfN4GcGlq3GaOA6gfltJeqpfeedveyLxlIy4nKNuk',
+#         # 'HOST': '127.0.0.1',
+#         'HOST': 'postgres',
+#         'PORT': '5432', }
+# }
 
 
 # import environ

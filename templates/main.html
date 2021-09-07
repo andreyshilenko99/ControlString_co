@@ -38,8 +38,8 @@
     <div class="map-info" style="margin: 1%">
 
         <div class="row">
-            <div class="col-8 ">
-                <div class="map-box" style="height: 60vh; width:98%; solid:#ffffff">
+            <div class="col-9 ">
+                <div class="map-box" style="height: 70vh; width:100%; solid:#ffffff">
                     <div class="row" style="margin: 1%">
                         <a href="menu">
                             <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
@@ -65,10 +65,10 @@
                         {% leaflet_map "map" callback="window.map_init_basic" %}
                     </div>
                 </div>
-                <div class="information-bottom-left" style="height: 30vh; margin-top: 10px; border: 0.5vh">
+                <div class="information-bottom-left" style="height: 5%; margin-top: 2%; border: 0.5vh">
                     <h3 style="margin-top: 4%"> Информация о засечках </h3>
-                    <div id="detections" style="margin: 10px 0;
-                    width: 100%; height: 230px">
+                    <div id="detections" style="margin: 2% 0;
+                    width: 100%;">
                         <table id="detections_table">
                             <thead>
                             <tr>
@@ -100,202 +100,214 @@
                     </div>
                 </div>
             </div>
-            <div class="col-4">
-                <div class="strizhes-all" style="height: 280px; ">
-                    <!--border: 0.5vh solid rgb(255,255,255)">-->
-                    <div class="strizh" style="margin-left: 5%;margin-top: 1%">
-                        <div class="row" style="margin-top: 2%;margin-left: 0.5%; width: 100%">
-                            <form action="choose_all_strizhes" method="post">
-                                {% csrf_token %}
-                                <button class="btn btn-primary">
-                                    Управление всеми стрижами
-                                </button>
-                            </form>
-                        </div>
-                        <div class="row" style="margin-top: 2%;margin-left: 0.5%; width: 100%">
-
-                            <div style="width: 100%">
-                                <h3>
-                                    Управление одним стрижом
-                                </h3>
-                            </div>
-                            <h5>
-                                <form action="choose_nomer_strizha" method="post">
+            <div class="col-3">
+                <div class="row">
+                    <div class="strizhes-all" style="height: 30%; ">
+                        <!--border: 0.5vh solid rgb(255,255,255)">-->
+                        <div class="strizh" style="margin-left: 5%;margin-top: 1%">
+                            <div class="row" style="margin-top: 5%;margin-left: 0.5%; width: 100%">
+                                <form action="choose_all_strizhes" method="post">
                                     {% csrf_token %}
-                                    {{ form }}
                                     <button class="btn btn-primary">
-                                        ввод
+                                        Управление всеми стрижами
                                     </button>
                                 </form>
-                            </h5>
-                        </div>
-                        <div class="row">
-                            <h5 style="text-align: center; margin-left: 2%">
-                                {% if chosen_strizh != all_strizhes %}
-                                Выбран
-                                {% for striz in chosen_strizh %}
-                                {% if striz != 'None' %}
-                                {{ striz }}
-                                {% endif %}
-                                {% endfor%}
-                                {% else %}
-                                Выбраны все
-                                {% endif %}
-                            </h5>
-                        </div>
+                            </div>
+                            <div class="row" style="margin-top: 2%;margin-left: 0.5%; width: 100%">
 
-                        <div class="strizh-each" style="margin-left: 0.5%">
+                                <div style="width: 100%">
+                                    <h3>
+                                        Управление одним стрижом
+                                    </h3>
+                                </div>
+                                <h5>
+                                    <form action="choose_nomer_strizha" method="post">
+                                        {% csrf_token %}
+                                        {{ form }}
+                                        <button class="btn btn-primary">
+                                            ввод
+                                        </button>
+                                    </form>
+                                </h5>
+                            </div>
                             <div class="row">
-                                {% if button_complex != 'red_scan' %}
-                                <form action='butt_scan' method='GET'>
-                                    <button class="button-green" type='submit'> Сканирование</button>
-                                </form>
-                                {% else %}
-                                <form action='butt_scan' method='GET'>
-                                    <button class="button-green-red" type='submit'>
-                                        Сканирование
-                                    </button>
-                                </form>
-                                {% endif %}
-                                {% if button_complex != 'red_jammer' %}
-                                <form action='butt_glush' method='GET'>
-                                    <button class="button-green">Глушение</button>
-                                </form>
-                                {% else %}
-                                <form action='butt_glush' method='GET'>
-                                    <button class="button-green-red"> Глушение</button>
-                                </form>
-                                {% endif %}
-<!--                                <form action='butt_gps' method='GET'>-->
-<!--                                    <button id="btn_green" class="button-green"> GPS глуш.</button>-->
-<!--                                </form>-->
-<!--                                <form action='butt_ku' method='GET'>-->
-<!--                                    <button class="button-green">КУ глуш.</button>-->
-<!--                                </form>-->
+                                <h5 style="text-align: center; margin-left: 2%">
+                                    {% if chosen_strizh != all_strizhes %}
+                                    Выбран
+                                    {% for striz in chosen_strizh %}
+                                    {% if striz != 'None' %}
+                                    {{ striz }}
+                                    {% endif %}
+                                    {% endfor%}
+                                    {% else %}
+                                    Выбраны все
+                                    {% endif %}
+                                </h5>
+                            </div>
+
+                            <div class="strizh-each" style="margin-left: 0.5%">
+                                <div class="row">
+                                    {% if button_complex != 'red_scan' %}
+                                    <form action='butt_scan' method='GET'>
+                                        <button class="button-green" type='submit'> Сканирование</button>
+                                    </form>
+                                    {% else %}
+                                    <form action='butt_scan' method='GET'>
+                                        <button class="button-green-red" type='submit'>
+                                            Сканирование
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    {% if button_complex != 'red_jammer' %}
+                                    <form action='butt_glush' method='GET'>
+                                        <button class="button-green">Глушение</button>
+                                    </form>
+                                    {% else %}
+                                    <form action='butt_glush' method='GET'>
+                                        <button class="button-green-red"> Глушение</button>
+                                    </form>
+                                    {% endif %}
+                                    <!--                                <form action='butt_gps' method='GET'>-->
+                                    <!--                                    <button id="btn_green" class="button-green"> GPS глуш.</button>-->
+                                    <!--                                </form>-->
+                                    <!--                                <form action='butt_ku' method='GET'>-->
+                                    <!--                                    <button class="button-green">КУ глуш.</button>-->
+                                    <!--                                </form>-->
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="row">
 
-                <div class="information-bottom"
-                     style="height: 65%; margin-top: 5px;">
-                    <!--                    border: 0.5vh solid rgb(255,255,255)">-->
+                    <div class="information-bottom"
+                         style="height: 65%; margin-top: 2%;">
+                        <!--                    border: 0.5vh solid rgb(255,255,255)">-->
 
-                    <div class="row" style="margin-left: 3%">
-                        {% for striz in chosen_strizh %}
-                        {% if striz != 'None' %}
-                        {% if complex_state_dict|getkey:striz == 'включен' %}
-                        <!--                        <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">-->
-                        <!--                            Режим </h4>-->
-                        <!--                        &nbsp;-->
-                        <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
-                            {{action_strizh|getkey:striz}}
-                        </h4>
-
-                        {% else %}
-                        <h4 style="font-weight:600; font-family: Calibri,
-                            sans-serif; margin-left: 2%; color: #a10202">
-                            Необходимо включить {{striz}} </h4>
-                        {% endif %}
-                        {% endif %}
-                        {% endfor %}
-
-                    </div>
-
-
-                    {% if chosen_strizh != all_strizhes %}
-                    <form action='main' style="margin: 2.5% 35px" method='GET'>
-                        {% for striz in chosen_strizh %}
-                        {% if striz != 'None' %}
-                        <h5> Температура: {{ temperature_dict|getkey:striz }} &deg </h5>
-                        <h5> Влажность: {{ humidity_dict|getkey:striz }}% </h5>
-                        <h5> Состояние: {{ weather_state_dict|getkey:striz }} </h5>
-                        <h5> Стриж:
+                        <div class="row" style="margin-left: 3%">
+                            {% for striz in chosen_strizh %}
+                            {% if striz != 'None' %}
                             {% if complex_state_dict|getkey:striz == 'включен' %}
-                            <span style="color: #027d1e"> {{ complex_state_dict|getkey:striz }} </span>
-                            {% else %}
-                            <span style="color: #a10202"> {{ complex_state_dict|getkey:striz }} </span>
-                            {% endif %}
-                        </h5>
+                            <!--                        <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">-->
+                            <!--                            Режим </h4>-->
+                            <!--                        &nbsp;-->
+                            <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">
+                                {{action_strizh|getkey:striz}}
+                            </h4>
 
+                            {% else %}
+                            <h4 style="font-weight:600; font-family: Calibri,
+                            sans-serif; margin-left: 2%; color: #a10202">
+                                Необходимо включить {{striz}} </h4>
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+
+                        </div>
+
+
+                        {% if chosen_strizh != all_strizhes %}
+                        <form action='main' style="margin: 3% 35px" method='GET'>
+                            {% for striz in chosen_strizh %}
+                            {% if striz != 'None' %}
+                            <!--                        <h5> Температура: {{ temperature_dict|getkey:striz }} &deg </h5>-->
+                            <h5> Температура: {{ temperature_dict|getkey:striz }} </h5>
+                            <!--                        <h5> Влажность: {{ humidity_dict|getkey:striz }}% </h5>-->
+                            <h5> Влажность: {{ humidity_dict|getkey:striz }} </h5>
+                            <!--                        <h5> Состояние: {{ weather_state_dict|getkey:striz }} </h5>-->
+                            <h5> Состояние: {{ weather_state_dict|getkey:striz }} </h5>
+                            <h5> Стриж:
+                                {% if complex_state_dict|getkey:striz == 'включен' %}
+                                <span style="color: #027d1e"> {{ complex_state_dict|getkey:striz }} </span>
+                                {% else %}
+                                <span style="color: #a10202"> {{ complex_state_dict|getkey:striz }} </span>
+                                {% endif %}
+                            </h5>
+
+                            {% endif %}
+                            {% endfor %}
+                        </form>
+                        {% elif chosen_strizh == all_strizhes %}
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="box-scroll" style="height: 150px; background-color: rgb(255,255,255)">
+                                    <form action='main' style="margin: 10px 15px" method='GET'>
+                                        {% for striz in chosen_strizh %}
+                                        {% if striz != 'None' %}
+                                        {% if weather_state_dict|getkey:striz == 'ошибка соединения с uniping' %}
+                                        <h5 style="color: #aa0505">
+                                            {{striz}}:
+                                            {{ complex_state_dict|getkey:striz }}.
+                                            {{ weather_state_dict|getkey:striz }}
+                                        </h5>
+                                        {% elif complex_state_dict|getkey:striz == 'выключен' %}
+                                        <h5 style="color: #aa0505">
+                                            {{striz}}:
+                                            {{ complex_state_dict|getkey:striz }}
+                                        </h5>
+                                        {% elif complex_state_dict|getkey:striz == 'включен' %}
+                                        <h5 style="color: #165c27"> {{striz}}:
+                                            {{ complex_state_dict|getkey:striz }} </h5>
+                                        {% endif %}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                         {% endif %}
-                        {% endfor %}
-                    </form>
-                    {% elif chosen_strizh == all_strizhes %}
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="box-scroll" style="height: 150px; background-color: rgb(255,255,255)">
-                                <form action='main' style="margin: 10px 15px" method='GET'>
+                        <div class="box-scroll" style="; background-color: rgb(255,255,255)">
+                            <form action='show_logs' method='GET'>
+
+                                {% for el in logs_list reversed %}
+                                {{ el }} <br>
+                                {% endfor %}
+
+                            </form>
+                        </div>
+
+                        <div class="row" style="margin: 5px;">
+                            <div class="col-6">
+                                <form action='turn_on_bp' method='GET'>
+                                    {% if chosen_strizh != all_strizhes %}
                                     {% for striz in chosen_strizh %}
                                     {% if striz != 'None' %}
-                                    {% if weather_state_dict|getkey:striz == 'ошибка соединения с uniping' %}
-                                    <h5 style="color: #aa0505">
-                                        {{striz}}:
-                                        {{ complex_state_dict|getkey:striz }}.
-                                        {{ weather_state_dict|getkey:striz }}
-                                    </h5>
-                                    {% elif complex_state_dict|getkey:striz == 'выключен' %}
-                                    <h5 style="color: #aa0505">
-                                        {{striz}}:
-                                        {{ complex_state_dict|getkey:striz }}
-                                    </h5>
-                                    {% elif complex_state_dict|getkey:striz == 'включен' %}
-                                    <h5 style="color: #165c27"> {{striz}}:
-                                        {{ complex_state_dict|getkey:striz }} </h5>
-                                    {% endif %}
+                                    <!--                                    <button class="button-green-on">-->
+                                    <button class="btn btn-success">
+                                        <!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
+                                        Включение {{striz}}
+                                    </button>
                                     {% endif %}
                                     {% endfor %}
+                                    {% else %}
+                                    <!--                                    <button class="button-green-on">Включение комплекса</button>-->
+                                    <button class="btn btn-success">Включение комплекса</button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                            <div class="col-6">
+                                <form action='turn_off_bp' method='GET'>
+                                    {% if chosen_strizh != all_strizhes %}
+                                    {% for striz in chosen_strizh %}
+                                    {% if striz != 'None' %}
+                                    <!--                                    <button class="button-red">-->
+                                    <button class="btn btn-danger">
+                                        <!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
+                                        Выключение {{striz}}
+
+                                    </button>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% else %}
+                                    <!--                                    <button class="button-red">Выключение комплекса</button>-->
+                                    <button class="btn btn-danger">Выключение комплекса</button>
+                                    {% endif %}
                                 </form>
                             </div>
                         </div>
+
+
                     </div>
-                    {% endif %}
-                    <div class="row" style="margin: 0.5%;">
-                        <div class="col-6">
-                            <form action='turn_on_bp' method='GET'>
-                                {% if chosen_strizh != all_strizhes %}
-                                {% for striz in chosen_strizh %}
-                                {% if striz != 'None' %}
-                                <button class="button-green-on">
-                                    <!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
-                                    Включение {{striz}}
-                                </button>
-                                {% endif %}
-                                {% endfor %}
-                                {% else %}
-                                <button class="button-green-on">Включение комплекса</button>
-                                {% endif %}
-                            </form>
-                        </div>
-                        <div class="col-6">
-                            <form action='turn_off_bp' method='GET'>
-                                {% if chosen_strizh != all_strizhes %}
-                                {% for striz in chosen_strizh %}
-                                {% if striz != 'None' %}
-                                <button class="button-red">
-                                    <!--                                    <img src="static/icons/onoff.png" alt="on" style="max-width: 10%;">-->
-                                    Выключение {{striz}}
-
-                                </button>
-                                {% endif %}
-                                {% endfor %}
-                                {% else %}
-                                <button class="button-red">Выключение комплекса</button>
-                                {% endif %}
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="box-scroll" style="; background-color: rgb(255,255,255)">
-                        <form action='show_logs' method='GET'>
-
-                            {% for el in logs_list reversed %}
-                            {{ el }} <br>
-                            {% endfor %}
-
-                        </form>
-                    </div>
-
                 </div>
             </div>
         </div>
