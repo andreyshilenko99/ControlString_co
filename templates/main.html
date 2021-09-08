@@ -11,8 +11,6 @@
     <script src="static/src/jquery-3.2.1.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
     <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
-    <script src="static/src/L.Icon.Pulse.js"></script>
-    <link rel="stylesheet" href="static/src/L.Icon.Pulse.css"/>
     <meta charset=utf-8>
 
     {% leaflet_js plugins="ALL" %}
@@ -25,10 +23,10 @@
     <script>
         const complex_state = JSON.parse("{{ complex_state_json|escapejs }}");
         const complex_mode = JSON.parse("{{ complex_mode_json|escapejs }}");
-        var btn_green = document.getElementById("btn_green");
-        btn_green.addEventListener("click", function () {
-            this.classList.add("active");
-        });
+        // var btn_green = document.getElementById("btn_green");
+        // btn_green.addEventListener("click", function () {
+        //     this.classList.add("active");
+        // });
     </script>
 
 </head>

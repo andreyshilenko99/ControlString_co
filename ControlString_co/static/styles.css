@@ -282,14 +282,6 @@
     opacity: 1;
 }
 
-.text-labels {
-    font-size: 22px;
-    font-weight: 400;
-    color: #ff0000;
-    /*background: #a35c5c;*/
-    /* Use color, background, set margins for offset, etc */
-}
-
 
 @keyframes fade {
     from {
@@ -343,6 +335,26 @@
     -ms-user-select: none;
     user-select: none;
     pointer-events: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/*.text-labels {*/
+/*    font-size: 22px;*/
+/*    font-weight: 400;*/
+/*    color: #252731;*/
+/*    !*background: #a35c5c;*!*/
+/*    !* Use color, background, set margins for offset, etc *!*/
+/*}*/
+
+.leaflet-tooltip-radius {
+    /*position: absolute;*/
+    /*padding: 4px;*/
+    /*background-color: rgb(206, 207, 252);*/
+    background-color: transparent;
+    border: 0px solid #000000;
+    color: #94e37f;
+    white-space: nowrap;
+    font-size: 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 

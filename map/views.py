@@ -475,8 +475,8 @@ def back2main(request):
 
 def get_info_main(ip1, ip2, name):
     try:
-        # mode_ips = [check_state(ip1), check_state(ip2)]
-        mode_ips = ['all_stop' for _ in range(2)]
+        mode_ips = [check_state(ip1), check_state(ip2)]
+        # mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -564,6 +564,13 @@ def choose_all_strizhes(request):
             url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
             temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
                 return_conditions(url_uniping_dict[strizh.name])
+
+            complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+
+            c["button_complex"] = button_complex
+            c['complex_mode_dict'][strizh.name] = complex_mode
+            c["action_strizh"][strizh.name] = action_strizh
+
         c['temperature_dict'] = temperature_dict
         c['humidity_dict'] = humidity_dict
         c['weather_state_dict'] = weather_state_dict
