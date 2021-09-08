@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'djgeojson',
     'pysnmp',
-    'bootstrap_datepicker_plus',
     'geo',
 
 ]
@@ -90,66 +89,26 @@ CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 CELERY_TIMEZONE = 'Europe/Moscow'
 
+# DATABASES = {
+#     'default': {
+#         # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'stuff',
+#         'USER': 'dron',
+#         'PASSWORD': '555',
+#         'HOST': 'localhost',
+#         'PORT': '5432', }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        # 'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'stuff',
-        'USER': 'dron',
-        'PASSWORD': '555',
-        'HOST': '192.168.1.66',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
         'PORT': '5432', }
 }
-
-# DATABASES = {
-#     'default': {
-#         # 'ENGINE': 'django.db.backends.postgresql',
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': '555',
-#         'HOST': 'localhost',
-#         'PORT': '5432', }
-# }
-
-# DATABASES = {
-#     'default': {
-#         # 'ENGINE': 'django.db.backends.postgresql',
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': '555',
-#         'HOST': 'localhost',
-#         'PORT': '5432', }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'project',
-#         'USER': 'bGbyNuHrWWtzFIzYSwYiUrBPOgwDWyBn',
-#         'PASSWORD': 'lbjZrLDFyKdUvajjVN4881wRfN4GcGlq3GaOA6gfltJeqpfeedveyLxlIy4nKNuk',
-#         # 'HOST': '127.0.0.1',
-#         'HOST': 'postgres',
-#         'PORT': '5432', }
-# }
-
-
-# import environ
-# BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-#
-# env = environ.Env()
-# READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
-# if READ_DOT_ENV_FILE:
-#     # OS environment variables take precedence over variables from .env
-#     env.read_env(str(BASE_DIR / ".env"))
-#
-# DATABASES = {"default": env.db("DATABASE_URL")}
-# DATABASES["default"]["ATOMIC_REQUESTS"] = True
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {

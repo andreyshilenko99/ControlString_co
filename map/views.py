@@ -14,7 +14,7 @@ from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
 
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
-from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm, TimeForm
+from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm
 
 from ControlString_co.control_trace import scan_on_off, check_state, jammer_on_off
 from ControlString_co.shelest_jam import set_gain

@@ -1,5 +1,6 @@
-from django.contrib.gis.db import models
 
+from django.db import models
+from django.apps import apps
 
 class Point(models.Model):
     system_name = models.CharField('Имя дрона', max_length=500)
@@ -108,7 +109,6 @@ PODAVITEL_CHOICES = (
     ('BarGen (Плата Б)', 'BarGen (Плата Б)'),
 )
 
-from django.db import models
 
 
 class IntegerRangeField(models.IntegerField):
@@ -123,8 +123,8 @@ class IntegerRangeField(models.IntegerField):
 
 
 class ApemsConfiguration(models.Model):
-    CHOICES_STRIZH = Strizh.objects.all()
-    strizh_name = models.CharField('Имя стрижа', max_length=500, choices=((x.name, x.name) for x in CHOICES_STRIZH),
+
+    strizh_name = models.CharField('Имя стрижа', max_length=500, default='default',
                                    error_messages={'required': ''}
                                    )
 
