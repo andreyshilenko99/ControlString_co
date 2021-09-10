@@ -123,8 +123,11 @@ class IntegerRangeField(models.IntegerField):
 
 
 class ApemsConfiguration(models.Model):
-    CHOICES_STRIZH = Strizh.objects.all()
-    strizh_name = models.CharField('Имя стрижа', max_length=500, choices=((x.name, x.name) for x in CHOICES_STRIZH),
+    # CHOICES_STRIZH = Strizh.objects.all()
+    # strizh_name = models.CharField('Имя стрижа', max_length=500, choices=((x.name, x.name) for x in CHOICES_STRIZH),
+    #                                error_messages={'required': ''}
+    #                                )
+    strizh_name = models.CharField('Имя стрижа', max_length=500, default='стриж 0 (по умолчанию)',
                                    error_messages={'required': ''}
                                    )
 

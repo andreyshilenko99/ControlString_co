@@ -14,7 +14,8 @@ from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
 
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
-from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm, TimeForm
+from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm, \
+    TableFilterForm, TableOrderForm
 
 from ControlString_co.control_trace import scan_on_off, check_state, jammer_on_off
 from ControlString_co.shelest_jam import set_gain
@@ -164,25 +165,72 @@ def journal(request):
     if request.method == 'POST':
         form_drone = DroneFilterForm(request.POST)
         form_filter = StrizhFilterForm(request.POST)
-        if form_drone.is_valid():
-            drone_toshow = form_drone.cleaned_data.get('drone_toshow')
-            c['drone_toshow'] = drone_toshow
-        if form_filter.is_valid():
-            filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
-            c['filtered_strizhes'] = filtered_strizhes
-        c['form_drone'] = form_drone
+        form_filter_table = TableFilterForm(request.POST)
+        form_order_table = TableOrderForm(request.POST)
+
     else:
-        if not c.get('form_drone'):
-            form_drone = DroneFilterForm()
-            c['form_drone'] = form_drone
-        # form_drone_alldrones = Point.objects.all().order_by('-detection_time')
-        form_drone_alldrones = c.get('form_drone').AllDrones.order_by('-detection_time')
-        c['form_drone_alldrones'] = form_drone_alldrones
-        timeform = TimeForm
+        c['order_sign'] = ''
+        c['table_filter'] = ''
+        # if not c.get('form_drone'):
+        form_drone = DroneFilterForm()
         form_filter = StrizhFilterForm()
+        c['form_drone'] = form_drone
+        # form_drone_alldrones = Point.objects.all().order_by('-detection_time')
+        form_filter_table = TableFilterForm()
+        form_order_table = TableOrderForm()
+        order_sign = c.get('order_sign', '')
+        table_filter = c.get('table_filter')
+        if not table_filter:
+            table_filter ='detection_time'
+        form_drone_alldrones = c.get('form_drone').AllDrones.order_by(order_sign + table_filter)
+            # form_drone_alldrones = c.get('form_drone').AllDrones.order_by('-' + c.get('table_filter'))
+        # form_drone_alldrones = c.get('form_drone').AllDrones.order_by('-id')
+        c['form_drone_alldrones'] = form_drone_alldrones
+
+    c['form_drone'] = form_drone
     c['form_filter'] = form_filter
-    c['timeform'] = timeform
+    form_filter_table.fields.get('field').initial = c.get('table_filter')
+    c['form_filter_table'] = form_filter_table
+    c['form_order_table'] = form_order_table
     return render(request, "journal.html", context=c)
+
+
+def apply_filter_table(request):
+    form_order_table = c.get('form_order_table')
+    form_filter_table = c.get('form_filter_table')
+
+    # order_sign = ''
+    # table_filter = ''
+    if request.method == 'POST':
+        table_filter = request.POST.get('field', c.get('table_filter'))
+        order_sign = request.POST.get('order_sign', c.get('order_sign'))
+        # if not form_filter_table:
+        form_filter_table = TableFilterForm(request.POST)
+        # if form_filter_table.is_valid():
+        #     table_filter22 = form_filter_table.cleaned_data.get('field')
+        # if not form_order_table:
+        form_order_table = TableOrderForm(request.POST)
+        # if form_order_table.is_valid():
+        #     order_sign22 = form_order_table.cleaned_data.get('order_sign')
+        form_drone_alldrones = c.get('form_drone').AllDrones.order_by(order_sign + table_filter)
+        c['form_drone_alldrones'] = form_drone_alldrones
+        c['order_sign'] = order_sign
+        c['table_filter'] = table_filter
+    else:
+        # if not form_filter_table:
+        form_filter_table = TableFilterForm()
+        # if not form_order_table:
+        form_order_table = TableOrderForm()
+
+    xx = c
+
+    form_filter_table.fields['field'].initial = table_filter
+    form_order_table.fields['order_sign'].initial = order_sign
+    c['form_filter_table'] = form_filter_table
+    c['form_order_table'] = form_order_table
+
+    return render(request, "journal.html", context=c)
+
 
 
 def filter_nomer_strizha(request):
@@ -270,11 +318,8 @@ def choose_apem_toshow(request):
                     apem_change_form.fields['ip_podavitelya'].initial = AP.get('ip_podavitelya')
                     apem_change_form.fields['canal_podavitelya'].initial = AP.get('canal_podavitelya')
                     apem_change_form.fields['usileniye_db'].initial = AP.get('usileniye_db')
-                    xxx = c
                     if c.get('apem_toshow'):
-                        xx = c['apem_toshow']
                         c['apem_action_message'] = '{} был отредактирован'.format(c.get('apem_toshow')[0])
-
                         try:
                             ApemsConfiguration.objects.get(id=c['apem_toshow'][0].pk).delete()
                             c['apem_toshow'] = [ApemsNew]
@@ -283,9 +328,7 @@ def choose_apem_toshow(request):
                         ApemsNew.save()
                     else:
                         c['apem_action_message'] = '{} был создан'.format(ApemsNew)
-                        # c['apem_toshow'] = [ApemsNew]
                         ApemsNew.save()
-
             else:
                 apem_toshow = form_apem.cleaned_data.get('apem_toshow')
                 c['apem_toshow'] = apem_toshow
@@ -475,8 +518,8 @@ def back2main(request):
 
 def get_info_main(ip1, ip2, name):
     try:
-        mode_ips = [check_state(ip1), check_state(ip2)]
-        # mode_ips = ['all_stop' for _ in range(2)]
+        # mode_ips = [check_state(ip1), check_state(ip2)]
+        mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -508,85 +551,72 @@ def get_info_main(ip1, ip2, name):
 
 def choose_nomer_strizha(request):
     global c
-
     strizhes = Strizh.objects.order_by('-lon').all()
-    c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
-    url_uniping_dict = {}
-    temperature_dict = {}
-    humidity_dict = {}
-    weather_state_dict = {}
     if request.method == 'POST':
-        # c['action_strizh'] = {}
         form = StrizhForm(request.POST)
-        if form.is_valid():
-            chosen_strizh = form.cleaned_data.get('chosen_strizh')
-            if chosen_strizh:
-                c['chosen_strizh'][0] = chosen_strizh.name
+        url_uniping_dict = {}
+        temperature_dict = {}
+        humidity_dict = {}
+        weather_state_dict = {}
 
+        if form.is_valid() and request.POST['chosen_strizh']:
+            c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
+            if 'choose_nomer_strizha' in request.POST:
+                chosen_strizh = form.cleaned_data.get('chosen_strizh')
+                if chosen_strizh:
+                    c['chosen_strizh'][0] = chosen_strizh.name
+                for strizh in strizhes:
+                    if c['chosen_strizh'][0] == strizh.name:
+                        url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
+                        temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+                            return_conditions(url_uniping_dict[strizh.name])
+                        complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+                        c["button_complex"] = button_complex
+                        c['complex_mode_dict'][strizh.name] = complex_mode
+                        c["action_strizh"][strizh.name] = action_strizh
+                c['chosen_strizh_json'] = json.dumps(c['chosen_strizh'][0])
+
+        if 'choose_all_strizhes' in request.POST:
+            c['chosen_strizh'] = [strizh.name for strizh in strizhes]
             for strizh in strizhes:
-                if c['chosen_strizh'][0] == strizh.name:
-                    url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
-                    temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-                        return_conditions(url_uniping_dict[strizh.name])
-
-                    complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
-
-                    c["button_complex"] = button_complex
-                    c['complex_mode_dict'][strizh.name] = complex_mode
-                    c["action_strizh"][strizh.name] = action_strizh
-
-            c['url_uniping_dict'] = url_uniping_dict
-            c['temperature_dict'] = temperature_dict
-            c['humidity_dict'] = humidity_dict
-            c['weather_state_dict'] = weather_state_dict
-
-        # nomer = request.POST['chosen_strizh']
-        # c['chosen_strizh'] = nomer
-        xx = c
-
+                url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
+                temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+                    return_conditions(url_uniping_dict[strizh.name])
+                complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+                c["button_complex"] = button_complex
+                c['complex_mode_dict'][strizh.name] = complex_mode
+                c["action_strizh"][strizh.name] = action_strizh
+        c['url_uniping_dict'] = url_uniping_dict
+        c['temperature_dict'] = temperature_dict
+        c['humidity_dict'] = humidity_dict
+        c['weather_state_dict'] = weather_state_dict
     return render(request, "main.html", context=c)
     # return HttpResponse(c)
 
 
-def choose_all_strizhes(request):
-    global c
-
-    strizhes = Strizh.objects.order_by('-lon').all()
-    if request.method == 'POST':
-        # c['action_strizh'] = {}
-        c['chosen_strizh'] = [strizh.name for strizh in strizhes]
-
-        temperature_dict = {}
-        humidity_dict = {}
-        weather_state_dict = {}
-        url_uniping_dict = {}
-        for strizh in strizhes:
-            url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
-            temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-                return_conditions(url_uniping_dict[strizh.name])
-
-            complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
-
-            c["button_complex"] = button_complex
-            c['complex_mode_dict'][strizh.name] = complex_mode
-            c["action_strizh"][strizh.name] = action_strizh
-
-        c['temperature_dict'] = temperature_dict
-        c['humidity_dict'] = humidity_dict
-        c['weather_state_dict'] = weather_state_dict
-        c['url_uniping_dict'] = url_uniping_dict
-
-        # nomer = request.POST['chosen_strizh']
-        # c['chosen_strizh'] = nomer
-
-    # if c.get("chosen_strizh"):
-    #     # c["action_strizh"] = "Выбрано: '{}'".format(c.get("chosen_strizh"))
-    #     temperature, humidity, weather_state = return_conditions(c['url_uniping'])
-    #     c['temperature'] = temperature
-    #     c['humidity'] = humidity
-    #     c['weather_state'] = weather_state
-
-    return render(request, "main.html", context=c)
+# def choose_all_strizhes(request):
+#     global c
+#     strizhes = Strizh.objects.order_by('-lon').all()
+#     if request.method == 'POST':
+#         temperature_dict = {}
+#         humidity_dict = {}
+#         weather_state_dict = {}
+#         url_uniping_dict = {}
+#         c['chosen_strizh'] = [strizh.name for strizh in strizhes]
+#
+#         for strizh in strizhes:
+#             url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
+#             temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+#                 return_conditions(url_uniping_dict[strizh.name])
+#             complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+#             c["button_complex"] = button_complex
+#             c['complex_mode_dict'][strizh.name] = complex_mode
+#             c["action_strizh"][strizh.name] = action_strizh
+#         c['temperature_dict'] = temperature_dict
+#         c['humidity_dict'] = humidity_dict
+#         c['weather_state_dict'] = weather_state_dict
+#         c['url_uniping_dict'] = url_uniping_dict
+#     return render(request, "main.html", context=c)
 
 
 def set_strizh(request):
@@ -610,7 +640,6 @@ def set_strizh(request):
     c['form_strizh'] = form_strizh
     c['form_apem'] = form_apem
     return render(request, "configuration.html", context=c)
-
 
 
 def render_main_page(request):
@@ -780,26 +809,6 @@ def butt_glush(request):
     return render(request, "main.html", context=c)
 
 
-def butt_gps(request):
-    global c
-    if c.get("chosen_strizh") != 0:
-        print('gps dlya strizha #', c.get('chosen_strizh'))
-        # TODO action 3 button
-    c["action_strizh"] = "GPS: {}".format(', '.join([st for st in c['chosen_strizh'] if st != 'None']))
-    # return redirect(request.META['HTTP_REFERER'])
-    return render(request, "main.html", context=c)
-
-
-def butt_ku(request):
-    global c
-    if c.get("chosen_strizh") != 0:
-        print('KU dlya strizha #', c.get('chosen_strizh'))
-        # TODO action 4 button
-    c["action_strizh"] = "КУ: {}".format(', '.join([st for st in c['chosen_strizh'] if st != 'None']))
-    # return redirect(request.META['HTTP_REFERER'])
-    return render(request, "main.html", context=c)
-
-
 def apply_period(request):
     global c, start_datetime, end_datetime, reset_time
     c['saved_table'] = False
@@ -826,21 +835,24 @@ def reset_filter(request):
     c['filtered_strizhes'] = ''
     c['start_datetime'] = 'Начало'
     c['saved_table'] = False
+    c['table_filter'] = ''
 
     if request.method == 'POST':
         form_filter = StrizhFilterForm(request.POST)
         form_drone = DroneFilterForm(request.POST)
+        form_filter_table = TableFilterForm(request.POST)
         form_drone_alldrones = Point.objects.all().order_by('-detection_time')
-
         for strizh in StrizhJournal.objects.all():
             strizh.delete()
     else:
         form_filter = StrizhFilterForm()
         form_drone = DroneFilterForm()
+        form_filter_table = TableFilterForm()
+    form_filter_table.fields.get('field').initial = c.get('table_filter')
     c['form_filter'] = form_filter
+    c['form_filter_table'] = form_filter_table
     c['form_drone_alldrones'] = form_drone_alldrones
     c['form_drone'] = form_drone
-
     c['end_datetime'] = 'Конец'
     return render(request, "journal.html", context=c)
 
@@ -848,8 +860,8 @@ def reset_filter(request):
 def export_csv(request):
     global c
     c['saved_table'] = False
-    time_start = '01/01/2000-00:01' if c.get('start_datetime')=='Начало' else c.get('start_datetime')
-    time_end = '01/01/2100-00:01' if c.get('end_datetime')=='Конец' else c.get('end_datetime')
+    time_start = '01/01/2000-00:01' if c.get('start_datetime') == 'Начало' else c.get('start_datetime')
+    time_end = '01/01/2100-00:01' if c.get('end_datetime') == 'Конец' else c.get('end_datetime')
     strizhes = Strizh.objects.all() if not c.get('filtered_strizhes') else c.get('filtered_strizhes')
 
     now = datetime.datetime.now()
@@ -858,19 +870,19 @@ def export_csv(request):
     ts3 = ts2[-1].split(':')
     time_start_datetime = now.replace(year=int(ts2[0]), month=int(ts1[0]), day=int(ts1[1]), hour=int(ts3[0]),
                                       minute=int(ts3[1]), second=0)
-
     ts11 = time_end.split('/')
     ts22 = ts11[-1].split('-')
     ts33 = ts22[-1].split(':')
     time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
                                     minute=int(ts33[1]), second=59)
-
     strizhes_ip = []
     for strizh in strizhes:
         for ip in [strizh.ip1, strizh.ip2]:
             strizhes_ip.append(ip)
-
-    drones_filtered_strizh = Point.objects.order_by('-detection_time').filter(ip__in=strizhes_ip)
+    if c.get('table_filter'):
+        drones_filtered_strizh = Point.objects.order_by('-' + c.get('table_filter')).filter(ip__in=strizhes_ip)
+    else:
+        drones_filtered_strizh = Point.objects.order_by('-detection_time').filter(ip__in=strizhes_ip)
     d = datetime.datetime.now()
     csv_name = "log_{}_{}_{}_{}_{}_{}.csv".format(d.hour, d.minute, d.second, d.day, d.month, d.year)
     print(csv_name)
@@ -880,10 +892,8 @@ def export_csv(request):
                     'Комментарии', 'Широта', 'Долгота', 'Азимут', 'Внутренний радиус сектора', 'Внешний радиус сектора', \
                     'Радиус сектора (м)', 'IP-адрес стрижа'
         writer.writerow(first_row)
-
         for dr in drones_filtered_strizh:
             writer = csv.writer(f)
-
             if time_start_datetime < get_datetime_drone(dr.detection_time) < time_end_datetime:
                 row = dr.system_name, dr.center_freq, dr.brandwidth, dr.detection_time, \
                       dr.comment_string, dr.lat, dr.lon, dr.azimuth, \
@@ -903,18 +913,17 @@ def collect_logs(log_string):
 
 def set_correct_temperature(url, strizh_name, temperature_state):
     global c
-    if temperature_state != 0:
-        while temperature_state != 0:
-            temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
-                                                high_border=high_t)
-            if temperature_state == 1:
-                send_line_command(url, 'вентилятор', 1)
-                state0 = obtain_state(url, 'датчик потока')
-                if state0 != 'вкл':
-                    collect_logs('АВАРИЯ! отсутствует вентиляция, возможен перегрев оборудования')
-            elif temperature_state == -1:
-                send_line_command(url, 'обогрев', 1)
-            time.sleep(60)
+    while temperature_state != 0:
+        temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
+                                            high_border=high_t)
+        if temperature_state == 1:
+            send_line_command(url, 'вентилятор', 1)
+            state0 = obtain_state(url, 'датчик воздушного потока')
+            if state0 != 'вкл':
+                collect_logs('АВАРИЯ! отсутствует вентиляция, возможен перегрев оборудования')
+        elif temperature_state == -1:
+            send_line_command(url, 'обогрев', 1)
+        time.sleep(60)
 
 
 # def check_states_on():
@@ -971,7 +980,7 @@ def turn_on_bp(request):
                 set_correct_temperature(url, strizh_name, temperature_state)
             elif temperature_state == 0:
                 # turn everything on
-                state0 = obtain_state(url, 'датчик потока')
+                state0 = obtain_state(url, 'датчик воздушного потока')
                 if state0 != 'вкл':
                     send_line_command(url, 'вентилятор', 1)
                 state1 = obtain_state(url, 'БП ПЭВМ')
@@ -996,13 +1005,12 @@ def turn_on_bp(request):
                     time.sleep(4)
                 if state5 != 'вкл':
                     send_impulse(url, 'ЭВМ2', time_pulse=3, action='вкл')
-
+                time.sleep(1)
                 complex_state = get_complex_state(url)
                 c['complex_state_dict'][strizh_name] = complex_state
                 c['complex_state_json'] = json.dumps(c['complex_state_dict'])
                 str_log = strizh_name + ': ' + complex_state
                 collect_logs(str_log)
-                c['logs_list'] = logs_list
                 # render(request, "main.html", context=c)
                 # functioning_loop(request)
     return render(request, "main.html", context=c)
@@ -1081,7 +1089,7 @@ lines_control_map = {
     'БП АПЕМ': 8,
     'ЭВМ1': 9,
     'ЭВМ2': 13,
-    'датчик потока': 16,
+    'датчик воздушного потока': 16,
 }
 
 
@@ -1117,14 +1125,26 @@ def obtain_state(url, line_name, to_collect_logs=False):
 
 
 def get_complex_state(url):
-    state0 = obtain_state(url, 'датчик потока')
-    state1 = obtain_state(url, 'БП ПЭВМ')
-    state2 = obtain_state(url, 'БП Шелест')
-    state3 = obtain_state(url, 'БП АПЕМ')
-    state4 = obtain_state(url, 'ЭВМ1')
-    state5 = obtain_state(url, 'ЭВМ2')
-    states = [state0, state1, state2, state3, state4, state5]
-    complex_state = 'включен' if all([True if x == 'вкл' else False for x in states]) else 'выключен'
+    states_map = {0: 'датчик воздушного потока', 1: "БП ПЭВМ",
+                  2: 'БП Шелест', 3: "БП АПЕМ",
+                  4: 'ЭВМ2', 5: "ЭВМ2"}
+    states = [obtain_state(url, val) for key, val in states_map.items()]
+
+    states_off = [i for i, e in enumerate(states) if e == 'выкл']
+    if len(states_off) == 0:
+        complex_state = 'включен'
+    elif len(states_off) == 6:
+        complex_state = 'выключен'
+    else:
+        complex_state = 'выключен '
+        for i, stat in enumerate(states_off):
+            if i == 0:
+                complex_state += states_map[stat]
+            else:
+                complex_state += f", {states_map[stat]}"
+    # complex_state = 'включен' if all([True if x == 'вкл' else False for x in states1]) else 'выключен вентилятор'
+    # complex_state = 'включен' if all([True if x == 'вкл' else False for x in states2]) else 'выключен'
+    print(complex_state)
     return complex_state
 
 
@@ -1187,18 +1207,3 @@ def send_line_command(url, line_name, arg):
         collect_logs("{}".format(log_str))
     else:
         collect_logs("проверьте, выбран ли стриж")
-
-# def functioning_loop(request):
-#     global c
-#     print('loop')
-#     is_on = True
-#     if c['complex_state'] == 'вкл':
-#         while is_on:
-#             is_on = check_states_on()
-#             render(request, "main.html", context=c)
-#             time.sleep(10)
-#     elif c['complex_state'] == 'выкл':
-#         print('всё выключено')
-#         # while True:
-#         #     # check_states_off()
-#         #     break

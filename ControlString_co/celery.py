@@ -15,7 +15,7 @@ from ControlString_co.check_uniping import main_check
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ControlString_co.settings')
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
-app = Celery('tasks', broker='redis://127.0.0.1:6379')
+app = Celery('tasks', broker='redis://redis:6379')
 
 app.autodiscover_tasks()
 CELERYD_CONCURRENCY = 1

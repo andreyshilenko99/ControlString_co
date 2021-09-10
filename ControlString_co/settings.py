@@ -86,31 +86,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ControlString_co.wsgi.application'
 
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 CELERY_TIMEZONE = 'Europe/Moscow'
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        # 'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'stuff',
-        'USER': 'dron',
-        'PASSWORD': '555',
-        'HOST': '192.168.1.66',
-        'PORT': '5432', }
-}
 
 # DATABASES = {
 #     'default': {
-#         # 'ENGINE': 'django.db.backends.postgresql',
 #         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
+#         # 'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'stuff',
+#         'USER': 'dron',
 #         'PASSWORD': '555',
-#         'HOST': 'localhost',
+#         'HOST': '192.168.1.66',
 #         'PORT': '5432', }
 # }
+
+DATABASES = {
+    'default': {
+        # 'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': '555',
+        'HOST': 'localhost',
+        'PORT': '5432', }
+}
 
 # DATABASES = {
 #     'default': {
@@ -193,7 +193,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LEAFLET_CONFIG = {
-    'SPATIAL_EXTENT': (30.415, 59.999, 30.477, 60.022),
+    'SPATIAL_EXTENT': (30.3, 59, 30.5, 61),
     'DEFAULT_CENTER': (60.013674, 30.452474),
     'RESET_VIEW': False,
     'DEFAULT_ZOOM': 15,
