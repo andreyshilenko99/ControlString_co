@@ -1,5 +1,7 @@
 from django.contrib.gis.db import models
 
+from django.db import models
+from django.apps import apps
 
 class Point(models.Model):
     system_name = models.CharField('Имя дрона', max_length=500)
