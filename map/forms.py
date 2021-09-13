@@ -60,7 +60,7 @@ class TableFilterForm(ModelForm):
     zz = Point._meta.get_fields()
     AllFields = tuple([(f.name, f.verbose_name) for f in Point._meta.get_fields()])
     field = forms.ChoiceField(choices=AllFields, required=False,
-                              label="",
+                              label="", initial="detection_time",
                               widget=Select(attrs={'id': 'name', 'onchange': 'submit();'}))
 
     class Meta:
@@ -70,7 +70,7 @@ class TableFilterForm(ModelForm):
 
 class TableOrderForm(ModelForm):
     zz = Point._meta.get_fields()
-    AllFields = tuple([('', 'по возрастанию'), ('-', 'по убыванию')])
+    AllFields = tuple([('-', 'по убыванию'), ('', 'по возрастанию')])
     order_sign = forms.ChoiceField(choices=AllFields, required=False,
                                    label="", widget=forms.Select(attrs={'onchange': 'submit();'}))
 
