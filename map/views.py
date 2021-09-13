@@ -181,56 +181,54 @@ def journal(request):
         order_sign = c.get('order_sign', '')
         table_filter = c.get('table_filter')
         if not table_filter:
-            table_filter ='detection_time'
+            table_filter = 'detection_time'
         form_drone_alldrones = c.get('form_drone').AllDrones.order_by(order_sign + table_filter)
-            # form_drone_alldrones = c.get('form_drone').AllDrones.order_by('-' + c.get('table_filter'))
+        # form_drone_alldrones = c.get('form_drone').AllDrones.order_by('-' + c.get('table_filter'))
         # form_drone_alldrones = c.get('form_drone').AllDrones.order_by('-id')
         c['form_drone_alldrones'] = form_drone_alldrones
 
     c['form_drone'] = form_drone
     c['form_filter'] = form_filter
-    form_filter_table.fields.get('field').initial = c.get('table_filter')
+    # form_filter_table.fields.get('field').initial = [c.get('table_filter')]
+    # form_filter_table.initial['field'] = c.get('table_filter')
     c['form_filter_table'] = form_filter_table
     c['form_order_table'] = form_order_table
     return render(request, "journal.html", context=c)
 
 
 def apply_filter_table(request):
-    form_order_table = c.get('form_order_table')
-    form_filter_table = c.get('form_filter_table')
-
-    # order_sign = ''
-    # table_filter = ''
     if request.method == 'POST':
         table_filter = request.POST.get('field', c.get('table_filter'))
-        order_sign = request.POST.get('order_sign', c.get('order_sign'))
-        # if not form_filter_table:
-        form_filter_table = TableFilterForm(request.POST)
-        # if form_filter_table.is_valid():
-        #     table_filter22 = form_filter_table.cleaned_data.get('field')
-        # if not form_order_table:
-        form_order_table = TableOrderForm(request.POST)
-        # if form_order_table.is_valid():
-        #     order_sign22 = form_order_table.cleaned_data.get('order_sign')
+        order_sign = c.get('order_sign', '')
         form_drone_alldrones = c.get('form_drone').AllDrones.order_by(order_sign + table_filter)
         c['form_drone_alldrones'] = form_drone_alldrones
         c['order_sign'] = order_sign
         c['table_filter'] = table_filter
+        form_filter_table = TableFilterForm(request.POST, initial={'field': table_filter})
+        # form_order_table = TableOrderForm(request.POST, initial={'order_sign': order_sign})
     else:
-        # if not form_filter_table:
         form_filter_table = TableFilterForm()
-        # if not form_order_table:
         form_order_table = TableOrderForm()
-
-    xx = c
-
-    form_filter_table.fields['field'].initial = table_filter
-    form_order_table.fields['order_sign'].initial = order_sign
     c['form_filter_table'] = form_filter_table
-    c['form_order_table'] = form_order_table
+    # c['form_order_table'] = form_order_table
 
     return render(request, "journal.html", context=c)
 
+
+def apply_order_table(request):
+    if request.method == 'POST':
+        table_filter = c.get('table_filter', 'detection_time')
+        order_sign = request.POST.get('order_sign', c.get('order_sign'))
+        form_drone_alldrones = c.get('form_drone').AllDrones.order_by(order_sign + table_filter)
+        c['form_drone_alldrones'] = form_drone_alldrones
+        c['order_sign'] = order_sign
+        c['table_filter'] = table_filter
+        form_order_table = TableOrderForm(request.POST, initial={'order_sign': order_sign})
+    else:
+        form_order_table = TableOrderForm()
+    c['form_order_table'] = form_order_table
+
+    return render(request, "journal.html", context=c)
 
 
 def filter_nomer_strizha(request):
@@ -559,30 +557,43 @@ def choose_nomer_strizha(request):
         humidity_dict = {}
         weather_state_dict = {}
 
-        if form.is_valid() and request.POST['chosen_strizh']:
+        if form.is_valid() and request.POST['chosen_strizh'] \
+                and 'choose_all_strizhes' not in request.POST:
             c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
-            if 'choose_nomer_strizha' in request.POST:
-                chosen_strizh = form.cleaned_data.get('chosen_strizh')
-                if chosen_strizh:
-                    c['chosen_strizh'][0] = chosen_strizh.name
-                for strizh in strizhes:
-                    if c['chosen_strizh'][0] == strizh.name:
-                        url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
-                        temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-                            return_conditions(url_uniping_dict[strizh.name])
-                        complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
-                        c["button_complex"] = button_complex
-                        c['complex_mode_dict'][strizh.name] = complex_mode
-                        c["action_strizh"][strizh.name] = action_strizh
-                c['chosen_strizh_json'] = json.dumps(c['chosen_strizh'][0])
+            # if 'choose_nomer_strizha' in request.POST:
+            chosen_strizh = form.cleaned_data.get('chosen_strizh')
+            if chosen_strizh:
+                c['chosen_strizh'][0] = chosen_strizh.name
+                # form.fields.get('chosen_strizh').initial = [chosen_strizh.name]
+                # form.initial['chosen_strizh'] = chosen_strizh.name
+                # c['form'] = form
+                form = StrizhForm(request.POST, initial={'chosen_strizh': chosen_strizh.name})
+                c['form'] = form
 
-        if 'choose_all_strizhes' in request.POST:
+            for strizh in strizhes:
+                if c['chosen_strizh'][0] == strizh.name:
+                    url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
+                    temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+                        return_conditions(url_uniping_dict[strizh.name])
+                    complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+                    c["button_complex"] = button_complex
+                    c['complex_mode_dict'][strizh.name] = complex_mode
+                    c["action_strizh"][strizh.name] = action_strizh
+            c['chosen_strizh_json'] = json.dumps(c['chosen_strizh'][0])
+
+        if form.is_valid() and 'choose_all_strizhes' in request.POST:
             c['chosen_strizh'] = [strizh.name for strizh in strizhes]
+            # form.fields['chosen_strizh'].initial = None
+            # form.initial['chosen_strizh'] = [None]
+            # c['form'] = form
+            form = StrizhForm()
+            c['form'] = form
             for strizh in strizhes:
                 url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
                 temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
                     return_conditions(url_uniping_dict[strizh.name])
                 complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+
                 c["button_complex"] = button_complex
                 c['complex_mode_dict'][strizh.name] = complex_mode
                 c["action_strizh"][strizh.name] = action_strizh

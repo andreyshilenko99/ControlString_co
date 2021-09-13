@@ -11,16 +11,18 @@ from django.forms import IntegerField, TextInput, NumberInput
 
 
 class StrizhForm(ModelForm):
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    # self.initial['chosen_strizh'] = None
+    # self.initial['chosen_strizh'] = kwargs.get('initial', None)
+    # self.fields['chosen_strizh'].initial = kwargs.get('initial', None)
     chosen_strizh = ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
                                      required=False, to_field_name="name",
-                                     label="")
+                                     label="", widget=Select(attrs={'id': 'name', 'onchange': 'submit();'}))
 
     class Meta:
         model = Strizh
         fields = ['chosen_strizh']
-        widgets = {
-            'chosen_strizh': Select(attrs={'id': 'name'}),
-        }
 
 
 class StrizhFilterForm(ModelForm):
@@ -58,8 +60,8 @@ class TableFilterForm(ModelForm):
     zz = Point._meta.get_fields()
     AllFields = tuple([(f.name, f.verbose_name) for f in Point._meta.get_fields()])
     field = forms.ChoiceField(choices=AllFields, required=False,
-                              label="Отсортировать",
-                              widget=forms.Select(attrs={'onchange': 'submit();'}))
+                              label="",
+                              widget=Select(attrs={'id': 'name', 'onchange': 'submit();'}))
 
     class Meta:
         model = Point
@@ -68,7 +70,6 @@ class TableFilterForm(ModelForm):
 
 class TableOrderForm(ModelForm):
     zz = Point._meta.get_fields()
-    # AllFields = tuple([(f.name, f.verbose_name) for f in Point._meta.get_fields()])
     AllFields = tuple([('', 'по возрастанию'), ('-', 'по убыванию')])
     order_sign = forms.ChoiceField(choices=AllFields, required=False,
                                    label="", widget=forms.Select(attrs={'onchange': 'submit();'}))
@@ -120,59 +121,3 @@ class ApemsChangingForm(ModelForm):
             'canal_podavitelya': NumberInput(attrs={'class': 'form-control', 'placeholder': 'Канал подавителя'}),
             'usileniye_db': NumberInput(attrs={'class': 'form-control', 'placeholder': 'Усиление, дб'}),
         }
-
-
-# from tempus_dominus.widgets import DatePicker, TimePicker, DateTimePicker
-
-
-# class TimeForm(forms.Form):
-#     date_field = forms.DateField(widget=DatePicker())
-#     date_field_required_with_min_max_date = forms.DateField(
-#         required=True,
-#         widget=DatePicker(
-#             options={
-#                 'minDate': '2009-01-20',
-#                 'maxDate': '2017-01-20',
-#             },
-#         ),
-#         initial='2013-01-01',
-#     )
-#     """
-#     In this example, the date portion of `defaultDate` is irrelevant;
-#     only the time portion is used. The reason for this is that it has
-#     to be passed in a valid MomentJS format. This will default the time
-#     to be 14:56:00 (or 2:56pm).
-#     """
-#     time_field = forms.TimeField(
-#         widget=TimePicker(
-#             options={
-#                 'enabledHours': [9, 10, 11, 12, 13, 14, 15, 16],
-#                 'defaultDate': '1970-01-01T14:56:00'
-#             },
-#             attrs={
-#                 'input_toggle': True,
-#                 'input_group': False,
-#             },
-#         ),
-#     )
-#     datetime_field = forms.DateTimeField(
-#         widget=DateTimePicker(
-#             options={
-#                 'useCurrent': True,
-#                 'collapse': False,
-#             },
-#             attrs={
-#                 'append': 'fa fa-calendar',
-#                 'icon_toggle': True,
-#             }
-#         ),
-#     )
-
-
-# freq_podavitelya = models.CharField('Частота подавителя', max_length=500, default=' ')
-# deg_podavitelya = IntegerRangeField('Номер подавителя (60, 120 ...)', default=0, min_value=0, max_value=300)
-#
-# type_podavitelya = models.CharField('Тип подавителя', max_length=500, choices=PODAVITEL_CHOICES)
-# ip_podavitelya = models.GenericIPAddressField('IP-адрес подавителя')
-# canal_podavitelya = IntegerRangeField('Канал подавителя', default=0, min_value=0, max_value=2)
-# usileniye_db = IntegerRangeField('Усиление', default=0, min_value=0, max_value=31)

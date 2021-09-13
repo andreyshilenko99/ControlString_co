@@ -102,11 +102,12 @@ CELERY_TIMEZONE = 'Europe/Moscow'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'PASSWORD': '555',
+        'HOST': 'localhost',
         'PORT': '5432', }
 }
 

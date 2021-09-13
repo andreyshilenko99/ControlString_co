@@ -218,14 +218,17 @@
                                 </div>
                             </div>
                         </form>
+                        <span style="font-size: 14px; color: #570613">
+                            Отсортировать по:
+                        </span>
                         <form action="apply_filter_table" method="post">
                             {% csrf_token %}
-                            {{table_filter}}
+
                             {{form_filter_table}}
                         </form>
-                        <form action="apply_filter_table" method="post">
+                        <form action="apply_order_table" method="post" style="margin-top: 2%; ">
                             {% csrf_token %}
-                            {{order_sign}}
+
                             {{form_order_table}}
                             <!--                            <button class="btn btn-primary" type='submit'-->
                             <!--                                            style="margin-left: 1%;font-size: 16px"> Применить-->

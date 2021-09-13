@@ -123,10 +123,12 @@
                                     <form action="choose_nomer_strizha" method="post">
                                         {% csrf_token %}
                                         {{ form }}
-                                        <button class="btn btn-primary" id=change_drone2 name="choose_nomer_strizha"
-                                                type="submit">
-                                            ввод
-                                        </button>
+                                        <!--                                        <button class="btn btn-primary" id=change_drone2 name="choose_nomer_strizha"-->
+                                        <!--                                                type="submit">-->
+                                        <!--                                            ввод-->
+                                        <!--                                        </button>-->
+
+                                        {% csrf_token %}
                                         <div class="row" style="margin-top: 5%;margin-left: 0.5%; width: 100%">
 
                                             {% csrf_token %}

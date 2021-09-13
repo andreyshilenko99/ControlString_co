@@ -32,6 +32,7 @@ urlpatterns = [
     path('main', views.render_main_page),
     path('back2main', views.back2main),
     path('choose_nomer_strizha', views.choose_nomer_strizha),
+    # path('choose_all_strizhes', views.choose_all_strizhes),
     path('butt_scan', views.butt_scan),
     path('butt_glush', views.butt_glush),
     path('apply_period', views.apply_period),
@@ -47,7 +48,7 @@ urlpatterns = [
     path('export_csv', views.export_csv),
     path('filter_all', views.filter_all),
     path('apply_filter_table', views.apply_filter_table),
-    # path('apply_order_table', views.apply_order_table),
+    path('apply_order_table', views.apply_order_table),
 
     path('configuration', views.configuration),
 
