@@ -5,7 +5,7 @@ https://docs.celeryproject.org/en/stable/django/first-steps-with-django.html
 from __future__ import absolute_import
 import os
 from datetime import timedelta
-
+from ControlString_co.settings import CELERY_BROKER_URL
 from celery import Celery
 from celery.schedules import crontab
 from celery import shared_task
@@ -15,7 +15,7 @@ from ControlString_co.check_uniping import main_check
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ControlString_co.settings')
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
-app = Celery('tasks', broker='redis://redis:6379')
+app = Celery('tasks', broker=CELERY_BROKER_URL)
 
 app.autodiscover_tasks()
 CELERYD_CONCURRENCY = 1

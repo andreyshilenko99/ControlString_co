@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-g*kuum+*d!@-s(h8&0*#ald#4rsf-6r3z=d@fwai2a29xlhbx(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "postgres"]
+ALLOWED_HOSTS = ["*"]
 
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 #
@@ -85,8 +85,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ControlString_co.wsgi.application'
 
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+# CELERY_BROKER_URL = 'amqp://localhost'
+# # CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+CELERY_BROKER_URL = 'amqp://rabit:rabit@rabbit:5672'
+CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TIMEZONE = 'Europe/Moscow'
 
 # DATABASES = {
@@ -106,8 +108,8 @@ DATABASES = {
         # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': '555',
-        'HOST': 'localhost',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
         'PORT': '5432', }
 }
 
