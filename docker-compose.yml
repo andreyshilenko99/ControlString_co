@@ -1,0 +1,66 @@
+version: "3.8"
+services:
+  db:
+    container_name: db
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DB_HOST=db
+
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  rabbit:
+    container_name: rabbitmq
+    hostname: rabbit
+    image: rabbitmq:latest
+    ports:
+      - "5672:5672"
+    restart: on-failure
+    environment:   
+      - RABBITMQ_DEFAULT_USER=rabit
+      - RABBITMQ_DEFAULT_PASS=rabit
+
+
+
+  celery:
+    build:
+      context: .
+    command: celery -A ControlString_co worker -l info
+    container_name: app_celery
+    volumes:
+      - .:/StrizhProject/ControlString_co
+    links:
+      - rabbit
+    depends_on:
+      - db
+      - rabbit
+      - web
+
+  celery-beat:
+    build: .
+    command: celery -A ControlString_co beat -l info
+    container_name: app_celeryb
+    volumes:
+      - .:/StrizhProject/ControlString_co
+    links:
+      - rabbit
+    depends_on:
+      - db
+      - rabbit
+      - web
+
+
+
