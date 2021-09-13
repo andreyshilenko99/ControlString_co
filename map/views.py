@@ -618,15 +618,16 @@ def apply_period(request):
 def reset_filter(request):
     global c
     c['filtered_strizhes'] = ''
-    c['start_datetime'] = 'Начало'
     c['saved_table'] = False
     c['table_filter'] = ''
 
     if request.method == 'POST':
         form_filter = StrizhFilterForm(request.POST)
         form_drone = DroneFilterForm(request.POST)
-        form_filter_table = TableFilterForm(request.POST)
+        # form_filter_table = TableFilterForm(request.POST)
         form_drone_alldrones = Point.objects.all().order_by('-detection_time')
+        form_filter_table = TableFilterForm(request.POST, initial={'field': 'detection_time'})
+        form_order_table = TableOrderForm(request.POST, initial={'order_sign': '-'})
         for strizh in StrizhJournal.objects.all():
             strizh.delete()
     else:
@@ -636,8 +637,11 @@ def reset_filter(request):
     form_filter_table.fields.get('field').initial = c.get('table_filter')
     c['form_filter'] = form_filter
     c['form_filter_table'] = form_filter_table
+    c['form_order_table'] = form_order_table
     c['form_drone_alldrones'] = form_drone_alldrones
     c['form_drone'] = form_drone
+
+    c['start_datetime'] = 'Начало'
     c['end_datetime'] = 'Конец'
     return render(request, "journal.html", context=c)
 
@@ -645,6 +649,7 @@ def reset_filter(request):
 def export_csv(request):
     global c
     c['saved_table'] = False
+    xx = c
     time_start = '01/01/2000-00:01' if c.get('start_datetime') == 'Начало' else c.get('start_datetime')
     time_end = '01/01/2100-00:01' if c.get('end_datetime') == 'Конец' else c.get('end_datetime')
     strizhes = Strizh.objects.all() if not c.get('filtered_strizhes') else c.get('filtered_strizhes')
@@ -664,8 +669,8 @@ def export_csv(request):
     for strizh in strizhes:
         for ip in [strizh.ip1, strizh.ip2]:
             strizhes_ip.append(ip)
-    if c.get('table_filter'):
-        drones_filtered_strizh = Point.objects.order_by('-' + c.get('table_filter')).filter(ip__in=strizhes_ip)
+    if c.get('table_filter') != '' and c.get('order_sign'):
+        drones_filtered_strizh = Point.objects.order_by(c.get('order_sign') + c.get('table_filter')).filter(ip__in=strizhes_ip)
     else:
         drones_filtered_strizh = Point.objects.order_by('-detection_time').filter(ip__in=strizhes_ip)
     d = datetime.datetime.now()
