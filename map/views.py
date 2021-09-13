@@ -597,10 +597,11 @@ def choose_nomer_strizha(request):
                 c["button_complex"] = button_complex
                 c['complex_mode_dict'][strizh.name] = complex_mode
                 c["action_strizh"][strizh.name] = action_strizh
-        c['url_uniping_dict'] = url_uniping_dict
-        c['temperature_dict'] = temperature_dict
-        c['humidity_dict'] = humidity_dict
-        c['weather_state_dict'] = weather_state_dict
+        if all([url_uniping_dict, temperature_dict, humidity_dict, weather_state_dict]):
+            c['url_uniping_dict'] = url_uniping_dict
+            c['temperature_dict'] = temperature_dict
+            c['humidity_dict'] = humidity_dict
+            c['weather_state_dict'] = weather_state_dict
     return render(request, "main.html", context=c)
     # return HttpResponse(c)
 
