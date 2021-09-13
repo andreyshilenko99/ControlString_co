@@ -82,6 +82,7 @@ def reset_filter_strizh(request):
 
 def filter_all(request):
     global c
+    # TODO maybe delete this condition and value
     if not c.get('saved_table'):
         c['saved_table'] = False
     print(c['saved_table'])
@@ -289,6 +290,7 @@ def back2main(request):
 
 def get_info_main(ip1, ip2, name):
     try:
+        # TODO UNCOMMENT for working check state
         # mode_ips = [check_state(ip1), check_state(ip2)]
         mode_ips = ['all_stop' for _ in range(2)]
     except:
@@ -622,19 +624,18 @@ def reset_filter(request):
     c['table_filter'] = ''
 
     if request.method == 'POST':
-        form_filter = StrizhFilterForm(request.POST)
-        form_drone = DroneFilterForm(request.POST)
+        form_filter = StrizhFilterForm()
+        form_drone = DroneFilterForm()
         # form_filter_table = TableFilterForm(request.POST)
         form_drone_alldrones = Point.objects.all().order_by('-detection_time')
-        form_filter_table = TableFilterForm(request.POST, initial={'field': 'detection_time'})
-        form_order_table = TableOrderForm(request.POST, initial={'order_sign': '-'})
+        form_filter_table = TableFilterForm()
+        form_order_table = TableOrderForm()
         for strizh in StrizhJournal.objects.all():
             strizh.delete()
     else:
         form_filter = StrizhFilterForm()
         form_drone = DroneFilterForm()
         form_filter_table = TableFilterForm()
-    form_filter_table.fields.get('field').initial = c.get('table_filter')
     c['form_filter'] = form_filter
     c['form_filter_table'] = form_filter_table
     c['form_order_table'] = form_order_table
