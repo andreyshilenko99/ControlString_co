@@ -15,6 +15,7 @@ services:
       - 5432:5432
   web:
     build: .
+#    python manage.py flush --no-input &&
     command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
