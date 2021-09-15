@@ -35,8 +35,8 @@ ALLOWED_HOSTS = ["*"]
 # # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 # ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
-# Application definition
 
+# Application definition
 INSTALLED_APPS = [
     'admin_numeric_filter',
     'django.contrib.admin',
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'geo',
 
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -91,27 +92,27 @@ CELERY_BROKER_URL = 'amqp://rabit:rabit@rabbit:5672'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TIMEZONE = 'Europe/Moscow'
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': '555',
+        'HOST': 'localhost',
+        'PORT': '5432', }
+}
+
 # DATABASES = {
 #     'default': {
 #         # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'stuff',
-#         'USER': 'dron',
-#         'PASSWORD': '555',
-#         'HOST': 'localhost',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'db',
 #         'PORT': '5432', }
 # }
-
-DATABASES = {
-    'default': {
-        # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432', }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -155,7 +156,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LEAFLET_CONFIG = {
-    'SPATIAL_EXTENT': (30.415, 59.999, 30.477, 60.022),
+    'SPATIAL_EXTENT': (29.315, 58.999, 31.477, 61.022),
     'DEFAULT_CENTER': (60.013674, 30.452474),
     'RESET_VIEW': False,
     'DEFAULT_ZOOM': 15,
@@ -192,3 +193,5 @@ LEAFLET_CONFIG = {
 SERIALIZATION_MODULES = {
     "geojson": "django.contrib.gis.serializers.geojson",
 }
+
+# docker-compose -f docker-compose.yml up

@@ -64,9 +64,9 @@
                     <form action="set_strizh" method="post">
                         {% csrf_token %}
                         {{ form_strizh }}
-                        <button class="btn btn-primary">
-                            ввод
-                        </button>
+<!--                        <button class="btn btn-primary">-->
+<!--                            ввод-->
+<!--                        </button>-->
                     </form>
                 </h5>
             </div>
@@ -90,7 +90,7 @@
             <div class="row">
                 <form action="new_apem" method="post">
                     {% csrf_token %}
-                    <button type="submit" name="new_apem" class="button-blue-small">
+                    <button type="submit" name="new_apem" class="btn btn-primary">
                         Добавить АПЕМ
                     </button>
                 </form>
@@ -106,17 +106,14 @@
                         {% csrf_token %}
                         {% if form_apem.fields.freq_podavitelya.queryset.count != 0 %}
                         {{ form_apem }}
-                        <button class="button-blue-small" style="margin-top: 20px; margin-left: 40px">
-                            выбрать
-                        </button>
+<!--                        <button class="button-blue-small" style="margin-top: 20px; margin-left: 40px">-->
+<!--                            выбрать-->
+<!--                        </button>-->
 
                         {% else %}
                         <h3> Необходимо добавить в базу имеющиеся блоки АПЕМ, Шелест </h3>
                         {% endif %}
                     </form>
-                    <!--            </div>-->
-
-                    <!--                </div>-->
 
                 </div>
             </div>
@@ -129,7 +126,7 @@
                 {% if apem_change_form.fields %}
                 <div class="row">
                     <div id="apems_form" style="margin: 0px 50px">
-                        <h3> {{apem_action_message}}
+                        <h3 style="width: 500px">  {{apem_action_message}}
                         </h3>
                         {{apem_change_form}}
                         {% endif %}

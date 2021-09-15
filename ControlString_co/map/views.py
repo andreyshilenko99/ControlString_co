@@ -73,6 +73,496 @@ def return_conditions(url):
     return temperature, humidity, weather_state
 
 
+def get_info_main(ip1, ip2, name):
+    try:
+        # TODO UNCOMMENT for working check state
+        mode_ips = [check_state(ip1), check_state(ip2)]
+        # mode_ips = ['all_stop' for _ in range(2)]
+    except:
+        mode_ips = ['all_stop' for _ in range(2)]
+
+    complex_mode = 'scan_on' if all(
+        [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+    complex_mode = 'jammer_on' if all(
+        [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+    print(complex_mode)
+
+    if 'jammer_on' in complex_mode:
+        # if 'jammer_on' in mode_ips:
+        action_complex = 'включено'
+        button_complex = 'red_jammer'
+        complex_mode_rus = 'Глушение: '
+    elif 'scan_on' in complex_mode:
+        # elif 'scan_on' in mode_ips:
+        action_complex = 'включено'
+        button_complex = 'red_scan'
+        complex_mode_rus = 'Сканирование: '
+    else:
+        action_complex = 'выключено'
+        button_complex = 'green'
+        complex_mode_rus = 'Сканирование и глушение: '
+
+    action_strizh = complex_mode_rus + name + ' ' + action_complex
+
+    return complex_mode, button_complex, action_strizh
+
+
+def journal_view(request):
+    global c
+    # geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-pk'))
+    x = Point.objects.all().order_by('-detection_time')
+    order_sign = c.get('order_sign') if c.get('order_sign') != '' else '-'
+    table_filter = c.get('table_filter') if c.get('table_filter') != '' else 'detection_time'
+    try:
+        y = c.get('form_drone').AllDrones.order_by(order_sign + table_filter)
+        geom_as_geojson = serialize('geojson', y)
+    except AttributeError:
+        geom_as_geojson = ''
+    # geom_as_geojson1 = serialize('geojson', Point.objects.all().order_by('-detection_time'))
+
+    return HttpResponse(geom_as_geojson, content_type='geojson')
+
+
+def collect_logs(log_string):
+    global logs, logs_list
+    time_obj = datetime.datetime.now().strftime("%Y-%d-%m  %H:%M:%S")
+    log_one = time_obj + '   ' + log_string + '\n\t'
+    logs_list.append(log_one)
+    c['logs_list'] = logs_list
+    print(log_one)
+
+
+def set_correct_temperature(url, strizh_name, temperature_state):
+    global c
+    while temperature_state != 0:
+        temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
+                                            high_border=high_t)
+        if temperature_state == 1:
+            send_line_command(url, 'вентилятор', 1)
+            state0 = obtain_state(url, 'датчик воздушного потока')
+            if state0 != 'вкл':
+                collect_logs('АВАРИЯ! отсутствует вентиляция, возможен перегрев оборудования')
+        elif temperature_state == -1:
+            send_line_command(url, 'обогрев', 1)
+        time.sleep(60)
+
+
+def back2main(request):
+    return redirect(request.META['HTTP_REFERER'])
+
+
+
+
+def choose_nomer_strizha(request):
+    global c
+    strizhes = Strizh.objects.order_by('-lon').all()
+    if request.method == 'POST':
+        form = StrizhForm(request.POST)
+        url_uniping_dict = {}
+        temperature_dict = {}
+        humidity_dict = {}
+        weather_state_dict = {}
+
+        if form.is_valid() and request.POST['chosen_strizh'] \
+                and 'choose_all_strizhes' not in request.POST:
+            c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
+            # if 'choose_nomer_strizha' in request.POST:
+            chosen_strizh = form.cleaned_data.get('chosen_strizh')
+            if chosen_strizh:
+                c['chosen_strizh'][0] = chosen_strizh.name
+                # form.fields.get('chosen_strizh').initial = [chosen_strizh.name]
+                # form.initial['chosen_strizh'] = chosen_strizh.name
+                # c['form'] = form
+                form = StrizhForm(request.POST, initial={'chosen_strizh': chosen_strizh.name})
+                c['form'] = form
+
+            for strizh in strizhes:
+                if c['chosen_strizh'][0] == strizh.name:
+                    url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
+                    temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+                        return_conditions(url_uniping_dict[strizh.name])
+                    complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+                    c["button_complex"] = button_complex
+                    c['complex_mode_dict'][strizh.name] = complex_mode
+                    c["action_strizh"][strizh.name] = action_strizh
+            c['chosen_strizh_json'] = json.dumps(c['chosen_strizh'][0])
+
+        if form.is_valid() and 'choose_all_strizhes' in request.POST:
+            c['chosen_strizh'] = [strizh.name for strizh in strizhes]
+            # form.fields['chosen_strizh'].initial = None
+            # form.initial['chosen_strizh'] = [None]
+            # c['form'] = form
+            form = StrizhForm()
+            c['form'] = form
+            for strizh in strizhes:
+                url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
+                temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+                    return_conditions(url_uniping_dict[strizh.name])
+                complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+
+                c["button_complex"] = button_complex
+                c['complex_mode_dict'][strizh.name] = complex_mode
+                c["action_strizh"][strizh.name] = action_strizh
+        if all([url_uniping_dict, temperature_dict, humidity_dict, weather_state_dict]):
+            c['url_uniping_dict'] = url_uniping_dict
+            c['temperature_dict'] = temperature_dict
+            c['humidity_dict'] = humidity_dict
+            c['weather_state_dict'] = weather_state_dict
+    return render(request, "main.html", context=c)
+    # return HttpResponse(c)
+
+
+# def choose_all_strizhes(request):
+#     global c
+#     strizhes = Strizh.objects.order_by('-lon').all()
+#     if request.method == 'POST':
+#         temperature_dict = {}
+#         humidity_dict = {}
+#         weather_state_dict = {}
+#         url_uniping_dict = {}
+#         c['chosen_strizh'] = [strizh.name for strizh in strizhes]
+#
+#         for strizh in strizhes:
+#             url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
+#             temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
+#                 return_conditions(url_uniping_dict[strizh.name])
+#             complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+#             c["button_complex"] = button_complex
+#             c['complex_mode_dict'][strizh.name] = complex_mode
+#             c["action_strizh"][strizh.name] = action_strizh
+#         c['temperature_dict'] = temperature_dict
+#         c['humidity_dict'] = humidity_dict
+#         c['weather_state_dict'] = weather_state_dict
+#         c['url_uniping_dict'] = url_uniping_dict
+#     return render(request, "main.html", context=c)
+
+
+def set_strizh(request):
+    global c
+    strizhes = Strizh.objects.order_by('-lon').all()
+    c['set_strizh_apem'] = ['None' for _ in range(len(strizhes))]
+    if request.method == 'POST':
+        form_strizh = StrizhForm(request.POST)
+        if form_strizh.is_valid():
+            set_strizh_apem = form_strizh.cleaned_data.get('chosen_strizh')
+            c['set_strizh_apem'][0] = set_strizh_apem.name
+            form_apem = ApemsConfigurationForm(request.POST)
+
+            form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
+                strizh_name=c['set_strizh_apem'][0])
+            c['is_strizh_chosen'] = 'True'
+    else:
+        form_strizh = StrizhForm()
+        form_apem = ApemsConfigurationForm()
+
+    c['form_strizh'] = form_strizh
+    c['form_apem'] = form_apem
+    return render(request, "configuration.html", context=c)
+
+
+def render_main_page(request):
+    global c
+    complex_state = ''
+
+    c['start_datetime'] = start_datetime
+    c['end_datetime'] = end_datetime
+
+    temperature_dict = {}
+    humidity_dict = {}
+    weather_state_dict = {}
+    url_uniping_dict = {}
+    complex_state_dict = {}
+    c['complex_mode_dict'] = {}
+    c['action_strizh'] = {}
+
+    strizhes = Strizh.objects.order_by('-lon').all()
+    for strizh in strizhes:
+        url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
+
+        temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name], = \
+            return_conditions(url_uniping_dict[strizh.name])
+        complex_state_dict[strizh.name] = get_complex_state(url_uniping_dict[strizh.name])
+
+        complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
+
+        c["action_strizh"][strizh.name] = action_strizh
+        c["button_complex"] = button_complex
+
+        c['complex_mode_dict'][strizh.name] = complex_mode
+        # c['complex_mode_dict'][strizh.name] = mode_ips[0]
+        c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
+
+    c['temperature_dict'] = temperature_dict
+    c['humidity_dict'] = humidity_dict
+    c['weather_state_dict'] = weather_state_dict
+    c['url_uniping_dict'] = url_uniping_dict
+    c['complex_state_dict'] = complex_state_dict
+    c['complex_state_json'] = json.dumps(complex_state_dict)
+
+    if not c.get('chosen_strizh'):
+        # c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
+        c['chosen_strizh'] = [s.name for s in strizhes]
+        c['chosen_strizh_json'] = json.dumps(c['chosen_strizh'])
+    if request.method == 'POST':
+        form = StrizhForm(request.POST)
+        if form.is_valid():
+            chosen_strizh = form.cleaned_data.get('chosen_strizh')
+            c['chosen_strizh'][0] = chosen_strizh
+    else:
+        form = StrizhForm()
+    c['form'] = form
+    # TODO current_time
+    drones = Point.objects.order_by('-detection_time').all()
+    c['info_drones'] = drones
+    c['all_strizhes'] = [_.name for _ in strizhes]
+
+    return render(request, "main.html", context=c)
+
+
+def butt_scan(request):
+    global c
+    strizh_names = Strizh.objects.all()
+
+    if c.get("chosen_strizh") != 0:
+        print('Сканирование dlya strizha #', c.get('chosen_strizh'))
+        for strizh in strizh_names:
+            if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
+                try:
+                    mode_ip1 = scan_on_off(strizh.ip1)
+                    # time.sleep(1)
+                    mode_ip2 = scan_on_off(strizh.ip2)
+                except:
+                    # если не включен трэйс
+                    mode_ip1 = "all_stop"
+                    mode_ip2 = "all_stop"
+
+                if mode_ip1 != mode_ip2:
+                    mode_ip2 = scan_on_off(strizh.ip2)
+
+                # try:
+                #
+                #     mode_ip2 = scan_on_off(strizh.ip2)
+                #     mode_ips = [mode_ip1, mode_ip2]
+                # except:
+                mode_ips = [mode_ip1, mode_ip2]
+                complex_mode = 'scan_on' if all(
+                    [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+                complex_mode = 'jammer_on' if all(
+                    [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+                print('complex_mode: ', complex_mode)
+                print('mode_ips: ', mode_ips)
+                action_complex = 'включено' if complex_mode == 'scan_on' else 'выключено'
+                button_complex = 'red_scan' if complex_mode == 'scan_on' else 'green'
+                # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
+                c["action_strizh"][strizh.name] = 'Сканирование: ' + strizh.name + ' ' + action_complex
+                # ', '.join(str(_) for _ in mode_ips)
+                c["button_complex"] = button_complex
+                c['complex_mode_dict'][strizh.name] = complex_mode
+                c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
+                # scan_on_off(strizh.ip1)
+                # scan_on_off(strizh.ip2)
+
+    return render(request, "main.html", context=c)
+
+
+def butt_glush(request):
+    global c
+    strizh_names = Strizh.objects.all()
+    apems = ApemsConfiguration.objects.all()
+
+    if c.get("chosen_strizh") != 0:
+        print('glushenie dlya strizha #', c.get('chosen_strizh'))
+        for strizh in strizh_names:
+
+            if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
+                # if check_state(strizh.ip1) == 'scan_on':
+                #     scan_on_off(strizh.ip1)
+                # if check_state(strizh.ip2) == 'scan_on':
+                #     scan_on_off(strizh.ip2)
+                #
+                # if check_state(strizh.ip1) == 'all_stop' and check_state(strizh.ip2) == 'all_stop':
+                #     scan_on_off(strizh.ip1)
+                #     scan_on_off(strizh.ip2)
+                #     time.sleep(0.5)
+                #     scan_on_off(strizh.ip1)
+                #     scan_on_off(strizh.ip2)
+                #     time.sleep(0.5)
+                #     for each_apem in apems.filter(strizh_name=strizh.name):
+                #         # TODO test tomorrow and dobavit apem
+                #         ip = each_apem.ip_podavitelya
+                #         if 'Шелест' in each_apem.type_podavitelya:
+                #             set_gain(ip, each_apem.usileniye_db)
+                #         elif 'АПЕМ' in apems.filter(strizh_name=strizh.name):
+                #             set_gain(ip, each_apem.usileniye_db)
+                #         print(ip)
+
+                # mode1 = check_state(strizh.ip1)
+                # mode2 = check_state(strizh.ip2)
+                # modes = [mode1, mode2]
+                # complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
+                # complex_mode = 'jammer_on' if all(
+                #     [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+
+                for ip_host in [strizh.ip1, strizh.ip2]:
+                    mode_ = check_state(ip_host)
+                    if mode_ == 'scan_on':
+                        # while check_state(strizh.ip2) != 'all_stop':
+                        scan_on_off(ip_host)
+                mode = check_state(strizh.ip1)
+                print(mode)
+                if mode != 'scan_on':
+                    jammer_on_off(strizh.ip1)
+                mode = check_state(strizh.ip1)
+                action_complex = 'включено' if mode == 'jammer_on' else 'выключено'
+                button_complex = 'red_jammer' if mode == 'jammer_on' else 'green'
+                # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
+                c["action_strizh"][strizh.name] = 'глушение: ' + strizh.name + ' ' + action_complex
+                c["button_complex"] = button_complex
+                c['complex_mode_dict'][strizh.name] = mode
+                c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
+                # jammer_on_off(strizh.ip1, 'on')
+
+    # return redirect(request.META['HTTP_REFERER'])
+    return render(request, "main.html", context=c)
+
+
+def turn_on_bp(request):
+    global c, comlex_state, logs
+
+    for strizh_name in c.get('chosen_strizh'):
+        if strizh_name != 'None':
+            url = c['url_uniping_dict'][strizh_name]
+            try:
+                requests.get(url, auth=auth, timeout=0.2)
+            except:
+                result_get = 'ошибка uniping'
+                collect_logs(strizh_name + ': ' + result_get)
+                continue
+            temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
+                                                high_border=high_t)
+            if temperature_state != 0:
+                print('температура не в порядке')
+                set_correct_temperature(url, strizh_name, temperature_state)
+            elif temperature_state == 0:
+                # turn everything on
+                state0 = obtain_state(url, 'датчик воздушного потока')
+                if state0 != 'вкл':
+                    send_line_command(url, 'вентилятор', 1)
+                state1 = obtain_state(url, 'БП ПЭВМ')
+                if state1 != 'вкл':
+                    # collect_logs('БП ПЭВМ выключен')
+                    send_line_command(url, 'БП ПЭВМ', 1)
+                state2 = obtain_state(url, 'БП Шелест')
+                if state2 != 'вкл':
+                    # collect_logs('БП Шелест выключен')
+                    send_line_command(url, 'БП Шелест', 1)
+                state3 = obtain_state(url, 'БП АПЕМ')
+                if state3 != 'вкл':
+                    # collect_logs('БП АПЕМ выключен')
+                    send_line_command(url, 'БП АПЕМ', 1)
+                state4 = obtain_state(url, 'ЭВМ1')
+                state5 = obtain_state(url, 'ЭВМ2')
+                if state4 != 'вкл':
+                    send_impulse(url, 'ЭВМ1', time_pulse=3, action='вкл')
+                    state4 = obtain_state(url, 'ЭВМ1')
+                    if state4 != 'вкл':
+                        send_impulse(url, 'ЭВМ1', time_pulse=3, action='вкл')
+                    time.sleep(4)
+                if state5 != 'вкл':
+                    send_impulse(url, 'ЭВМ2', time_pulse=3, action='вкл')
+                time.sleep(1)
+                complex_state = get_complex_state(url)
+                c['complex_state_dict'][strizh_name] = complex_state
+                c['complex_state_json'] = json.dumps(c['complex_state_dict'])
+                str_log = strizh_name + ': ' + complex_state
+                collect_logs(str_log)
+                # render(request, "main.html", context=c)
+                # functioning_loop(request)
+    return render(request, "main.html", context=c)
+
+
+def turn_off_bp(request):
+    global c
+
+    for strizh_name in c.get('chosen_strizh'):
+        if strizh_name != 'None':
+            url = c['url_uniping_dict'][strizh_name]
+            try:
+                requests.get(url, auth=auth, timeout=0.2)
+            except:
+                result_get = 'ошибка uniping'
+                collect_logs(strizh_name + ': ' + result_get)
+                continue
+
+            state4 = obtain_state(url, 'ЭВМ1')
+            state5 = obtain_state(url, 'ЭВМ2')
+            if state4 != 'выкл':
+                send_impulse(url, 'ЭВМ1', time_pulse=3, action='выкл')
+            if state5 != 'выкл':
+                send_impulse(url, 'ЭВМ2', time_pulse=3, action='выкл')
+
+            time.sleep(5)
+            state1 = obtain_state(url, 'БП ПЭВМ')
+            if state1 != 'выкл':
+                # collect_logs('БП ПЭВМ включен')
+                send_line_command(url, 'БП ПЭВМ', 0)
+            state2 = obtain_state(url, 'БП Шелест')
+            if state2 != 'выкл':
+                # collect_logs('БП Шелест включен')
+                send_line_command(url, 'БП Шелест', 0)
+            state3 = obtain_state(url, 'БП АПЕМ')
+            if state3 != 'выкл':
+                # collect_logs('БП АПЕМ включен')
+                send_line_command(url, 'БП АПЕМ', 0)
+
+            send_line_command(url, 'вентилятор', 0)
+            time.sleep(1)
+            send_impulse(url, 'РЕЗЕТ', time_pulse=6, action='выкл')
+
+            complex_state = get_complex_state(url)
+            c['complex_state_dict'][strizh_name] = complex_state
+            c['complex_state_json'] = json.dumps(c['complex_state_dict'])
+            c['logs'] = logs
+            c['logs_list'] = logs_list
+    # render(request, "main.html", context=c)
+    # functioning_loop(request)
+
+    return render(request, "main.html", context=c)
+
+
+def show_logs(request):
+    global logs
+    c['logs'] = logs
+    c['logs_list'] = logs_list
+    return render(request, "main.html", context=c)
+
+
+def choose_drone_toshow(request):
+    global c
+    xx = c
+    if request.method == 'POST':
+        dron_id = request.POST['detection_id']
+        DP = Point.objects.filter(pk=dron_id)[0]
+        for el_db in DroneJournal.objects.all():
+            el_db.delete()
+
+        drone_value = DroneJournal(system_name=DP.system_name,
+                                   center_freq=DP.center_freq,
+                                   brandwidth=DP.brandwidth,
+                                   detection_time=DP.detection_time,
+                                   comment_string=DP.comment_string,
+                                   lat=DP.lat,
+                                   lon=DP.lon,
+                                   azimuth=DP.azimuth,
+                                   area_sector_start_grad=DP.area_sector_start_grad,
+                                   area_sector_end_grad=DP.area_sector_end_grad,
+                                   area_radius_m=DP.area_radius_m,
+                                   ip=DP.ip,
+                                   current_time=DP.current_time,
+                                   strig_name=DP.strig_name)
+        drone_value.save()
+    return render(request, "journal.html", context=c)
+
 def reset_filter_strizh(request):
     global c
     c['filtered_strizhes'] = ''
@@ -242,360 +732,6 @@ def filter_nomer_strizha(request):
 
     return render(request, "journal.html", context=c)
 
-
-def journal_view(request):
-    global c
-    # geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-pk'))
-    x = Point.objects.all().order_by('-detection_time')
-    try:
-        y = c.get('form_drone').AllDrones.order_by('-detection_time')
-        geom_as_geojson = serialize('geojson', y)
-    except AttributeError:
-        geom_as_geojson = ''
-    # geom_as_geojson1 = serialize('geojson', Point.objects.all().order_by('-detection_time'))
-
-    return HttpResponse(geom_as_geojson, content_type='geojson')
-
-
-def choose_drone_toshow(request):
-    global c
-    xx = c
-    if request.method == 'POST':
-        dron_id = request.POST['detection_id']
-        DP = Point.objects.filter(pk=dron_id)[0]
-        for el_db in DroneJournal.objects.all():
-            el_db.delete()
-
-        drone_value = DroneJournal(system_name=DP.system_name,
-                                   center_freq=DP.center_freq,
-                                   brandwidth=DP.brandwidth,
-                                   detection_time=DP.detection_time,
-                                   comment_string=DP.comment_string,
-                                   lat=DP.lat,
-                                   lon=DP.lon,
-                                   azimuth=DP.azimuth,
-                                   area_sector_start_grad=DP.area_sector_start_grad,
-                                   area_sector_end_grad=DP.area_sector_end_grad,
-                                   area_radius_m=DP.area_radius_m,
-                                   ip=DP.ip,
-                                   current_time=DP.current_time,
-                                   strig_name=DP.strig_name)
-        drone_value.save()
-    return render(request, "journal.html", context=c)
-
-
-def back2main(request):
-    return redirect(request.META['HTTP_REFERER'])
-
-
-def get_info_main(ip1, ip2, name):
-    try:
-        # TODO UNCOMMENT for working check state
-        # mode_ips = [check_state(ip1), check_state(ip2)]
-        mode_ips = ['all_stop' for _ in range(2)]
-    except:
-        mode_ips = ['all_stop' for _ in range(2)]
-
-    complex_mode = 'scan_on' if all(
-        [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-    complex_mode = 'jammer_on' if all(
-        [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
-    print(complex_mode)
-
-    if 'jammer_on' in complex_mode:
-        # if 'jammer_on' in mode_ips:
-        action_complex = 'включено'
-        button_complex = 'red_jammer'
-        complex_mode_rus = 'Глушение: '
-    elif 'scan_on' in complex_mode:
-        # elif 'scan_on' in mode_ips:
-        action_complex = 'включено'
-        button_complex = 'red_scan'
-        complex_mode_rus = 'Сканирование: '
-    else:
-        action_complex = 'выключено'
-        button_complex = 'green'
-        complex_mode_rus = 'Сканирование и глушение: '
-
-    action_strizh = complex_mode_rus + name + ' ' + action_complex
-
-    return complex_mode, button_complex, action_strizh
-
-
-def choose_nomer_strizha(request):
-    global c
-    strizhes = Strizh.objects.order_by('-lon').all()
-    if request.method == 'POST':
-        form = StrizhForm(request.POST)
-        url_uniping_dict = {}
-        temperature_dict = {}
-        humidity_dict = {}
-        weather_state_dict = {}
-
-        if form.is_valid() and request.POST['chosen_strizh'] \
-                and 'choose_all_strizhes' not in request.POST:
-            c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
-            # if 'choose_nomer_strizha' in request.POST:
-            chosen_strizh = form.cleaned_data.get('chosen_strizh')
-            if chosen_strizh:
-                c['chosen_strizh'][0] = chosen_strizh.name
-                # form.fields.get('chosen_strizh').initial = [chosen_strizh.name]
-                # form.initial['chosen_strizh'] = chosen_strizh.name
-                # c['form'] = form
-                form = StrizhForm(request.POST, initial={'chosen_strizh': chosen_strizh.name})
-                c['form'] = form
-
-            for strizh in strizhes:
-                if c['chosen_strizh'][0] == strizh.name:
-                    url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
-                    temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-                        return_conditions(url_uniping_dict[strizh.name])
-                    complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
-                    c["button_complex"] = button_complex
-                    c['complex_mode_dict'][strizh.name] = complex_mode
-                    c["action_strizh"][strizh.name] = action_strizh
-            c['chosen_strizh_json'] = json.dumps(c['chosen_strizh'][0])
-
-        if form.is_valid() and 'choose_all_strizhes' in request.POST:
-            c['chosen_strizh'] = [strizh.name for strizh in strizhes]
-            # form.fields['chosen_strizh'].initial = None
-            # form.initial['chosen_strizh'] = [None]
-            # c['form'] = form
-            form = StrizhForm()
-            c['form'] = form
-            for strizh in strizhes:
-                url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
-                temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-                    return_conditions(url_uniping_dict[strizh.name])
-                complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
-
-                c["button_complex"] = button_complex
-                c['complex_mode_dict'][strizh.name] = complex_mode
-                c["action_strizh"][strizh.name] = action_strizh
-        if all([url_uniping_dict, temperature_dict, humidity_dict, weather_state_dict]):
-            c['url_uniping_dict'] = url_uniping_dict
-            c['temperature_dict'] = temperature_dict
-            c['humidity_dict'] = humidity_dict
-            c['weather_state_dict'] = weather_state_dict
-    return render(request, "main.html", context=c)
-    # return HttpResponse(c)
-
-
-# def choose_all_strizhes(request):
-#     global c
-#     strizhes = Strizh.objects.order_by('-lon').all()
-#     if request.method == 'POST':
-#         temperature_dict = {}
-#         humidity_dict = {}
-#         weather_state_dict = {}
-#         url_uniping_dict = {}
-#         c['chosen_strizh'] = [strizh.name for strizh in strizhes]
-#
-#         for strizh in strizhes:
-#             url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
-#             temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-#                 return_conditions(url_uniping_dict[strizh.name])
-#             complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
-#             c["button_complex"] = button_complex
-#             c['complex_mode_dict'][strizh.name] = complex_mode
-#             c["action_strizh"][strizh.name] = action_strizh
-#         c['temperature_dict'] = temperature_dict
-#         c['humidity_dict'] = humidity_dict
-#         c['weather_state_dict'] = weather_state_dict
-#         c['url_uniping_dict'] = url_uniping_dict
-#     return render(request, "main.html", context=c)
-
-
-def set_strizh(request):
-    global c
-    strizhes = Strizh.objects.order_by('-lon').all()
-    c['set_strizh_apem'] = ['None' for _ in range(len(strizhes))]
-    if request.method == 'POST':
-        form_strizh = StrizhForm(request.POST)
-        if form_strizh.is_valid():
-            set_strizh_apem = form_strizh.cleaned_data.get('chosen_strizh')
-            c['set_strizh_apem'][0] = set_strizh_apem.name
-            form_apem = ApemsConfigurationForm(request.POST)
-
-            form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
-                strizh_name=c['set_strizh_apem'][0])
-            c['is_strizh_chosen'] = 'True'
-    else:
-        form_strizh = StrizhForm()
-        form_apem = ApemsConfigurationForm()
-
-    c['form_strizh'] = form_strizh
-    c['form_apem'] = form_apem
-    return render(request, "configuration.html", context=c)
-
-
-def render_main_page(request):
-    global c
-    complex_state = ''
-
-    c['start_datetime'] = start_datetime
-    c['end_datetime'] = end_datetime
-
-    temperature_dict = {}
-    humidity_dict = {}
-    weather_state_dict = {}
-    url_uniping_dict = {}
-    complex_state_dict = {}
-    c['complex_mode_dict'] = {}
-    c['action_strizh'] = {}
-
-    strizhes = Strizh.objects.order_by('-lon').all()
-    for strizh in strizhes:
-        url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
-
-        temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name], = \
-            return_conditions(url_uniping_dict[strizh.name])
-        complex_state_dict[strizh.name] = get_complex_state(url_uniping_dict[strizh.name])
-
-        complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
-
-        c["action_strizh"][strizh.name] = action_strizh
-        # ', '.join(str(_) for _ in mode_ips)
-        c["button_complex"] = button_complex
-
-        c['complex_mode_dict'][strizh.name] = complex_mode
-        # c['complex_mode_dict'][strizh.name] = mode_ips[0]
-        c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
-
-    c['temperature_dict'] = temperature_dict
-    xx = c
-    c['humidity_dict'] = humidity_dict
-    c['weather_state_dict'] = weather_state_dict
-    c['url_uniping_dict'] = url_uniping_dict
-    c['complex_state_dict'] = complex_state_dict
-    c['complex_state_json'] = json.dumps(complex_state_dict)
-
-    if not c.get('chosen_strizh'):
-        # c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
-        c['chosen_strizh'] = [_.name for _ in strizhes]
-    if request.method == 'POST':
-        form = StrizhForm(request.POST)
-        if form.is_valid():
-            chosen_strizh = form.cleaned_data.get('chosen_strizh')
-            c['chosen_strizh'][0] = chosen_strizh
-    else:
-        form = StrizhForm()
-    c['form'] = form
-    # TODO current_time
-    drones = Point.objects.order_by('-detection_time').all()
-    c['info_drones'] = drones
-    c['all_strizhes'] = [_.name for _ in strizhes]
-
-    return render(request, "main.html", context=c)
-
-
-def butt_scan(request):
-    global c
-    strizh_names = Strizh.objects.all()
-
-    if c.get("chosen_strizh") != 0:
-        print('Сканирование dlya strizha #', c.get('chosen_strizh'))
-        for strizh in strizh_names:
-            if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
-                try:
-                    mode_ip1 = scan_on_off(strizh.ip1)
-                    # time.sleep(1)
-                    mode_ip2 = scan_on_off(strizh.ip2)
-                except:
-                    # если не включен трэйс
-                    mode_ip1 = "all_stop"
-                    mode_ip2 = "all_stop"
-
-                if mode_ip1 != mode_ip2:
-                    mode_ip2 = scan_on_off(strizh.ip2)
-
-                # try:
-                #
-                #     mode_ip2 = scan_on_off(strizh.ip2)
-                #     mode_ips = [mode_ip1, mode_ip2]
-                # except:
-                mode_ips = [mode_ip1, mode_ip2]
-                complex_mode = 'scan_on' if all(
-                    [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-                complex_mode = 'jammer_on' if all(
-                    [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
-                print('complex_mode: ', complex_mode)
-                print('mode_ips: ', mode_ips)
-                action_complex = 'включено' if complex_mode == 'scan_on' else 'выключено'
-                button_complex = 'red_scan' if complex_mode == 'scan_on' else 'green'
-                # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
-                c["action_strizh"][strizh.name] = 'Сканирование: ' + strizh.name + ' ' + action_complex
-                # ', '.join(str(_) for _ in mode_ips)
-                c["button_complex"] = button_complex
-                c['complex_mode_dict'][strizh.name] = complex_mode
-                c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
-                # scan_on_off(strizh.ip1)
-                # scan_on_off(strizh.ip2)
-
-    return render(request, "main.html", context=c)
-
-
-def butt_glush(request):
-    global c
-    strizh_names = Strizh.objects.all()
-    apems = ApemsConfiguration.objects.all()
-
-    if c.get("chosen_strizh") != 0:
-        print('glushenie dlya strizha #', c.get('chosen_strizh'))
-        for strizh in strizh_names:
-
-            if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
-                # if check_state(strizh.ip1) == 'scan_on':
-                #     scan_on_off(strizh.ip1)
-                # if check_state(strizh.ip2) == 'scan_on':
-                #     scan_on_off(strizh.ip2)
-                #
-                # if check_state(strizh.ip1) == 'all_stop' and check_state(strizh.ip2) == 'all_stop':
-                #     scan_on_off(strizh.ip1)
-                #     scan_on_off(strizh.ip2)
-                #     time.sleep(0.5)
-                #     scan_on_off(strizh.ip1)
-                #     scan_on_off(strizh.ip2)
-                #     time.sleep(0.5)
-                #     for each_apem in apems.filter(strizh_name=strizh.name):
-                #         # TODO test tomorrow and dobavit apem
-                #         ip = each_apem.ip_podavitelya
-                #         if 'Шелест' in each_apem.type_podavitelya:
-                #             set_gain(ip, each_apem.usileniye_db)
-                #         elif 'АПЕМ' in apems.filter(strizh_name=strizh.name):
-                #             set_gain(ip, each_apem.usileniye_db)
-                #         print(ip)
-
-                # mode1 = check_state(strizh.ip1)
-                # mode2 = check_state(strizh.ip2)
-                # modes = [mode1, mode2]
-                # complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-                # complex_mode = 'jammer_on' if all(
-                #     [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
-
-                for ip_host in [strizh.ip1, strizh.ip2]:
-                    mode_ = check_state(ip_host)
-                    if mode_ == 'scan_on':
-                        # while check_state(strizh.ip2) != 'all_stop':
-                        scan_on_off(ip_host)
-                mode = check_state(strizh.ip1)
-                print(mode)
-                if mode != 'scan_on':
-                    jammer_on_off(strizh.ip1)
-                mode = check_state(strizh.ip1)
-                action_complex = 'включено' if mode == 'jammer_on' else 'выключено'
-                button_complex = 'red_jammer' if mode == 'jammer_on' else 'green'
-                # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
-                c["action_strizh"][strizh.name] = 'глушение: ' + strizh.name + ' ' + action_complex
-                c["button_complex"] = button_complex
-                c['complex_mode_dict'][strizh.name] = mode
-                c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
-                # jammer_on_off(strizh.ip1, 'on')
-
-    # return redirect(request.META['HTTP_REFERER'])
-    return render(request, "main.html", context=c)
-
-
 def apply_period(request):
     global c, start_datetime, end_datetime, reset_time
     c['saved_table'] = False
@@ -671,7 +807,8 @@ def export_csv(request):
         for ip in [strizh.ip1, strizh.ip2]:
             strizhes_ip.append(ip)
     if c.get('table_filter') != '' and c.get('order_sign'):
-        drones_filtered_strizh = Point.objects.order_by(c.get('order_sign') + c.get('table_filter')).filter(ip__in=strizhes_ip)
+        drones_filtered_strizh = Point.objects.order_by(c.get('order_sign') + c.get('table_filter')).filter(
+            ip__in=strizhes_ip)
     else:
         drones_filtered_strizh = Point.objects.order_by('-detection_time').filter(ip__in=strizhes_ip)
     d = datetime.datetime.now()
@@ -691,141 +828,6 @@ def export_csv(request):
                       dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip
                 writer.writerow(row)
     return render(request, "journal.html", context=c)
-
-
-def collect_logs(log_string):
-    global logs, logs_list
-    time_obj = datetime.datetime.now().strftime("%Y-%d-%m  %H:%M:%S")
-    log_one = time_obj + '   ' + log_string + '\n\t'
-    logs_list.append(log_one)
-    c['logs_list'] = logs_list
-    print(log_one)
-
-
-def set_correct_temperature(url, strizh_name, temperature_state):
-    global c
-    while temperature_state != 0:
-        temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
-                                            high_border=high_t)
-        if temperature_state == 1:
-            send_line_command(url, 'вентилятор', 1)
-            state0 = obtain_state(url, 'датчик воздушного потока')
-            if state0 != 'вкл':
-                collect_logs('АВАРИЯ! отсутствует вентиляция, возможен перегрев оборудования')
-        elif temperature_state == -1:
-            send_line_command(url, 'обогрев', 1)
-        time.sleep(60)
-
-
-def turn_on_bp(request):
-    global c, comlex_state, logs
-
-    for strizh_name in c.get('chosen_strizh'):
-        if strizh_name != 'None':
-            url = c['url_uniping_dict'][strizh_name]
-            try:
-                requests.get(url, auth=auth, timeout=0.2)
-            except:
-                result_get = 'ошибка uniping'
-                collect_logs(strizh_name + ': ' + result_get)
-                continue
-            temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
-                                                high_border=high_t)
-            if temperature_state != 0:
-                print('температура не в порядке')
-                set_correct_temperature(url, strizh_name, temperature_state)
-            elif temperature_state == 0:
-                # turn everything on
-                state0 = obtain_state(url, 'датчик воздушного потока')
-                if state0 != 'вкл':
-                    send_line_command(url, 'вентилятор', 1)
-                state1 = obtain_state(url, 'БП ПЭВМ')
-                if state1 != 'вкл':
-                    # collect_logs('БП ПЭВМ выключен')
-                    send_line_command(url, 'БП ПЭВМ', 1)
-                state2 = obtain_state(url, 'БП Шелест')
-                if state2 != 'вкл':
-                    # collect_logs('БП Шелест выключен')
-                    send_line_command(url, 'БП Шелест', 1)
-                state3 = obtain_state(url, 'БП АПЕМ')
-                if state3 != 'вкл':
-                    # collect_logs('БП АПЕМ выключен')
-                    send_line_command(url, 'БП АПЕМ', 1)
-                state4 = obtain_state(url, 'ЭВМ1')
-                state5 = obtain_state(url, 'ЭВМ2')
-                if state4 != 'вкл':
-                    send_impulse(url, 'ЭВМ1', time_pulse=3, action='вкл')
-                    state4 = obtain_state(url, 'ЭВМ1')
-                    if state4 != 'вкл':
-                        send_impulse(url, 'ЭВМ1', time_pulse=3, action='вкл')
-                    time.sleep(4)
-                if state5 != 'вкл':
-                    send_impulse(url, 'ЭВМ2', time_pulse=3, action='вкл')
-                time.sleep(1)
-                complex_state = get_complex_state(url)
-                c['complex_state_dict'][strizh_name] = complex_state
-                c['complex_state_json'] = json.dumps(c['complex_state_dict'])
-                str_log = strizh_name + ': ' + complex_state
-                collect_logs(str_log)
-                # render(request, "main.html", context=c)
-                # functioning_loop(request)
-    return render(request, "main.html", context=c)
-
-
-def turn_off_bp(request):
-    global c
-
-    for strizh_name in c.get('chosen_strizh'):
-        if strizh_name != 'None':
-            url = c['url_uniping_dict'][strizh_name]
-            try:
-                requests.get(url, auth=auth, timeout=0.2)
-            except:
-                result_get = 'ошибка uniping'
-                collect_logs(strizh_name + ': ' + result_get)
-                continue
-
-            state4 = obtain_state(url, 'ЭВМ1')
-            state5 = obtain_state(url, 'ЭВМ2')
-            if state4 != 'выкл':
-                send_impulse(url, 'ЭВМ1', time_pulse=3, action='выкл')
-            if state5 != 'выкл':
-                send_impulse(url, 'ЭВМ2', time_pulse=3, action='выкл')
-
-            time.sleep(5)
-            state1 = obtain_state(url, 'БП ПЭВМ')
-            if state1 != 'выкл':
-                # collect_logs('БП ПЭВМ включен')
-                send_line_command(url, 'БП ПЭВМ', 0)
-            state2 = obtain_state(url, 'БП Шелест')
-            if state2 != 'выкл':
-                # collect_logs('БП Шелест включен')
-                send_line_command(url, 'БП Шелест', 0)
-            state3 = obtain_state(url, 'БП АПЕМ')
-            if state3 != 'выкл':
-                # collect_logs('БП АПЕМ включен')
-                send_line_command(url, 'БП АПЕМ', 0)
-
-            send_line_command(url, 'вентилятор', 0)
-            time.sleep(1)
-            send_impulse(url, 'РЕЗЕТ', time_pulse=6, action='выкл')
-
-            complex_state = get_complex_state(url)
-            c['complex_state_dict'][strizh_name] = complex_state
-            c['complex_state_json'] = json.dumps(c['complex_state_dict'])
-            c['logs'] = logs
-            c['logs_list'] = logs_list
-    # render(request, "main.html", context=c)
-    # functioning_loop(request)
-
-    return render(request, "main.html", context=c)
-
-
-def show_logs(request):
-    global logs
-    c['logs'] = logs
-    c['logs_list'] = logs_list
-    return render(request, "main.html", context=c)
 
 
 lines_map = {'обогрев': 1,
@@ -1192,6 +1194,11 @@ def configuration(request):
     return render(request, "configuration.html", context=c)
 
 
+def track_page(request):
+    global c
+
+
+    return render(request, "track_page.html", context=c)
 
 # def check_states_on():
 #     temperature_state = check_condition(c['temperature'], low_border=low_t, high_border=high_t)

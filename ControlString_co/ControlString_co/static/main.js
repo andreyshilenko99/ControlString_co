@@ -36,13 +36,10 @@ function map_init_basic(map, options) {
     // }).addTo(map);
 
     L.ClickableTooltip = L.Tooltip.extend({
-
         onAdd: function (map) {
             L.Tooltip.prototype.onAdd.call(this, map);
-
             var el = this.getElement(),
                 self = this;
-
             el.addEventListener('click', function () {
                 self.fire("click");
             });
@@ -76,17 +73,12 @@ function map_init_basic(map, options) {
         }
         return color;
     }
-
-
     var dron_colors = {};
-
     var data_drawn = new Set();
     var ids_drawn = new Set();
     var initial_draw = 0;
     var initial_draw_strizh = 0;
-    // var counter_periodic = -1;
     var flag_state = {};
-    // var counter_drone_period = 0
     var drone_counter = {};
     var drone_layers = {};
     var strizh_layers = {};
@@ -101,24 +93,15 @@ function map_init_basic(map, options) {
             className: 'blinking'
         }
     });
-
-    // var tooltip = new L.tooltip();
-
     var tooltip_radius = new L.tooltip();
 
-
     function refreshMarkers() {
-
         // counter_periodic = counter_periodic + 1;
-
         $.getJSON('/geo/data/', function (data) {
                 let arc1;
                 let sector1;
                 let str1;
                 let str_radius;
-                let name1;
-
-
                 $.getJSON('/geo/strizh_view/', function (strizh_data) {
                         let len_strizh_data = strizh_data.features.length;
                         let strizh_map_name = {};
@@ -133,15 +116,13 @@ function map_init_basic(map, options) {
 
                         // каждые 10 итераций отрисовка стрижа и подписи к нему
                         var strizh_markers = {};
-
                         for (let j = 0; j < len_strizh_data; j++) {
-
                             let strizh_name = strizh_data.features[j].properties.name;
-                            let strizh_coords = [strizh_data.features[j].properties.lat,
-                                strizh_data.features[j].properties.lon]
-                            strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
-                                strizh_data.features[j].properties.lon, strizh_data.features[j].properties.radius];
+                            let strizh_coords = [strizh_data.features[j].properties.lat, strizh_data.features[j].properties.lon];
                             let radius = strizh_data.features[j].properties.radius;
+                            strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
+                                strizh_data.features[j].properties.lon, radius];
+
                             let dx_radius = radius * 0.000008998;
                             let radius_x = strizh_map_name[strizh_data.features[j].properties.name][0] - dx_radius;
                             let strizh_radius_coords = [radius_x, strizh_map_name[strizh_data.features[j].properties.name][1]];
@@ -190,7 +171,6 @@ function map_init_basic(map, options) {
                                         col = '#2f80ed'
                                         icon_url = 'static/icons/strizh_markers/blue.png'
                                     }
-                                    // icon_url = 'static/icons/strizh_green_pulse.gif'
                                 } else {
                                     // all off or not working (1)
                                     col = '#4f4f4f'
@@ -203,11 +183,12 @@ function map_init_basic(map, options) {
                                     fillOpacity: 0.01,
                                     radius: radius
                                 }).addTo(strizh_layers[strizh_name]);
+
                                 var logoMarkerStrizh = new logoMarkerStyleStrizh({
                                     iconUrl: icon_url
                                 });
-                                str1 = L.marker([strizh_data.features[j].properties.lat,
-                                    strizh_data.features[j].properties.lon], {icon: logoMarkerStrizh})
+                                str1 = L.marker([strizh_data.features[j].properties.lat, strizh_data.features[j].properties.lon],
+                                    {icon: logoMarkerStrizh})
                                     .addTo(strizh_layers[strizh_name])
                                     .bindTooltip(tooltip_strizh)
                                     .openTooltip()
@@ -224,15 +205,12 @@ function map_init_basic(map, options) {
                             }
 
                         }
-                        console.log('chosen_strizh', chosen_strizh)
                         if (chosen_strizh !== '' && initial_draw_strizh === 0) {
                             initial_draw_strizh = 1;
-                        //     $("#change_drone").click(function () {
-                                markerFunction(chosen_strizh, strizh_markers);
-                            // });
+                            markerFunction(chosen_strizh, strizh_markers);
                         }
 
-                        let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/drons/dron_top.png'});
+                        let logoMarkerDroneSymb = new logoMarkerStyle({iconUrl: 'static/icons/drons/znak_dron.png'});
                         var len_arr = 20;
                         if (data.features.length < 20) {
                             len_arr = data.features.length;
@@ -282,8 +260,10 @@ function map_init_basic(map, options) {
                                 return
                             }
                             // Отрисовка сектора с обновлением + layer Drones
-                            let r_y = 0.004499 * 4 / 5
-                            let r_x = 0.008892 * 4 / 5
+                            // let r_y = 0.004499 //* 4 / 5
+                            let r_y = radius * 0.000008998
+                            // let r_x = 0.008892 //* 4 / 5
+                            let r_x = radius * 0.000017784 //* 4 / 5
                             // scan on, glushenie off  (4)
                             if (complex_mode[strizh_name] === 'scan_on') {
                                 tooltip_strizh.setContent(strizh_name);
@@ -300,6 +280,7 @@ function map_init_basic(map, options) {
                                 logoMarkerStrizh = new logoMarkerStyleStrizh({
                                     iconUrl: icon_url
                                 });
+
                                 str1 = L.marker(strizh_center, {icon: logoMarkerStrizh})
                                     .addTo(drone_layers[d_id])
                                     .bindTooltip(tooltip_strizh).openTooltip().on('click', clickZoom);
@@ -307,7 +288,7 @@ function map_init_basic(map, options) {
                                 arc1 = L.circle(strizh_center, {
                                     color: '#ffc900',
                                     fillColor: "#ffc900",
-                                    fillOpacity: 0.2,
+                                    fillOpacity: 0.01,
                                     radius: radius
                                 });
                                 // arc1.addTo(layerDrones);
@@ -315,19 +296,20 @@ function map_init_basic(map, options) {
                                 arc1.addTo(drone_layers[d_id]);
 
                                 if (area_sector_start_grad === -1 && area_sector_end_grad === -1) {
-                                    let angle = (90 - (area_sector_start_grad)) / 180 * Math.PI;
-                                    var d_y = 0.004499 * Math.sin(angle);
-                                    var d_x = 0.008892 * Math.cos(angle);
+                                    let angle = Math.PI / 2;
+                                    var d_y = r_y * Math.sin(angle);
+                                    var d_x = r_x * Math.cos(angle);
 
                                 } else {
                                     let angle = (90 - (area_sector_start_grad + 30)) / 180 * Math.PI;
-                                    var d_y = r_y * Math.sin(angle);
-                                    var d_x = r_x * Math.cos(angle);
+                                    d_y = r_y * Math.sin(angle);
+                                    d_x = r_x * Math.cos(angle);
                                     sector1 = L.circle(strizh_center, {
                                         color: '#ffc900',
                                         radius: radius,
                                         startAngle: area_sector_start_grad,
-                                        endAngle: area_sector_end_grad
+                                        endAngle: area_sector_end_grad,
+                                        fillOpacity: 0.1
                                     });
                                     if (!drone_layers[d_id]) {
                                         drone_layers[d_id] = L.layerGroup().addTo(map);
@@ -353,7 +335,7 @@ function map_init_basic(map, options) {
 
                             // Отрисовка дрона в секторе + layer Drones
                             var drone1 = L.marker([strizh_center[0] + d_y,
-                                strizh_center[1] + d_x], {icon: logoMarker});
+                                strizh_center[1] + d_x], {icon: logoMarkerDroneSymb, opacity:0.6});
                             // drone1.addTo(layerDrones).bindTooltip(tooltip_drone).openTooltip();
                             if (!drone_layers[d_id]) {
                                 drone_layers[d_id] = L.layerGroup().addTo(map);

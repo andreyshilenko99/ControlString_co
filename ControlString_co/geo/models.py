@@ -1,7 +1,10 @@
 from django.contrib.gis.db import models
+import django.contrib.gis.db.models as M
 
 from django.db import models
 from django.apps import apps
+import django.contrib.gis.geos as G
+from django.contrib.postgres.fields import ArrayField
 
 class Point(models.Model):
     system_name = models.CharField('Имя дрона', max_length=500)
@@ -34,6 +37,42 @@ class Point(models.Model):
     class Meta:
         verbose_name_plural = 'Дроны'
         verbose_name = 'Дрон'
+
+
+class AeroPoints(models.Model):
+    drone_id = models.IntegerField('Идентификатор дрона', default=1)
+    system_name = models.CharField('Имя дрона', max_length=500)
+    # center_freq = models.FloatField('Несущая частота')
+    # brandwidth = models.FloatField('Пропускная способность')
+    detection_time = models.CharField('Время обнаружения', max_length=500)
+    comment_string = models.CharField('Комментарии', max_length=500)
+    # lat = models.FloatField('Широта')
+    # lon = models.FloatField('Долгота')
+    # drone_coords = ArrayField(ArrayField(models.FloatField(max_length=10)))
+    drone_lat = models.FloatField(max_length=10)
+    drone_lon = models.FloatField(max_length=10)
+    # remote_coords = models.FloatField(max_length=10)
+    # home_coords = models.FloatField(max_length=10)
+
+    height = models.FloatField('Высота (м)')
+    # ip = models.CharField('IP-адрес стрижа', max_length=500)
+    # current_time = models.CharField('Время засечки', max_length=500, default='')
+    strig_name = models.CharField('Имя устройства', max_length=500, default='')
+
+    def __str__(self):
+        # prop_spos = 'Пропускная способность: {} МГц'.format(round(self.brandwidth, 2))
+        # arr_to_return = [self.detection_time, self.system_name, str(int(self.area_sector_start_grad)) + '°-' +
+        #                  str(int(self.area_sector_end_grad)) + '° ', self.azimuth, 'host:', self.ip,
+        #                  self.strig_name, prop_spos, self.comment_string,
+        #                  str(int(self.area_radius_m)) + 'м.']
+        # arr_strings = [str(el) for el in arr_to_return]
+        #
+        # str_to_return = ', '.join(arr_strings)
+        return str(self.system_name)
+
+    class Meta:
+        verbose_name_plural = 'Аэропупы'
+        verbose_name = 'Аэропуп'
 
 
 class DroneJournal(models.Model):
@@ -109,8 +148,6 @@ PODAVITEL_CHOICES = (
     ('BarGen (Enter Morph)', 'BarGen (Enter Morph)'),
     ('BarGen (Плата Б)', 'BarGen (Плата Б)'),
 )
-
-from django.db import models
 
 
 class IntegerRangeField(models.IntegerField):

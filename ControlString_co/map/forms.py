@@ -85,9 +85,8 @@ class ApemsConfigurationForm(ModelForm):
                                            required=False, to_field_name="pk",
                                            label="",
                                            )
-    apem_toshow.widget = SelectMultiple(attrs={'size': 12, 'id': 'block1'
+    apem_toshow.widget = SelectMultiple(attrs={'size': 12, 'id': 'block1', 'onchange': 'submit();'
                                                })
-
     class Meta:
         model = ApemsConfiguration
         fields = ['apem_toshow']
@@ -111,7 +110,7 @@ class ApemsChangingForm(ModelForm):
                   ]
 
         widgets = {
-            'strizh_name': Select(attrs={'class': 'form-control', 'placeholder': 'Имя стрижа'}),
+            'strizh_name': TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя стрижа'}),
             'freq_podavitelya': NumberInput(attrs={'class': 'form-control', 'required': 'False',
                                                    'placeholder': 'Частота подавителя'}),
             'deg_podavitelya': NumberInput(attrs={'class': 'form-control',

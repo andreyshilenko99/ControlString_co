@@ -50,9 +50,9 @@ def get_info_trace():
     trace()
 
 
-# @shared_task(name='uniping')
-# def uniping():
-#     main_check()
+@shared_task(name='uniping')
+def uniping():
+    main_check()
 
 # @app.task
 # def uniping_info():

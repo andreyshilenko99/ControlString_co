@@ -41,6 +41,7 @@ urlpatterns = [
     path('show_logs', views.show_logs),
 
     path('journal', views.journal),
+    path('track_page', views.track_page),
     path('filter_nomer_strizha', views.filter_nomer_strizha),
     path('choose_drone_toshow', views.choose_drone_toshow),
     path('reset_filter', views.reset_filter),
