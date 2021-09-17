@@ -46,9 +46,16 @@
                         <a href="menu">
                             <button class="button-black" style="margin-left: 10px"> Меню</button>
                         </a>
+                        {% if page_picked == 'main' %}
+                        <a href="main" method='GET'>
+                            <button class="button-page-picked"> Главная</button>
+                        </a>
+                        {% else %}
                         <a href="main">
                             <button class="button-black"> Главная</button>
                         </a>
+                        {% endif %}
+
                         <a href="journal" method='GET'>
                             <button class="button-black"> Журнал</button>
                         </a>

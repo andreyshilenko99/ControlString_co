@@ -2,7 +2,7 @@ from django.core.serializers import serialize
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from .models import Point, Strizh, DroneJournal, AeroPoints
+from .models import Point, Strizh, DroneJournal, AeroPoints, DroneTrajectoryJournal
 
 
 def geojson_view(request):
@@ -14,6 +14,12 @@ def geojson_view(request):
 def drone_journal_view(request):
     # geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-pk'))
     drone_as_geojson = serialize('geojson', DroneJournal.objects.all().order_by('-pk'))
+    return HttpResponse(drone_as_geojson, content_type='geojson')
+
+
+def drone_journal_view_traj(request):
+    # geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-pk'))
+    drone_as_geojson = serialize('geojson', DroneTrajectoryJournal.objects.all().order_by('-pk'))
     return HttpResponse(drone_as_geojson, content_type='geojson')
 
 

@@ -36,9 +36,16 @@
                     <a href="journal" method='GET'>
                         <button class="button-black"> Журнал</button>
                     </a>
+                    {% if page_picked == 'configuration' %}
+                    <a href="configuration" method='GET'>
+                        <button class="button-page-picked"> Конфигуратор</button>
+                    </a>
+                    {% else %}
                     <a href="configuration" method='GET'>
                         <button class="button-black"> Конфигуратор</button>
                     </a>
+                    {% endif %}
+
                     <a href="admin" method='GET'>
                         <button class="button-black"> Администратор</button>
                     </a>
@@ -64,9 +71,9 @@
                     <form action="set_strizh" method="post">
                         {% csrf_token %}
                         {{ form_strizh }}
-<!--                        <button class="btn btn-primary">-->
-<!--                            ввод-->
-<!--                        </button>-->
+                        <!--                        <button class="btn btn-primary">-->
+                        <!--                            ввод-->
+                        <!--                        </button>-->
                     </form>
                 </h5>
             </div>
@@ -106,9 +113,9 @@
                         {% csrf_token %}
                         {% if form_apem.fields.freq_podavitelya.queryset.count != 0 %}
                         {{ form_apem }}
-<!--                        <button class="button-blue-small" style="margin-top: 20px; margin-left: 40px">-->
-<!--                            выбрать-->
-<!--                        </button>-->
+                        <!--                        <button class="button-blue-small" style="margin-top: 20px; margin-left: 40px">-->
+                        <!--                            выбрать-->
+                        <!--                        </button>-->
 
                         {% else %}
                         <h3> Необходимо добавить в базу имеющиеся блоки АПЕМ, Шелест </h3>
@@ -126,7 +133,7 @@
                 {% if apem_change_form.fields %}
                 <div class="row">
                     <div id="apems_form" style="margin: 0px 50px">
-                        <h3 style="width: 500px">  {{apem_action_message}}
+                        <h3 style="width: 500px"> {{apem_action_message}}
                         </h3>
                         {{apem_change_form}}
                         {% endif %}

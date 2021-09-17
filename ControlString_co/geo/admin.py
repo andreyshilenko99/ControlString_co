@@ -1,5 +1,5 @@
 from django.contrib import admin
-from geo.models import Point, Strizh, ApemsConfiguration, AeroPoints
+from geo.models import Point, Strizh, ApemsConfiguration, AeroPoints, SkyPoint
 
 
 # from map.models import MyStrizh
@@ -11,6 +11,7 @@ class Inc(admin.ModelAdmin):
 
 admin.site.register(Point)
 admin.site.register(Strizh)
+admin.site.register(SkyPoint)
 admin.site.register(ApemsConfiguration)
 admin.site.register(AeroPoints)
 

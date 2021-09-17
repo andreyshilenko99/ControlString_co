@@ -3,7 +3,7 @@ from django.forms import ModelForm, Select, ModelChoiceField, ModelMultipleChoic
     TextInput, SelectMultiple
 from django.forms import CheckboxSelectMultiple
 
-from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration
+from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration, SkyPoint
 # from django.forms import widgets
 from django import forms
 
@@ -29,17 +29,26 @@ class StrizhFilterForm(ModelForm):
     filtered_strizhes = ModelMultipleChoiceField(queryset=Strizh.objects.all(),
                                                  required=False, to_field_name="name",
                                                  label="")
-    filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '4',
+    filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '4', 'class': 'myfieldclass'
                                                      })
 
     class Meta:
         model = Strizh
         fields = ['filtered_strizhes']
-        widgets = {
-            'filtered_strizhes': SelectMultiple(attrs={'id': 'name', 'width': '300px',
-                                                       'class': 'myfieldclass'}),
 
-        }
+
+
+class SkyPointFilterForm(ModelForm):
+    filtered_skypoints = ModelMultipleChoiceField(queryset=SkyPoint.objects.all(),
+                                                 required=False, to_field_name="name",
+                                                 label="")
+    filtered_skypoints.widget = SelectMultiple(attrs={'id': 'choose_skypoint', 'size': '4', 'class': 'myfieldclass'
+                                                     })
+
+    class Meta:
+        model = Strizh
+        fields = ['filtered_skypoints']
+
 
 
 class DroneFilterForm(ModelForm):
