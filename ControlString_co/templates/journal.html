@@ -122,9 +122,9 @@
                                         <div class="col-1">
 
                                             <!--                                            <button class="button-blue-small" style="margin: 0px 20px">-->
-                                            <button class="btn btn-primary" style="margin: 0px 1%; font-size: 16px">
-                                                выбор
-                                            </button>
+<!--                                            <button class="btn btn-primary" style="margin: 0px 1%; font-size: 16px">-->
+<!--                                                выбор-->
+<!--                                            </button>-->
                                         </div>
                                     </div>
 
@@ -180,9 +180,9 @@
                                         <div class="col-1">
 
                                             <!--                                            <button class="button-blue-small" style="margin: 0px 20px">-->
-                                            <button class="btn btn-primary" style="margin: 0px 1%; font-size: 16px">
-                                                выбор
-                                            </button>
+<!--                                            <button class="btn btn-primary" style="margin: 0px 1%; font-size: 16px">-->
+<!--                                                выбор-->
+<!--                                            </button>-->
                                         </div>
                                     </div>
 
@@ -357,7 +357,7 @@
                             <div>
                                 <div id="detections" style="margin: 10px 0;
                     width: 99%; height: 5%">
-                                    {% if all_drones2.count != 0 %}
+                                    {% if all_drones_res.count != 0 %}
 
                                     <table id="detections_table">
                                         <thead>
@@ -373,8 +373,8 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {% for all_d in form_drone_alldrones %}
-                                        {% for dron in all_d %}
+
+                                        {% for dron in all_drones_res %}
                                         <tr>
                                             <td>{{dron.detection_time}}</td>
                                             <td>{{dron.system_name}}</td>
@@ -397,14 +397,14 @@
                                             </td>
                                         </tr>
                                         {% endfor %}
-                                        {% endfor %}
+
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                             {% else %}
                             <h2 style="color: #3b3b3b;text-align:  center; margin-top: 40px">
-                                По выбранным критериям ничего не найдено
+                                По вашим критериям ничего не найдено (проверьте, выбран ли комплекс)
                             </h2>
                             {% endif %}
                         </div>

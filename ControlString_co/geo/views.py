@@ -25,17 +25,8 @@ def drone_journal_view_traj(request):
 
 def journal_view_aero(request):
     # geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-pk'))
-    drone_as_geojson = serialize('geojson', AeroPoints.objects.all().order_by('pk'))
+    drone_as_geojson = serialize('geojson', AeroPoints.objects.all().order_by('-pk'))
     return HttpResponse(drone_as_geojson, content_type='geojson')
-
-
-def strizh_coords(request):
-    strizh_c = Strizh(name="strizh1", lat=60.014375,
-                      lon=30.448045)
-    strizh_c.save()
-    geom_as_geojson = serialize('geojson', Strizh.objects.all())
-    return HttpResponse(geom_as_geojson, content_type='geojson')
-    # return render(request, 'test.html')
 
 
 def strizh_view(request):

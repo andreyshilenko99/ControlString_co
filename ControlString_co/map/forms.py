@@ -29,26 +29,25 @@ class StrizhFilterForm(ModelForm):
     filtered_strizhes = ModelMultipleChoiceField(queryset=Strizh.objects.all(),
                                                  required=False, to_field_name="name",
                                                  label="")
-    filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '4', 'class': 'myfieldclass'
-                                                     })
+    filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '4', 'class': 'myfieldclass',
+                                                     'onchange': 'submit();'})
 
     class Meta:
         model = Strizh
         fields = ['filtered_strizhes']
 
 
-
 class SkyPointFilterForm(ModelForm):
     filtered_skypoints = ModelMultipleChoiceField(queryset=SkyPoint.objects.all(),
-                                                 required=False, to_field_name="name",
-                                                 label="")
-    filtered_skypoints.widget = SelectMultiple(attrs={'id': 'choose_skypoint', 'size': '4', 'class': 'myfieldclass'
-                                                     })
+                                                  required=False, to_field_name="name",
+                                                  label="")
+    filtered_skypoints.widget = SelectMultiple(attrs={'id': 'choose_skypoint', 'size': '4', 'class': 'myfieldclass',
+                                                      'onchange': 'submit();'
+                                                      })
 
     class Meta:
         model = Strizh
         fields = ['filtered_skypoints']
-
 
 
 class DroneFilterForm(ModelForm):
@@ -79,7 +78,7 @@ class TableFilterForm(ModelForm):
 
 class TableOrderForm(ModelForm):
     zz = Point._meta.get_fields()
-    AllFields = tuple([('-', 'по убыванию'), ('', 'по возрастанию')])
+    AllFields = tuple([('-', 'по убыванию'), ('+', 'по возрастанию')])
     order_sign = forms.ChoiceField(choices=AllFields, required=False, initial="-",
                                    label="", widget=forms.Select(attrs={'onchange': 'submit();'}))
 
@@ -96,6 +95,7 @@ class ApemsConfigurationForm(ModelForm):
                                            )
     apem_toshow.widget = SelectMultiple(attrs={'size': 12, 'id': 'block1', 'onchange': 'submit();'
                                                })
+
     class Meta:
         model = ApemsConfiguration
         fields = ['apem_toshow']

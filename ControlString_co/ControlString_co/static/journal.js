@@ -254,7 +254,7 @@ function map_init_basic(map, options) {
 
         draw_tooltip(map,
             coords = [60.013674, 30.442474],
-            icon_url = 'static/icons/controller/contr1_black.png', size = 50, tooltip_text = '')
+            icon_url = 'static/icons/controller/contr_round2.png', size = 50, tooltip_text = '')
 
 
         draw_tooltip(map,
@@ -294,15 +294,15 @@ function map_init_basic(map, options) {
             map.fitBounds(firstpolyline.getBounds());
 
             draw_tooltip(map,
-                coords = coords_arr[0],
+                coords = coords_arr[coords_arr.length - 1],
                 icon_url = 'static/icons/route/start_circle.png', size = 60, tooltip_text = '')
             draw_tooltip(map,
-                coords = coords_arr[coords_arr.length - 1],
+                coords = coords_arr[0],
                 icon_url = 'static/icons/route/finish_circle.png', size = 60, tooltip_text = '')
 
             for (let j = 0; j < coords_arr.length; j++) {
-                var height = heights_arr[j];
-                var coords = coords_arr[j];
+                let height = heights_arr[j];
+                let coords = coords_arr[j];
                 if (j !== 0 && j !== coords_arr.length - 1) {
                     place_text(map, coords, height)
                 }
