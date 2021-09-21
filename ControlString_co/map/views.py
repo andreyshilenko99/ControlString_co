@@ -618,8 +618,9 @@ def filter_all(request):
         skypoints_names_arr = [st.name for st in c['filtered_skypoints']]
         skypoints_names = ';; '.join(skypoints_names_arr)
 
-    c['start_datetime'] = start_datetime
-    c['end_datetime'] = end_datetime
+    c['start_datetime'] = c.get('start_datetime') if c.get('start_datetime') else start_datetime
+    c['end_datetime'] = c.get('end_datetime') if c.get('end_datetime') else end_datetime
+    xx = c
     strizh_value = StrizhJournal(filtered_strizhes=strizh_names, filtered_skypoints=skypoints_names,
                                  start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
     strizh_value.save()
