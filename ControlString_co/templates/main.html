@@ -261,7 +261,7 @@
                                             {{ weather_state_dict|getkey:striz }}
                                         </h5>
                                         {% elif 'выключен' in complex_state_dict|getkey:striz %}
-                                        {% if complex_state_dict|getkey:striz == 'выключен датчик воздушного потока'%}
+                                        {% if complex_state_dict|getkey:striz == 'выключен вентилятор'%}
                                         <h5 style="color: #b36c00">
                                             {{striz}}:
                                             {{ complex_state_dict|getkey:striz }}

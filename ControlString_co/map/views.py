@@ -139,8 +139,8 @@ def set_correct_temperature(url, strizh_name, temperature_state):
         temperature_state = check_condition(c['temperature_dict'][strizh_name], low_border=low_t,
                                             high_border=high_t)
         if temperature_state == 1:
-            send_line_command(url, 'вентилятор', 1)
-            state0 = obtain_state(url, 'датчик воздушного потока')
+            send_line_command(url, 'вентилятор_команда', 1)
+            state0 = obtain_state(url, 'вентилятор')
             if state0 != 'вкл':
                 collect_logs('АВАРИЯ! отсутствует вентиляция, возможен перегрев оборудования')
         elif temperature_state == -1:
@@ -324,12 +324,15 @@ def render_main_page(request):
 
 def butt_scan(request):
     global c
+    xx = c
     strizh_names = Strizh.objects.all()
 
     if c.get("chosen_strizh") != 0:
         print('Сканирование dlya strizha #', c.get('chosen_strizh'))
         for strizh in strizh_names:
-            if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
+            state = c.get("complex_state_dict")[strizh.name]
+            bool_val = (state == 'включен' or state == 'выключен вентилятор')
+            if strizh.name in c.get("chosen_strizh") and bool_val:
                 try:
                     mode_ip1 = scan_on_off(strizh.ip1)
                     # time.sleep(1)
@@ -448,9 +451,9 @@ def turn_on_bp(request):
                 set_correct_temperature(url, strizh_name, temperature_state)
             elif temperature_state == 0:
                 # turn everything on
-                state0 = obtain_state(url, 'датчик воздушного потока')
+                state0 = obtain_state(url, 'вентилятор')
                 if state0 != 'вкл':
-                    send_line_command(url, 'вентилятор', 1)
+                    send_line_command(url, 'вентилятор_команда', 1)
                 state1 = obtain_state(url, 'БП ПЭВМ')
                 if state1 != 'вкл':
                     # collect_logs('БП ПЭВМ выключен')
@@ -895,7 +898,7 @@ def export_csv(request):
 
 
 lines_map = {'обогрев': 1,
-             'вентилятор': 2,
+             'вентилятор_команда': 2,
              'БП ПЭВМ': 3,
              'БП Шелест': 5,
              'БП АПЕМ': 7,
@@ -905,13 +908,13 @@ lines_map = {'обогрев': 1,
              }
 
 lines_control_map = {
-    'вентилятор': 2,
+    'вентилятор_команда': 2,
     'БП ПЭВМ': 4,
     'БП Шелест': 6,
     'БП АПЕМ': 8,
     'ЭВМ1': 9,
     'ЭВМ2': 13,
-    'датчик воздушного потока': 16,
+    'вентилятор': 16,
 }
 
 
@@ -947,7 +950,7 @@ def obtain_state(url, line_name, to_collect_logs=False):
 
 
 def get_complex_state(url):
-    states_map = {0: 'датчик воздушного потока', 1: "БП ПЭВМ",
+    states_map = {0: 'вентилятор', 1: "БП ПЭВМ",
                   2: 'БП Шелест', 3: "БП АПЕМ",
                   4: 'ЭВМ2', 5: "ЭВМ2"}
     states = [obtain_state(url, val) for key, val in states_map.items()]

@@ -240,7 +240,10 @@ function map_init_basic(map, options) {
                                 if (!strizh_layers[strizh_name]) {
                                     strizh_layers[strizh_name] = L.layerGroup().addTo(map);
                                 }
-                                if (complex_state[strizh_name] === 'включен') {
+                                console.log('complex_state', complex_state)
+                                console.log('complex_mode', complex_mode)
+                                if (complex_state[strizh_name] === 'включен' ||
+                                    complex_state[strizh_name] === 'выключен вентилятор') {
                                     if (complex_mode[strizh_name] === 'scan_on') {
                                         // on and scan on, jammer off (3)
                                         col = '#17bd04'
