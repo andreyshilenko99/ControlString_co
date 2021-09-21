@@ -680,7 +680,6 @@ def filter_all(request):
         all_drones_s = strizh_drones.filter(pk__in=drones_pk, strig_name__in=names_arr)
         all_drones_a = aero_points.filter(pk__in=drones_pk_aero, strig_name__in=names_arr_sky)
 
-
         # all_drones_s = drones_filtered_time.filter(strig_name__in=names_arr)
         #
         # all_drones_a = drones_filtered_time_aero.filter(strig_name__in=names_arr_sky)
@@ -863,9 +862,6 @@ def reset_filter(request):
     c['form_filter_skypoint'] = form_filter_skypoint
     c['form_filter_table'] = form_filter_table
     c['form_order_table'] = form_order_table
-    # c['form_drone_alldrones'] = form_drone_alldrones
-    # c['form_drone'] = form_drone
-
     c['start_datetime'] = 'Начало'
     c['end_datetime'] = 'Конец'
     return render(request, "journal.html", context=c)
@@ -874,61 +870,27 @@ def reset_filter(request):
 def export_csv(request):
     global c
     c['saved_table'] = False
-    xx = c
-    time_start = '01/01/2000-00:01' if c.get('start_datetime') == 'Начало' else c.get('start_datetime')
-    time_end = '01/01/2100-00:01' if c.get('end_datetime') == 'Конец' else c.get('end_datetime')
-    strizhes = Strizh.objects.all() if not c.get('filtered_strizhes') else c.get('filtered_strizhes')
 
-    now = datetime.datetime.now()
-    ts1 = time_start.split('/')
-    ts2 = ts1[-1].split('-')
-    ts3 = ts2[-1].split(':')
-    time_start_datetime = now.replace(year=int(ts2[0]), month=int(ts1[0]), day=int(ts1[1]), hour=int(ts3[0]),
-                                      minute=int(ts3[1]), second=0)
-    ts11 = time_end.split('/')
-    ts22 = ts11[-1].split('-')
-    ts33 = ts22[-1].split(':')
-    time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
-                                    minute=int(ts33[1]), second=59)
-    strizhes_ip = []
-    for strizh in strizhes:
-        for ip in [strizh.ip1, strizh.ip2]:
-            strizhes_ip.append(ip)
-
-    order_sign = '' if c.get('order_sign') == '+' else '-'
-    if c.get('table_filter') != '' and c.get('order_sign') != '':
-
-        if c.get('filtered_skypoints') == '':
-            drones_filtered_strizh = Point.objects.order_by(order_sign + c.get('table_filter')).filter(
-                ip__in=strizhes_ip)
-        if c.get('filtered_strizhes') == '':
-            drones_filtered_strizh = AeroPoints.objects.order_by(order_sign + c.get('table_filter')).filter(
-                ip__in=strizhes_ip)
-
-    else:
-        if c.get('filtered_skypoints') == '':
-            drones_filtered_strizh = Point.objects.order_by('-detection_time').filter(
-                ip__in=strizhes_ip)
-        if c.get('filtered_strizhes') == '':
-            drones_filtered_strizh = AeroPoints.objects.order_by('-detection_time').filter(
-                ip__in=strizhes_ip)
-
+    drones_filtered_strizh = c.get('all_drones_res')
     d = datetime.datetime.now()
     csv_name = "log_{}_{}_{}_{}_{}_{}.csv".format(d.hour, d.minute, d.second, d.day, d.month, d.year)
     print(csv_name)
     with open(os.path.join('saved_logs_csv', csv_name), 'w+', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
-        first_row = 'Имя дрона', 'Несущая частота', 'Пропускная способность', 'Время обнаружения', \
-                    'Комментарии', 'Широта', 'Долгота', 'Азимут', 'Внутренний радиус сектора', 'Внешний радиус сектора', \
-                    'Радиус сектора (м)', 'IP-адрес стрижа'
+        first_row = 'Имя дрона', 'Имя комплекса', 'ID дрона', 'Несущая частота', 'Пропускная способность', \
+                    'Время обнаружения', 'Комментарии', 'Координаты дрона', 'Азимут', \
+                    'Внутренний радиус сектора (м.)', 'Внешний радиус сектора (м.)', 'Радиус сектора (м)',\
+                    'IP-адрес стрижа', 'Высота (м.)'
         writer.writerow(first_row)
+        # TODO write frequencies correctly (MGhz..)
         for dr in drones_filtered_strizh:
             writer = csv.writer(f)
-            if time_start_datetime < get_datetime_drone(dr.detection_time) < time_end_datetime:
-                row = dr.system_name, dr.center_freq, dr.brandwidth, dr.detection_time, \
-                      dr.comment_string, dr.drone_lat, dr.drone_lon, dr.azimuth, \
-                      dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip
-                writer.writerow(row)
+            azimuth = int(re.findall('[0-9]+', dr.azimuth)[0])
+            row = dr.system_name, dr.strig_name, dr.drone_id, dr.center_freq, dr.brandwidth, \
+                  dr.detection_time, dr.comment_string, (dr.drone_lat, dr.drone_lon), azimuth, \
+                  dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip, dr.height
+
+            writer.writerow(row)
     return render(request, "journal.html", context=c)
 
 
