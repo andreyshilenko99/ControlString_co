@@ -6,7 +6,6 @@ from django.forms import CheckboxSelectMultiple
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration, SkyPoint
 # from django.forms import widgets
 from django import forms
-
 from django.forms import IntegerField, TextInput, NumberInput
 
 

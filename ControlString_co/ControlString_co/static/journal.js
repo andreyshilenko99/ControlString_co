@@ -1,6 +1,7 @@
 var last_id = 0;
 
 function refresh() {
+
     $.getJSON('/geo/journal_view/', function (data) {
         var current_id = data.features[0].properties.pk;
         console.log('data ', data)
@@ -102,6 +103,7 @@ function map_init_basic(map, options) {
     var layerStrizhes = L.layerGroup().addTo(map);
     var counter_periodic = -1;
     counter_periodic = counter_periodic + 1;
+
 
     $.getJSON('/geo/drone_journal/', function (data) {
         let arc1;
@@ -276,6 +278,8 @@ function map_init_basic(map, options) {
                 points_data[drone_id].heights.push(height)
             }
         }
+
+
         console.log('points_data', points_data)
         for (const [keys, values_data] of Object.entries(points_data)) {
             var coords_arr = values_data.coords

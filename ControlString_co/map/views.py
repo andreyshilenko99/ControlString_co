@@ -80,8 +80,8 @@ def return_conditions(url):
 def get_info_main(ip1, ip2, name):
     try:
         # TODO UNCOMMENT for working check state
-        # mode_ips = [check_state(ip1), check_state(ip2)]
-        mode_ips = ['all_stop' for _ in range(2)]
+        mode_ips = [check_state(ip1), check_state(ip2)]
+        # mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -311,9 +311,13 @@ def render_main_page(request):
         form = StrizhForm()
     c['form'] = form
     # TODO current_time
-    drones = Point.objects.order_by('-detection_time').all()
-    c['info_drones'] = drones
-    c['all_strizhes'] = [_.name for _ in strizhes]
+    all_drones_a = AeroPoints.objects.all().order_by('-detection_time')
+    all_drones_s = Point.objects.all().order_by('-detection_time')
+    all_drones_res = all_drones_s.union(all_drones_a)
+    all_drones_res = all_drones_res.order_by('-detection_time')
+
+    c['all_drones_res'] = all_drones_res
+    c['all_strizhes'] = [s.name for s in strizhes]
 
     return render(request, "main.html", context=c)
 
@@ -830,8 +834,8 @@ def reset_filter(request):
     c['filtered_strizhes'] = ''
     c['filtered_skypoints'] = ''
     c['saved_table'] = False
-    c['table_filter'] = ''
-    c['order_sign'] = '+'
+    c['table_filter'] = 'detection_time'
+    c['order_sign'] = '-'
     form_filter = StrizhFilterForm()
     form_filter_skypoint = SkyPointFilterForm()
     # form_drone = DroneFilterForm()
@@ -843,6 +847,7 @@ def reset_filter(request):
         all_drones_a = AeroPoints.objects.all().order_by('-detection_time')
         all_drones_s = Point.objects.all().order_by('-detection_time')
         all_drones_res = all_drones_s.union(all_drones_a)
+        all_drones_res = all_drones_res.order_by('-detection_time')
 
         c['all_drones_res'] = all_drones_res
 
