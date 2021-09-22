@@ -94,10 +94,10 @@ function map_init_basic(map, options) {
     }
 
 
-    map.setView([60.013674, 30.452474], 14);
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; Strizh'
-    }).addTo(map);
+    // map.setView([60.013674, 30.452474], 14);
+    // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    //     attribution: '&copy; Strizh'
+    // }).addTo(map);
 
     var layerDrones = L.layerGroup().addTo(map);
     var layerStrizhes = L.layerGroup().addTo(map);
@@ -260,7 +260,7 @@ function map_init_basic(map, options) {
 
 
         draw_tooltip(map,
-            coords = [60.015, 30.55],
+            coords = [60.015, 30.47],
             icon_url = 'static/icons/home.png', size = 50, tooltip_text = '')
 
         for (let i = 0; i < n_elements; i++) {

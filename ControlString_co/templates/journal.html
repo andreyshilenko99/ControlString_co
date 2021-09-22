@@ -80,11 +80,11 @@
                         </a>
 
                         {% if page_picked == 'journal' %}
-                        <a href="journal" method='GET'>
+                        <a href="journal" method='POST'>
                             <button class="button-page-picked"> Журнал</button>
                         </a>
                         {% else %}
-                        <a href="journal" method='GET'>
+                        <a href="journal" method='POST'>
                             <button class="button-black"> Журнал</button>
                         </a>
                         {% endif %}
@@ -367,8 +367,12 @@
                                         <tr>
                                             <th>Время</th>
                                             <th>Имя дрона</th>
-                                            <th>Хост</th>
+                                            <th>ID дрона</th>
                                             <th>Имя поста</th>
+                                            <th>Высота, м</th>
+                                            <th>Хост</th>
+                                            <th>Несущая частота</th>
+                                            <th>Проп. спос.</th>
                                             <th>Радиус, м</th>
                                             <th>Азимут</th>
                                             <th>Комментарий</th>
@@ -381,20 +385,24 @@
                                         <tr>
                                             <td>{{dron.detection_time}}</td>
                                             <td>{{dron.system_name}}</td>
-                                            <td>{{dron.ip}}</td>
+                                            <td>{{dron.drone_id}}</td>
                                             <td>{{dron.strig_name}}</td>
+                                            <td>{% widthratio dron.height 1 1 %}</td>
+                                            <td>{{dron.ip}}</td>
+                                            <td>{% widthratio dron.center_freq 1 1 %}</td>
+                                            <td>{% widthratio dron.brandwidth 1 1 %}</td>
                                             <td>{% widthratio dron.area_radius_m 1 1 %}</td>
                                             <td>{{ dron.azimuth|get_int }}</td>
                                             <td>{{dron.comment_string}}</td>
                                             <td>
                                                 {% if dron.drone_id != 0 %}
                                                 <button type="submit" class="btn btn-primary" name="drone_id"
-                                                        value="{{ dron.drone_id }}"> Показать траекторию
+                                                        value="{{ dron.drone_id }}"> Траектория
                                                 </button>
                                                 {% else %}
 
                                                 <button type="submit" class="btn btn-primary" name="detection_id"
-                                                        value="{{ dron.pk }}"> Показать
+                                                        value="{{ dron.pk }}"> Радиус
                                                 </button>
                                                 {% endif %}
                                             </td>

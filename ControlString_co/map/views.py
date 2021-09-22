@@ -34,7 +34,12 @@ low_h = 5
 high_h = 85
 auth = ('user', '555')
 message_condition = ''
-c = dict(chosen_strizh=[], start_datetime=start_datetime, end_datetime=end_datetime)
+c = {}
+
+
+def init_content():
+    c = dict(chosen_strizh=[], start_datetime=start_datetime, end_datetime=end_datetime)
+    return c
 
 
 def index(request):
@@ -207,7 +212,8 @@ def choose_nomer_strizha(request):
             c['temperature_dict'] = temperature_dict
             c['humidity_dict'] = humidity_dict
             c['weather_state_dict'] = weather_state_dict
-    return render(request, "main.html", context=c)
+    return redirect('/main')
+    # return render(request, "main.html", context=c)
     # return HttpResponse(c)
 
 
@@ -260,7 +266,6 @@ def set_strizh(request):
 
 def render_main_page(request):
     global c
-    complex_state = ''
 
     c['start_datetime'] = start_datetime
     c['end_datetime'] = end_datetime
@@ -270,7 +275,8 @@ def render_main_page(request):
     humidity_dict = {}
     weather_state_dict = {}
     url_uniping_dict = {}
-    complex_state_dict = {}
+    if request.method == 'POST' or not c.get('complex_state_dict'):
+        c['complex_state_dict'] = {}
     c['complex_mode_dict'] = {}
     c['action_strizh'] = {}
 
@@ -280,7 +286,8 @@ def render_main_page(request):
 
         temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name], = \
             return_conditions(url_uniping_dict[strizh.name])
-        complex_state_dict[strizh.name] = get_complex_state(url_uniping_dict[strizh.name])
+        c['complex_state_dict'][strizh.name] = get_complex_state(url_uniping_dict[strizh.name])
+        c['complex_state_json'] = json.dumps(c['complex_state_dict'])
 
         complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
 
@@ -295,8 +302,8 @@ def render_main_page(request):
     c['humidity_dict'] = humidity_dict
     c['weather_state_dict'] = weather_state_dict
     c['url_uniping_dict'] = url_uniping_dict
-    c['complex_state_dict'] = complex_state_dict
-    c['complex_state_json'] = json.dumps(complex_state_dict)
+    # c['complex_state_dict'] = complex_state_dict
+    # c['complex_state_json'] = json.dumps(complex_state_dict)
 
     if not c.get('chosen_strizh'):
         # c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
@@ -367,8 +374,8 @@ def butt_scan(request):
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
                 # scan_on_off(strizh.ip1)
                 # scan_on_off(strizh.ip2)
-
-    return render(request, "main.html", context=c)
+    return redirect('/main')
+    # return render(request, "main.html", context=c)
 
 
 def butt_glush(request):
@@ -428,13 +435,13 @@ def butt_glush(request):
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
                 # jammer_on_off(strizh.ip1, 'on')
 
-    # return redirect(request.META['HTTP_REFERER'])
-    return render(request, "main.html", context=c)
+    return redirect('/main')
+    # return render(request, "main.html", context=c)
 
 
 def turn_on_bp(request):
-    global c, comlex_state, logs
-
+    global c, complex_state, logs
+    xx = c
     for strizh_name in c.get('chosen_strizh'):
         if strizh_name != 'None':
             url = c['url_uniping_dict'][strizh_name]
@@ -453,6 +460,8 @@ def turn_on_bp(request):
                 # turn everything on
                 state0 = obtain_state(url, 'вентилятор')
                 if state0 != 'вкл':
+                    # TODO uncomment ventilator
+                    # pass
                     send_line_command(url, 'вентилятор_команда', 1)
                 state1 = obtain_state(url, 'БП ПЭВМ')
                 if state1 != 'вкл':
@@ -484,7 +493,10 @@ def turn_on_bp(request):
                 collect_logs(str_log)
                 # render(request, "main.html", context=c)
                 # functioning_loop(request)
-    return render(request, "main.html", context=c)
+        else:
+            print('EROOOOOOOORRR')
+    return redirect('/main')
+    # return render(request, "main.html", context=c)
 
 
 def turn_off_bp(request):
@@ -521,7 +533,7 @@ def turn_off_bp(request):
                 # collect_logs('БП АПЕМ включен')
                 send_line_command(url, 'БП АПЕМ', 0)
 
-            send_line_command(url, 'вентилятор', 0)
+            send_line_command(url, 'вентилятор_команда', 0)
             time.sleep(1)
             send_impulse(url, 'РЕЗЕТ', time_pulse=6, action='выкл')
 
@@ -530,17 +542,17 @@ def turn_off_bp(request):
             c['complex_state_json'] = json.dumps(c['complex_state_dict'])
             c['logs'] = logs
             c['logs_list'] = logs_list
-    # render(request, "main.html", context=c)
     # functioning_loop(request)
-
-    return render(request, "main.html", context=c)
+    return redirect('/main')
+    # return render(request, "main.html", context=c)
 
 
 def show_logs(request):
     global logs
     c['logs'] = logs
     c['logs_list'] = logs_list
-    return render(request, "main.html", context=c)
+    return redirect('/main')
+    # return render(request, "main.html", context=c)
 
 
 def choose_drone_toshow(request):
@@ -589,22 +601,22 @@ def choose_drone_toshow(request):
                                        height=DP.height,
                                        strig_name=DP.strig_name)
             drone_value.save()
-
+    # return redirect('/journal')
     return render(request, "journal.html", context=c)
 
 
 def reset_filter_strizh(request):
     global c
     c['filtered_strizhes'] = ''
-
-    return render(request, "journal.html", context=c)
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 def reset_filter_skypoint(request):
     global c
     c['filtered_skypoints'] = ''
-
-    return render(request, "journal.html", context=c)
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 def filter_all(request):
@@ -669,51 +681,53 @@ def filter_all(request):
             time_end_datetime = now
         drones_pk = []
         for drone in strizh_drones:
-            if time_start_datetime < get_datetime_drone(drone.detection_time) < time_end_datetime:
+            if time_start_datetime <= get_datetime_drone(drone.detection_time) <= time_end_datetime:
                 drones_pk.append(drone.pk)
         drones_pk_aero = []
         for drone_aero in aero_points:
-            if time_start_datetime < get_datetime_drone(drone_aero.detection_time) < time_end_datetime:
+            if time_start_datetime <= get_datetime_drone(drone_aero.detection_time) <= time_end_datetime:
                 drones_pk_aero.append(drone_aero.pk)
         names_str = filter_values[0].filtered_strizhes
         names_sky = filter_values[0].filtered_skypoints
 
         names_arr = names_str.split(';; ')
         names_arr_sky = names_sky.split(';; ')
-        all_drones_s = strizh_drones.filter(pk__in=drones_pk, strig_name__in=names_arr)
-        all_drones_a = aero_points.filter(pk__in=drones_pk_aero, strig_name__in=names_arr_sky)
+        all_drones_s = strizh_drones.filter(strig_name__in=names_arr, pk__in=drones_pk)
+        all_drones_a = aero_points.filter(strig_name__in=names_arr_sky, pk__in=drones_pk_aero)
+        if len(names_str) != 0 and len(drones_pk) == 0:
+            all_drones_s = strizh_drones.filter(strig_name__in=names_arr)
 
-        # all_drones_s = drones_filtered_time.filter(strig_name__in=names_arr)
-        #
-        # all_drones_a = drones_filtered_time_aero.filter(strig_name__in=names_arr_sky)
+        elif len(names_str) == 0 and len(names_sky) == 0:
+            if time_start != "Начало" or time_end != "Конец":
+                all_drones_s = aero_points.filter(pk__in=drones_pk)
+                all_drones_a = aero_points.filter(pk__in=drones_pk_aero)
+        if len(names_sky) != 0 and len(drones_pk_aero) == 0:
+            all_drones_a = aero_points.filter(strig_name__in=names_arr_sky)
 
-        if len(all_drones_s) == 0:
-            all_drones_res = all_drones_a
-            if len(all_drones_a) == 0:
-                all_drones_res = all_drones_s
-        if len(all_drones_a) == 0:
-            all_drones_res = all_drones_s
-            if len(all_drones_s) == 0:
-                all_drones_res = all_drones_a
-        #         TODO ubrat kostil` pzdc
+        all_drones_res = all_drones_a.union(all_drones_s, all=True)
+        all_drones_res = all_drones_res.order_by(order_sign + table_filter)
 
-        if all([len(all_drones_a), len(all_drones_s)]):
-            all_drones_res = all_drones_a.union(all_drones_s, all=True)
-            all_drones_res = all_drones_res.order_by(order_sign + table_filter)
-        # all_drones_res = all_drones_s.union(all_drones_a, all=True)
+        # if all([len(all_drones_a), len(all_drones_s)]):
+        #     all_drones_res = all_drones_a.union(all_drones_s, all=True)
+        #     all_drones_res = all_drones_res.order_by(order_sign + table_filter)
+
 
         c['all_drones_res'] = all_drones_res
     c['form_filter'] = form_filter
     c['form_filter_skypoint'] = form_filter_skypoint
-
-    return render(request, "journal.html", context=c)
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 def journal(request):
     global c
-
-    c['start_datetime'] = start_datetime
-    c['end_datetime'] = end_datetime
+    try:
+        c
+    except NameError:
+        c = init_content()
+    c['start_datetime'] = c.get('start_datetime', start_datetime)
+    c['end_datetime'] = c.get('end_datetime', end_datetime)
+    xx = c
     c['page_picked'] = 'journal'
     for el_db in DroneTrajectoryJournal.objects.all():
         el_db.delete()
@@ -725,23 +739,37 @@ def journal(request):
         form_filter_skypoint = SkyPointFilterForm(request.POST)
         form_filter_table = TableFilterForm(request.POST)
         form_order_table = TableOrderForm(request.POST)
-
-    else:
         c['order_sign'] = '-'
-        c['table_filter'] = ''
+        c['table_filter'] = 'detection_time'
+        all_drones_a = AeroPoints.objects.all().order_by(c['order_sign'] + c['table_filter'])
+        all_drones_s = Point.objects.all().order_by(c['order_sign'] + c['table_filter'])
+        all_drones_res = all_drones_s.union(all_drones_a)
+    else:
+
         form_filter = StrizhFilterForm()
         form_filter_skypoint = SkyPointFilterForm()
-        form_filter_table = TableFilterForm()
-        form_order_table = TableOrderForm()
-        table_filter = 'detection_time'
-        order_sign = '-'
+        form_filter_table = c.get('form_filter_table', TableFilterForm())
+        form_order_table = c.get('form_order_table', TableOrderForm())
+        # form_order_table = TableOrderForm()
 
-        all_drones_a = AeroPoints.objects.all().order_by(order_sign + table_filter)
-        all_drones_s = Point.objects.all().order_by(order_sign + table_filter)
+        order_sign = '' if c.get('order_sign') == '+' else '-'
+        table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
+        bool_expr = bool(c.get('start_datetime')) or bool(c.get('end_datetime'))
+        if not c.get('all_drones_res') and not bool_expr or len(c) == 3:
+            # не записан в словарь, но есть фильтр времени след-но выводим все
+            all_drones_a = AeroPoints.objects.all().order_by(order_sign + table_filter)
+            all_drones_s = Point.objects.all().order_by(order_sign + table_filter)
+            all_drones_res = all_drones_s.union(all_drones_a)
+            # all_drones_res = AeroPoints.objects.none()
+            all_drones_res = all_drones_res.order_by(order_sign + table_filter)
+        else:
+            # есть в словаре
+            all_drones_res = c.get('all_drones_res')
 
-        all_drones_res = all_drones_s.union(all_drones_a)
-        all_drones_res = all_drones_res.order_by(order_sign + table_filter)
-        c['all_drones_res'] = all_drones_res
+
+
+
+    c['all_drones_res'] = all_drones_res
 
     c['form_filter'] = form_filter
     c['form_filter_skypoint'] = form_filter_skypoint
@@ -764,8 +792,8 @@ def apply_filter_table(request):
         form_order_table = TableOrderForm()
     c['form_filter_table'] = form_filter_table
     # c['form_order_table'] = form_order_table
-
-    return render(request, "journal.html", context=c)
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 def apply_order_table(request):
@@ -784,8 +812,8 @@ def apply_order_table(request):
     else:
         form_order_table = TableOrderForm()
     c['form_order_table'] = form_order_table
-
-    return render(request, "journal.html", context=c)
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 def filter_nomer_strizha(request):
@@ -795,8 +823,8 @@ def filter_nomer_strizha(request):
         if form_filter.is_valid():
             filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
             c['filtered_strizhes'] = filtered_strizhes
-
-    return render(request, "journal.html", context=c)
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 def filter_nomer_skypoint(request):
@@ -806,8 +834,8 @@ def filter_nomer_skypoint(request):
         if form_filter_skypoint.is_valid():
             filtered_skypoints = form_filter_skypoint.cleaned_data.get('filtered_skypoints')
             c['filtered_skypoints'] = filtered_skypoints
-
-    return render(request, "journal.html", context=c)
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 def apply_period(request):
@@ -827,8 +855,8 @@ def apply_period(request):
 
         c['start_datetime'] = start_datetime
         c['end_datetime'] = end_datetime
-        # return render(request, "journal.html", context=c)
-    return render(request, "journal.html", context=c)
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 def reset_filter(request):
@@ -838,10 +866,14 @@ def reset_filter(request):
     c['saved_table'] = False
     c['table_filter'] = 'detection_time'
     c['order_sign'] = '-'
+    c['start_datetime'] = 'Начало'
+    c['end_datetime'] = 'Конец'
+
     form_filter = StrizhFilterForm()
     form_filter_skypoint = SkyPointFilterForm()
     # form_drone = DroneFilterForm()
     form_filter_table = TableFilterForm()
+    form_order_table = TableOrderForm()
     if request.method == 'POST':
 
         # form_filter_table = TableFilterForm(request.POST)
@@ -853,7 +885,6 @@ def reset_filter(request):
 
         c['all_drones_res'] = all_drones_res
 
-        form_order_table = TableOrderForm()
         for el in StrizhJournal.objects.all():
             el.delete()
         for el in DroneTrajectoryJournal.objects.all():
@@ -865,9 +896,9 @@ def reset_filter(request):
     c['form_filter_skypoint'] = form_filter_skypoint
     c['form_filter_table'] = form_filter_table
     c['form_order_table'] = form_order_table
-    c['start_datetime'] = 'Начало'
-    c['end_datetime'] = 'Конец'
-    return render(request, "journal.html", context=c)
+
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 def export_csv(request):
@@ -882,7 +913,7 @@ def export_csv(request):
         writer = csv.writer(f)
         first_row = 'Имя дрона', 'Имя комплекса', 'ID дрона', 'Несущая частота', 'Пропускная способность', \
                     'Время обнаружения', 'Комментарии', 'Координаты дрона', 'Азимут', \
-                    'Внутренний радиус сектора (м.)', 'Внешний радиус сектора (м.)', 'Радиус сектора (м)',\
+                    'Внутренний радиус сектора (м.)', 'Внешний радиус сектора (м.)', 'Радиус сектора (м)', \
                     'IP-адрес стрижа', 'Высота (м.)'
         writer.writerow(first_row)
         # TODO write frequencies correctly (MGhz..)
@@ -894,7 +925,8 @@ def export_csv(request):
                   dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip, dr.height
 
             writer.writerow(row)
-    return render(request, "journal.html", context=c)
+    return redirect('/journal')
+    # return render(request, "journal.html", context=c)
 
 
 lines_map = {'обогрев': 1,

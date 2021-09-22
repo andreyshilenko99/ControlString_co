@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
     <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
     <script src="static/js/howler.min.js"></script>
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.1/howler.min.js"></script>-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.1/howler.min.js"></script>-->
     <meta charset=utf-8>
 
     {% leaflet_js plugins="ALL" %}
@@ -203,30 +203,30 @@
 
                     <div class="information-bottom" style="height: 65%; margin-top: 2%; width: 100%">
                         <!--                    border: 0.5vh solid rgb(255,255,255)">-->
-                        {% for striz in chosen_strizh %}
-                        {% if striz != 'None' %}
-                        {% if complex_state_dict|getkey:striz == 'включен' %}
-                        <div class="row" style="margin-left: 2.2%">
-
-                            <!--                        <h4 style="color: #2b2b2b; font-weight:600; font-family: Calibri, sans-serif; margin-left: 2%;">-->
-                            <!--                            Режим </h4>-->
-                            <!--                        &nbsp;-->
-                            <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 4%;">
-                                {{action_strizh|getkey:striz}}
-                            </h4>
-                        </div>
+                        <form action='main' method='GET'>
+                            {% for striz in chosen_strizh %}
+                            {% if striz != 'None' %}
+                            <p>{{complex_state_dict}}</p>
+                            {% if complex_state_dict|getkey:striz == 'включен' %}
+                            <div class="row" style="margin-left: 2.2%">
+                                <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 4%;">
+                                    {{action_strizh|getkey:striz}}
+                                </h4>
+                            </div>
 
 
-                        {% else %}
-                        <div class="row" style="margin-left: 2.2%">
-                            <h4 style="font-weight:600; font-family: Calibri, sans-serif; margin-left: 4%; color: #a10202">
-                                Необходимо включить {{striz}} </h4>
+                            {% else %}
+                            <div class="row" style="margin-left: 2.2%">
+                                <h4 style="font-weight:600; font-family: Calibri, sans-serif; margin-left: 4%; color: #a10202">
+                                    Необходимо включить {{striz}} </h4>
 
 
-                        </div>
-                        {% endif %}
-                        {% endif %}
-                        {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                        </form>
+
 
                         {% if chosen_strizh != all_strizhes %}
                         <form action='main' style="margin: 2% 7%" method='GET'>
