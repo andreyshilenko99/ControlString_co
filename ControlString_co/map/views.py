@@ -18,14 +18,13 @@ from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfigur
     SkyPoint, AeroPoints, DroneTrajectoryJournal
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm, \
     TableFilterForm, TableOrderForm, SkyPointFilterForm
+from .forms import TimePickForm
 
 from ControlString_co.control_trace import scan_on_off, check_state, jammer_on_off
 from ControlString_co.shelest_jam import set_gain
 
 DEGREE_SIGN = u"\u2103"
 chosen_strizh = 0
-start_datetime = "Начало"
-end_datetime = "Конец"
 logs = ''
 logs_list = []
 low_t = 10
@@ -38,7 +37,7 @@ c = {}
 
 
 def init_content():
-    c = dict(chosen_strizh=[], start_datetime=start_datetime, end_datetime=end_datetime)
+    c = dict(chosen_strizh=[], start_datetime='', end_datetime='')
     return c
 
 
@@ -267,8 +266,8 @@ def set_strizh(request):
 def render_main_page(request):
     global c
 
-    c['start_datetime'] = start_datetime
-    c['end_datetime'] = end_datetime
+    c['start_datetime'] = ''
+    c['end_datetime'] = ''
     c['page_picked'] = 'main'
 
     temperature_dict = {}
@@ -641,8 +640,8 @@ def filter_all(request):
         skypoints_names_arr = [st.name for st in c['filtered_skypoints']]
         skypoints_names = ';; '.join(skypoints_names_arr)
 
-    c['start_datetime'] = c.get('start_datetime') if c.get('start_datetime') else start_datetime
-    c['end_datetime'] = c.get('end_datetime') if c.get('end_datetime') else end_datetime
+    c['start_datetime'] = c.get('start_datetime') if c.get('start_datetime') else ''
+    c['end_datetime'] = c.get('end_datetime') if c.get('end_datetime') else ''
     xx = c
     strizh_value = StrizhJournal(filtered_strizhes=strizh_names, filtered_skypoints=skypoints_names,
                                  start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
@@ -667,28 +666,33 @@ def filter_all(request):
         time_start = filter_values[0].start_datetime
         time_end = filter_values[0].end_datetime
         now = datetime.datetime.now()
-        if time_start != 'Начало':
-            ts1 = time_start.split('/')
-            ts2 = ts1[-1].split('-')
-            ts3 = ts2[-1].split(':')
-            time_start_datetime = now.replace(year=int(ts2[0]), month=int(ts1[0]), day=int(ts1[1]), hour=int(ts3[0]),
-                                              minute=int(ts3[1]), second=0)
+        if time_start != '':
+            dateYMDHM = time_start.split('T')
+            YMD_arr = dateYMDHM[0].split('-')
+            HM_arr = dateYMDHM[1].split(':')
+            time_start_datetime = now.replace(year=int(YMD_arr[0]), month=int(YMD_arr[1]), day=int(YMD_arr[2]),
+                                              hour=int(HM_arr[0]), minute=int(HM_arr[1]), second=0)
         else:
             time_start_datetime = now.replace(year=1970)
-        if time_end != 'Конец':
-            ts11 = time_end.split('/')
-            ts22 = ts11[-1].split('-')
-            ts33 = ts22[-1].split(':')
-            time_end_datetime = now.replace(year=int(ts22[0]), month=int(ts11[0]), day=int(ts11[1]), hour=int(ts33[0]),
-                                            minute=int(ts33[1]), second=59)
+        if time_end != '':
+            dateYMDHM = time_end.split('T')
+            YMD_arr = dateYMDHM[0].split('-')
+            HM_arr = dateYMDHM[1].split(':')
+            time_end_datetime = now.replace(year=int(YMD_arr[0]), month=int(YMD_arr[1]), day=int(YMD_arr[2]),
+                                            hour=int(HM_arr[0]), minute=int(HM_arr[1]), second=59)
         else:
             time_end_datetime = now
         drones_pk = []
+        all_complexes = set()
         for drone in strizh_drones:
+            all_complexes.add(drone.strig_name)
             if time_start_datetime <= get_datetime_drone(drone.detection_time) <= time_end_datetime:
                 drones_pk.append(drone.pk)
         drones_pk_aero = []
+
+        all_complexes_aero = set()
         for drone_aero in aero_points:
+            all_complexes_aero.add(drone_aero.strig_name)
             if time_start_datetime <= get_datetime_drone(drone_aero.detection_time) <= time_end_datetime:
                 drones_pk_aero.append(drone_aero.pk)
         names_str = filter_values[0].filtered_strizhes
@@ -696,21 +700,11 @@ def filter_all(request):
 
         names_arr = names_str.split(';; ')
         names_arr_sky = names_sky.split(';; ')
+        if len(names_str) == 0 and len(names_sky) == 0:
+            names_arr = list(all_complexes)
+            names_arr_sky = list(all_complexes_aero)
         all_drones_s = strizh_drones.filter(strig_name__in=names_arr, pk__in=drones_pk)
         all_drones_a = aero_points.filter(strig_name__in=names_arr_sky, pk__in=drones_pk_aero)
-        # if len(names_str) != 0 and len(drones_pk) == 0:
-        #     all_drones_s = strizh_drones.filter(strig_name__in=names_arr)
-        # if len(names_str) == 0 and len(names_sky) == 0:
-        #     if time_start != "Начало" or time_end != "Конец":
-        #         all_drones_s = aero_points.filter(pk__in=drones_pk)
-        #         all_drones_a = aero_points.filter(pk__in=drones_pk_aero)
-        # if len(names_sky) != 0 and len(drones_pk_aero) == 0:
-        #     all_drones_a = aero_points.filter(strig_name__in=names_arr_sky)
-        # if len(all_drones_s) != 0 and len(all_drones_a) != 0:
-        #     all_drones_res = all_drones_s.union(all_drones_a, all=True)
-        #     # len(all_drones_s) == 0 and len(all_drones_a) == 0
-        # else:
-        #     all_drones_res = AeroPoints.objects.none()
         if len(all_drones_s) != 0 and len(all_drones_a) != 0:
             all_drones_res = all_drones_s.union(all_drones_a, all=True)
         else:
@@ -718,15 +712,7 @@ def filter_all(request):
                 all_drones_res = all_drones_a
             if len(all_drones_a) == 0:
                 all_drones_res = all_drones_s
-
-        # all_drones_res = all_drones_s.union(all_drones_a, all=True)
-
         all_drones_res = all_drones_res.order_by(order_sign + table_filter)
-
-        # if all([len(all_drones_a), len(all_drones_s)]):
-        #     all_drones_res = all_drones_a.union(all_drones_s, all=True)
-        #     all_drones_res = all_drones_res.order_by(order_sign + table_filter)
-
         c['all_drones_res'] = all_drones_res
     c['form_filter'] = form_filter
     c['form_filter_skypoint'] = form_filter_skypoint
@@ -740,8 +726,8 @@ def journal(request):
         c
     except NameError:
         c = init_content()
-    c['start_datetime'] = c.get('start_datetime', start_datetime)
-    c['end_datetime'] = c.get('end_datetime', end_datetime)
+    c['start_datetime'] = c.get('start_datetime', '')
+    c['end_datetime'] = c.get('end_datetime', '')
     xx = c
     c['page_picked'] = 'journal'
     for el_db in DroneTrajectoryJournal.objects.all():
@@ -750,6 +736,7 @@ def journal(request):
         el_db.delete()
 
     if request.method == 'POST':
+
         form_filter = StrizhFilterForm(request.POST)
         form_filter_skypoint = SkyPointFilterForm(request.POST)
         form_filter_table = TableFilterForm(request.POST)
@@ -761,6 +748,11 @@ def journal(request):
         all_drones_res = all_drones_s.union(all_drones_a)
         c['all_drones_res'] = all_drones_res
     else:
+        if not c.get('form_time_pick'):
+            c['form_time_pick'] = TimePickForm()
+        # form_time_pick = TimePickForm()
+        # form_time_pick = TimePickForm(initial={'datetime': c.get('start_datetime'),
+        #                                        'end_datetime': c.get('end_datetime') })
 
         form_filter = StrizhFilterForm()
         form_filter_skypoint = SkyPointFilterForm()
@@ -770,10 +762,9 @@ def journal(request):
 
         order_sign = '' if c.get('order_sign') == '+' else '-'
         table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
-        bool_expr = bool(c.get('start_datetime') != 'Начало') or bool(c.get('end_datetime') != 'Конец')
-        if c.get('all_drones_res') is None :
-            # xddx = len(c.get('all_drones_res'))
-            if bool_expr or len(c) == 3:
+        bool_expr = bool(c.get('start_datetime') != '') or bool(c.get('end_datetime') != '')
+        if c.get('all_drones_res') is None:
+            if bool_expr or len(c) <= 5:
                 # не записан в словарь, но есть фильтр времени след-но выводим все
                 all_drones_a = AeroPoints.objects.all().order_by(order_sign + table_filter)
                 all_drones_s = Point.objects.all().order_by(order_sign + table_filter)
@@ -783,9 +774,7 @@ def journal(request):
         else:
             # есть в словаре
             all_drones_res = c.get('all_drones_res')
-
-
-
+    # c['form_time_pick'] = form_time_pick
     c['form_filter'] = form_filter
     c['form_filter_skypoint'] = form_filter_skypoint
     c['form_filter_table'] = form_filter_table
@@ -854,24 +843,32 @@ def filter_nomer_skypoint(request):
 
 
 def apply_period(request):
-    global c, start_datetime, end_datetime, reset_time
+    global c, reset_time
     c['saved_table'] = False
     if request.method == 'POST':
-        if request.POST.get('start_datetime'):
-            start = request.POST['start_datetime']
+        start = ''
+        end = ''
+        if request.POST.get('datetime_start'):
+            start = request.POST['datetime_start']
             print('got start ', start, '\n')
             start_arr = start.split(' ')
             start_datetime = "-".join(start_arr)
-        if request.POST.get('end_datetime'):
-            end = request.POST['end_datetime']
+            form_time_pick = TimePickForm(request.POST, initial={'datetime_start': start})
+            c['form_time_pick'] = form_time_pick
+            c['start_datetime'] = start_datetime
+        if request.POST.get('datetime_end'):
+            end = request.POST['datetime_end']
             print('got end', end, '\n')
             end_arr = end.split(' ')
             end_datetime = "-".join(end_arr)
-
-        c['start_datetime'] = start_datetime
-        c['end_datetime'] = end_datetime
-    return redirect('/journal')
-    # return render(request, "journal.html", context=c)
+            form_time_pick = TimePickForm(request.POST, initial={'datetime_end': end})
+            c['form_time_pick'] = form_time_pick
+            c['end_datetime'] = end_datetime
+        if start and end:
+            form_time_pick = TimePickForm(request.POST, initial={'datetime_start': start, 'datetime_end': end})
+            c['form_time_pick'] = form_time_pick
+    # return redirect('/journal')
+    return render(request, "journal.html", context=c)
 
 
 def reset_filter(request):
@@ -881,9 +878,11 @@ def reset_filter(request):
     c['saved_table'] = False
     c['table_filter'] = 'detection_time'
     c['order_sign'] = '-'
-    c['start_datetime'] = 'Начало'
-    c['end_datetime'] = 'Конец'
-
+    c['start_datetime'] = ''
+    c['end_datetime'] = ''
+    xx = c
+    del c['all_drones_res']
+    form_time_pick = TimePickForm()
     form_filter = StrizhFilterForm()
     form_filter_skypoint = SkyPointFilterForm()
     # form_drone = DroneFilterForm()
@@ -907,6 +906,7 @@ def reset_filter(request):
         for el in DroneJournal.objects.all():
             el.delete()
 
+    c['form_time_pick'] = form_time_pick
     c['form_filter'] = form_filter
     c['form_filter_skypoint'] = form_filter_skypoint
     c['form_filter_table'] = form_filter_table

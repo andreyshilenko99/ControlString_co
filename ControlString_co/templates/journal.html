@@ -221,69 +221,83 @@
                         </div>
 
 
+                        <!--                        <form action="apply_period" method="post">-->
+                        <!--                            {% csrf_token %}-->
+                        <!--                            <h3> Период </h3>-->
+
+                        <!--                            <div class="form-group" id="datetimepicker2">-->
+                        <!--                                <h4 style="color: #72849e">-->
+                        <!--                                    <label for="id_start_datetime">Начало</label>-->
+                        <!--                                </h4>-->
+                        <!--                                <div class="input-group date" style="height: 48px; width: 80%">-->
+
+                        <!--                                    <input type="text" name="start_datetime" value="Начало"-->
+                        <!--                                           class="form-control" placeholder="{{start_datetime}}"-->
+                        <!--                                           required id="id_start_datetime"-->
+                        <!--                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">-->
+                        <!--                                    <div class="input-group-addon input-group-append" data-target="#datetimepicker1"-->
+                        <!--                                         data-toggle="datetimepickerv">-->
+                        <!--                                        <div class="input-group-text">-->
+                        <!--                                            <i class="glyphicon glyphicon-calendar"></i>-->
+                        <!--                                        </div>-->
+                        <!--                                    </div>-->
+                        <!--                                    &lt;!&ndash;                                    <input type="text" name="start_datetime" value="05/16/2018 12:31"&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                           class="form-control" placeholder="Start datetime" title=""&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                           required id="id_start_datetime"&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}"&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                    />&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                    <div class="input-group-addon input-group-append" data-target="#datetimepicker1"&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                         data-toggle="datetimepickerv">&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                        <div class="input-group-text">&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                            <i class="glyphicon glyphicon-calendar"></i>&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                        </div>&ndash;&gt;-->
+                        <!--                                    &lt;!&ndash;                                    </div>&ndash;&gt;-->
+
+                        <!--                                    <button class="btn btn-primary" type='submit'-->
+                        <!--                                            style="margin-left: 1%;font-size: 16px"> Применить-->
+                        <!--                                    </button>-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+
+                        <!--                        </form>-->
+                        <!--                        <form action="apply_period" method="post">-->
+                        <!--                            {% csrf_token %}-->
+
+                        <!--                            <div class="form-group">-->
+                        <!--                                <h4 style="color: #72849e">-->
+                        <!--                                    <label for="id_end_datetime">Конец</label>-->
+                        <!--                                </h4>-->
+                        <!--                                <div class="input-group date" style="height: 48px; width: 80%">-->
+                        <!--                                    <input type="text" name="end_datetime" value="Конец"-->
+                        <!--                                           class="form-control" placeholder="{{end_datetime}}"-->
+                        <!--                                           required="" id="id_end_datetime"-->
+                        <!--                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">-->
+                        <!--                                    <div class="input-group-addon input-group-append"-->
+                        <!--                                         data-target="#datetimepicker2" data-toggle="datetimepicker2">-->
+                        <!--                                        <div class="input-group-text">-->
+                        <!--                                            <i class="glyphicon glyphicon-calendar"></i>-->
+                        <!--                                        </div>-->
+                        <!--                                    </div>-->
+                        <!--                                    <button class="btn btn-primary" type='submit'-->
+                        <!--                                            style="margin-left: 1%;font-size: 16px"> Применить-->
+                        <!--                                    </button>-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                        </form>-->
+
                         <form action="apply_period" method="post">
                             {% csrf_token %}
-                            <h3> Период </h3>
-
-                            <div class="form-group" id="datetimepicker2">
-                                <h4 style="color: #72849e">
-                                    <label for="id_start_datetime">Начало</label>
-                                </h4>
-                                <div class="input-group date" style="height: 48px; width: 80%">
-
-                                    <input type="text" name="start_datetime" value="Начало"
-                                           class="form-control" placeholder="{{start_datetime}}"
-                                           required id="id_start_datetime"
-                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
-                                    <div class="input-group-addon input-group-append" data-target="#datetimepicker1"
-                                         data-toggle="datetimepickerv">
-                                        <div class="input-group-text">
-                                            <i class="glyphicon glyphicon-calendar"></i>
-                                        </div>
-                                    </div>
-                                    <!--                                    <input type="text" name="start_datetime" value="05/16/2018 12:31"-->
-                                    <!--                                           class="form-control" placeholder="Start datetime" title=""-->
-                                    <!--                                           required id="id_start_datetime"-->
-                                    <!--                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}"-->
-                                    <!--                                    />-->
-                                    <!--                                    <div class="input-group-addon input-group-append" data-target="#datetimepicker1"-->
-                                    <!--                                         data-toggle="datetimepickerv">-->
-                                    <!--                                        <div class="input-group-text">-->
-                                    <!--                                            <i class="glyphicon glyphicon-calendar"></i>-->
-                                    <!--                                        </div>-->
-                                    <!--                                    </div>-->
-
-                                    <button class="btn btn-primary" type='submit'
-                                            style="margin-left: 1%;font-size: 16px"> Применить
-                                    </button>
-                                </div>
-                            </div>
-
+                            {{ form_time_pick.as_p }}
+                            <input type="submit" class="btn btn-primary"
+                                   name="start_datetime" value="Применить"/>
                         </form>
-                        <form action="apply_period" method="post">
-                            {% csrf_token %}
+<!--                        <form action="apply_period" method="post">-->
+<!--                            {% csrf_token %}-->
+<!--                            {{ form_time_pick.as_p }}-->
+<!--                            <input type="submit" class="btn btn-primary"-->
+<!--                                   name="end_datetime" value="Применить"/>-->
+<!--                        </form>-->
 
-                            <div class="form-group">
-                                <h4 style="color: #72849e">
-                                    <label for="id_end_datetime">Конец</label>
-                                </h4>
-                                <div class="input-group date" style="height: 48px; width: 80%">
-                                    <input type="text" name="end_datetime" value="Конец"
-                                           class="form-control" placeholder="{{end_datetime}}"
-                                           required="" id="id_end_datetime"
-                                           dp_config="{&quot;id&quot;: &quot;dp_3&quot;, &quot;picker_type&quot;: &quot;DATETIME&quot;, &quot;linked_to&quot;: null, &quot;options&quot;: {&quot;showClose&quot;: true, &quot;showClear&quot;: true, &quot;showTodayButton&quot;: true, &quot;format&quot;: &quot;MM/DD/YYYY HH:mm&quot;}}">
-                                    <div class="input-group-addon input-group-append"
-                                         data-target="#datetimepicker2" data-toggle="datetimepicker2">
-                                        <div class="input-group-text">
-                                            <i class="glyphicon glyphicon-calendar"></i>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-primary" type='submit'
-                                            style="margin-left: 1%;font-size: 16px"> Применить
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
                         <h5 style="">
                             Отсортировать по:
                         </h5>

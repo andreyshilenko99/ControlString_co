@@ -284,7 +284,7 @@ function map_init_basic(map, options) {
                     console.log('map.getZoom()', map.getZoom())
                     map.fitBounds(L.latLngBounds(c2, c1), {padding: [10, 10]});
                     // map.setZoom(map.getZoom() );
-                    map.setView(strizh_center, map.getZoom() + 1 );
+                    map.setView(strizh_center, map.getZoom() - 2 );
                 }
 
                 // Отрисовка подписи к дрону в секторе + layerDrones

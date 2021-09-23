@@ -5,8 +5,26 @@ from django.forms import CheckboxSelectMultiple
 
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration, SkyPoint
 # from django.forms import widgets
+
+from django.forms import IntegerField, TextInput, NumberInput, ModelForm
 from django import forms
-from django.forms import IntegerField, TextInput, NumberInput
+
+from .models import TimePick
+
+
+class TimePickForm(ModelForm):
+    datetime_start = forms.DateTimeInput(format='%Y-%m-%d %H:%M')
+    datetime_end = forms.DateTimeInput(format='%Y-%m-%d %H:%M')
+
+    class Meta:
+        model = TimePick
+        fields = ['datetime_start', 'datetime_end']
+        widgets = {
+            'datetime_start': forms.DateTimeInput(
+                attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'datetime_end': forms.DateTimeInput(
+                attrs={'type': 'datetime-local', 'class': 'form-control'})
+        }
 
 
 class StrizhForm(ModelForm):
