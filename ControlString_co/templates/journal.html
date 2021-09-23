@@ -3,21 +3,14 @@
 {% load geojson_tags %}
 {% load mytags %}
 
-
 <html lang="en">
-
-
 <head>
-
-
     {% csrf_token %}
     <meta charset="UTF-8">
     {% leaflet_js plugins="ALL" %}
     {% leaflet_css plugins="ALL" %}
     {% leaflet_js %}
     {% leaflet_css %}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Журнал</title>
 
     <!--    <link rel="stylesheet" type="text/css" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">-->
@@ -56,8 +49,11 @@
 
 
     <script type="text/javascript" src="/static/journal.js"></script>
+    <script type="text/javascript">
+        const chosen_complex_to_show = "{{ chosen_complex_to_show }}";
 
 
+    </script>
 </head>
 <!--<body style="background-color:rgba(113,129,132,0.14);">-->
 <body style="text-align: left;  background: rgba(113,129,132,0.14) url(static/icons/strizh_images/strizh3.png); ">
@@ -125,9 +121,9 @@
                                         <div class="col-1">
 
                                             <!--                                            <button class="button-blue-small" style="margin: 0px 20px">-->
-<!--                                            <button class="btn btn-primary" style="margin: 0px 1%; font-size: 16px">-->
-<!--                                                выбор-->
-<!--                                            </button>-->
+                                            <!--                                            <button class="btn btn-primary" style="margin: 0px 1%; font-size: 16px">-->
+                                            <!--                                                выбор-->
+                                            <!--                                            </button>-->
                                         </div>
                                     </div>
 
@@ -183,9 +179,9 @@
                                         <div class="col-1">
 
                                             <!--                                            <button class="button-blue-small" style="margin: 0px 20px">-->
-<!--                                            <button class="btn btn-primary" style="margin: 0px 1%; font-size: 16px">-->
-<!--                                                выбор-->
-<!--                                            </button>-->
+                                            <!--                                            <button class="btn btn-primary" style="margin: 0px 1%; font-size: 16px">-->
+                                            <!--                                                выбор-->
+                                            <!--                                            </button>-->
                                         </div>
                                     </div>
 

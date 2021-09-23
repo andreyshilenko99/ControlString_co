@@ -26,6 +26,50 @@ var seconds_wait = 3; // seconds, edit here
 setInterval(refresh, seconds_wait * 1000);
 
 function map_init_basic(map, options) {
+
+    L.ClickableTooltip = L.Tooltip.extend({
+        onAdd: function (map) {
+            L.Tooltip.prototype.onAdd.call(this, map);
+            var el = this.getElement(),
+                self = this;
+            el.addEventListener('click', function () {
+                self.fire("click");
+            });
+            el.style.pointerEvents = 'auto';
+        }
+    });
+
+    function clickZoom(e) {
+        map.setView(e.target.getLatLng(), 15);
+    }
+
+    function track_map_bounds(map, coords_arr) {
+        let coords_lat = [];
+        let coords_lon = [];
+        console.log('coords_arr:', coords_arr);
+        for (let n = 0; n < coords_arr.length; n++) {
+            coords_lat.push(coords_arr[n].lat)
+            coords_lon.push(coords_arr[n].lng)
+        }
+        const sum_lat = coords_lat.reduce((a, b) => a + b, 0);
+        const sum_lon = coords_lon.reduce((a, b) => a + b, 0);
+        const avg_lat = (sum_lat / coords_lat.length) || 0;
+        const avg_lon = (sum_lon / coords_lon.length) || 0;
+        let mean_coords = new L.LatLng(avg_lat, avg_lon);
+        let min_lat = Math.min.apply(Math, coords_lat)
+        let min_lon = Math.min.apply(Math, coords_lon)
+        let max_lat = Math.max.apply(Math, coords_lat)
+        let max_lon = Math.max.apply(Math, coords_lon)
+        let c1 = L.latLng(min_lat, min_lon);
+        let c2 = L.latLng(max_lat, max_lon);
+        map.fitBounds(L.latLngBounds(c2, c1));
+        console.log('map.getZoom()', map.getZoom())
+        console.log('mean_coords:', mean_coords);
+        map.setZoom(map.getZoom() - 1);
+        map.setView(mean_coords, map.getZoom() - 1);
+        return map
+    }
+
     function isEmpty(obj) {
         return Object.keys(obj).length === 0;
     }
@@ -49,7 +93,7 @@ function map_init_basic(map, options) {
     }
 
     function draw_tooltip(map, coords, icon_url, size, tooltip_text) {
-        var tooltip_strizh = new L.Tooltip({
+        var tooltip_strizh = new L.ClickableTooltip({
             direction: 'bottom',
             permanent: true,
             noWrap: true,
@@ -70,13 +114,13 @@ function map_init_basic(map, options) {
             {icon: logoMarkerStrizh})
             .addTo(map)
         if (tooltip_text) {
-            tooltip_strizh.setContent('PIZDA');
-            mark.bindTooltip(tooltip_strizh).openTooltip()
+            tooltip_strizh.setContent(tooltip_text);
+            mark.bindTooltip(tooltip_strizh).openTooltip().on('click', clickZoom);
         }
     }
 
     function place_text(map, coords, text) {
-        var tooltip_ = new L.tooltip({
+        var tooltip_ = new L.Tooltip({
             direction: 'center',
             noWrap: true,
             permanent: true,
@@ -90,7 +134,7 @@ function map_init_basic(map, options) {
         })
             .addTo(map)
             .bindTooltip(tooltip_)
-            .openTooltip();
+            .openTooltip().on('click', clickZoom);
     }
 
 
@@ -139,7 +183,7 @@ function map_init_basic(map, options) {
             for (let j = 0; j < len_strizh_data; j++) {
 
                 strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
-                    strizh_data.features[j].properties.lon, strizh_data.features[j].properties.name];
+                    strizh_data.features[j].properties.lon, strizh_data.features[j].properties.radius];
 
                 console.log('strizh_data: ', strizh_data.features[j].properties)
 
@@ -149,7 +193,7 @@ function map_init_basic(map, options) {
                         layerStrizhes.clearLayers();
                     }
                     if (counter_periodic === 0) {
-                        var tooltip = L.tooltip({
+                        var tooltip = new L.ClickableTooltip({
                             direction: 'bottom',
                             noWrap: true,
                             permanent: true,
@@ -159,16 +203,16 @@ function map_init_basic(map, options) {
 
                         str1 = L.marker([strizh_data.features[j].properties.lat,
                             strizh_data.features[j].properties.lon], {icon: logoMarkerStrizh}).addTo(layerStrizhes)
-                            .bindTooltip(tooltip).openTooltip();
+                            .bindTooltip(tooltip).openTooltip().on('click', clickZoom);
                     }
                     map.addLayer(layerStrizhes)
                 }
             }
-            let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/drons/dron_top.png', color: '#ff0000'});
+            let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/drons/znak_dron.png', color: '#ff0000'});
             console.log('data ', data)
             // статичная отрисовка радиуса вокруг стрижа, стрижа и его подписи
             if (data.features.length !== 0) {
-                let radius = parseFloat(data.features[0].properties.area_radius_m);
+                // let radius = parseFloat(data.features[0].properties.area_radius_m);
                 let area_sector_start_grad = parseFloat(data.features[0].properties.area_sector_start_grad);
                 let area_sector_end_grad = parseFloat(data.features[0].properties.area_sector_end_grad);
                 console.log('strizh_map_name', strizh_map_name)
@@ -180,15 +224,16 @@ function map_init_basic(map, options) {
                     strizh_map_name[data.features[0].properties.strig_name])
 
                 let strizh_center = [strizh_map_name[data.features[0].properties.strig_name][0], strizh_map_name[data.features[0].properties.strig_name][1]];
+                var radius = parseFloat(strizh_map_name[data.features[0].properties.strig_name][2])
 
                 // Отрисовка сектора с обновлением + layerDrones
-                let r_y = 0.004499 * 4 / 5
-                let r_x = 0.008892 * 4 / 5
+                let r_y = radius * 0.000008998
+                let r_x = radius * 0.000017784
 
                 if (area_sector_start_grad === -1 && area_sector_end_grad === -1) {
                     let angle = (90 - (area_sector_start_grad)) / 180 * Math.PI;
-                    var d_y = 0.004499 * Math.sin(angle);
-                    var d_x = 0.008892 * Math.cos(angle);
+                    var d_y = r_y * Math.sin(angle);
+                    var d_x = r_x * Math.cos(angle);
                     arc1 = L.circle(strizh_center, {
                         color: '#0296f8',
                         // fillColor: "#f1b44e",
@@ -216,10 +261,30 @@ function map_init_basic(map, options) {
                         radius: radius,
                         startAngle: area_sector_start_grad,
                         endAngle: area_sector_end_grad,
-
                     }).addTo(layerDrones);
+                }
+
+                if (chosen_complex_to_show !== '') {
+                    // initial_draw_strizh = 1;
+
+                    // // let r_y = Math.abs((radius - 400)) * 0.000008998
+                    let r_y = radius * 0.000008998
+                    // // let r_x = Math.abs((radius - 400)) * 0.000017784
+                    let r_x = radius * 0.000017784
 
 
+                    let max_lat = strizh_center[0] + r_x
+                    let max_lon = strizh_center[1] + r_y
+                    let min_lat = strizh_center[0] - r_x
+                    let min_lon = strizh_center[1] - r_y
+
+                    let c1 = L.latLng(min_lat, min_lon);
+                    let c2 = L.latLng(max_lat, max_lon);
+
+                    console.log('map.getZoom()', map.getZoom())
+                    map.fitBounds(L.latLngBounds(c2, c1), {padding: [10, 10]});
+                    // map.setZoom(map.getZoom() );
+                    map.setView(strizh_center, map.getZoom() + 1 );
                 }
 
                 // Отрисовка подписи к дрону в секторе + layerDrones
@@ -242,9 +307,12 @@ function map_init_basic(map, options) {
                 // Отрисовка дрона в секторе + layerDrones
                 L.marker([strizh_center[0] + d_y,
                     strizh_center[1] + d_x], {icon: logoMarker}).addTo(layerDrones)
-                    .bindTooltip(tooltip_drone).openTooltip();
+                    .bindTooltip(tooltip_drone).openTooltip().on('click', clickZoom);
             }
         });
+
+
+        console.log('chosen_complex_to_show', chosen_complex_to_show)
     })
 
 
@@ -256,12 +324,12 @@ function map_init_basic(map, options) {
 
         draw_tooltip(map,
             coords = [60.013674, 30.442474],
-            icon_url = 'static/icons/controller/contr_round2.png', size = 50, tooltip_text = '')
+            icon_url = 'static/icons/controller/pad.svg', size = 50, tooltip_text = '')
 
 
         draw_tooltip(map,
             coords = [60.015, 30.47],
-            icon_url = 'static/icons/home.png', size = 50, tooltip_text = '')
+            icon_url = 'static/icons/home/home2.png', size = 50, tooltip_text = '')
 
         for (let i = 0; i < n_elements; i++) {
             var aero_value = data.features[i].properties;
@@ -285,7 +353,7 @@ function map_init_basic(map, options) {
             var coords_arr = values_data.coords
             var heights_arr = values_data.heights
 
-            var firstpolyline = new L.Polyline(coords_arr, {
+            var polyline = new L.Polyline(coords_arr, {
                 // color: getRandomColor(),
                 // color: '#ff0000',
                 color: random_rgba(),
@@ -294,15 +362,22 @@ function map_init_basic(map, options) {
                 opacity: 0.9,
                 smoothFactor: 0
             });
-            firstpolyline.addTo(map);
-            map.fitBounds(firstpolyline.getBounds());
+            polyline.addTo(map);
+            // map.fitBounds(polyline.getBounds());
 
             draw_tooltip(map,
                 coords = coords_arr[coords_arr.length - 1],
-                icon_url = 'static/icons/route/start_circle.png', size = 60, tooltip_text = '')
+                icon_url = 'static/icons/route/start.svg', size = 60, tooltip_text = '')
             draw_tooltip(map,
                 coords = coords_arr[0],
-                icon_url = 'static/icons/route/finish_circle.png', size = 60, tooltip_text = '')
+                icon_url = 'static/icons/route/stop.svg', size = 60, tooltip_text = '')
+
+            if (chosen_complex_to_show !== '') {
+                // initial_draw_strizh = 1;
+                // let avg = average(coords_arr)
+                map = track_map_bounds(map, coords_arr)
+
+            }
 
             for (let j = 0; j < coords_arr.length; j++) {
                 let height = heights_arr[j];

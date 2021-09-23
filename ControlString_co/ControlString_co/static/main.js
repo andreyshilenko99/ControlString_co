@@ -240,7 +240,6 @@ function map_init_basic(map, options) {
                                 if (!strizh_layers[strizh_name]) {
                                     strizh_layers[strizh_name] = L.layerGroup().addTo(map);
                                 }
-                                console.log('complex_state', complex_state)
                                 console.log('complex_mode', complex_mode)
                                 if (complex_state[strizh_name] === 'включен' ||
                                     complex_state[strizh_name] === 'выключен вентилятор') {
@@ -537,7 +536,7 @@ function map_init_basic(map, options) {
 
                 layers_track[key] = draw_tooltip(layers_track[key],
                     coords = coords_arr[0],
-                    icon_url = 'static/icons/route/eye1.png', size = 60, tooltip_text = '')
+                    icon_url = 'static/icons/route/start.svg', size = 60, tooltip_text = '')
                 layers_track[key] = draw_tooltip(layers_track[key],
                     coords = coords_arr[coords_arr.length - 1],
                     icon_url = 'static/icons/drons/dron_top.png', size = 60,

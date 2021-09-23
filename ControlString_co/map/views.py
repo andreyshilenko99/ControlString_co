@@ -558,6 +558,7 @@ def show_logs(request):
 def choose_drone_toshow(request):
     global c
     if request.method == 'POST':
+        c['chosen_complex_to_show'] = ''
         detection_id = request.POST.get('detection_id')
         drone_id = request.POST.get('drone_id')
         for el_db in DroneTrajectoryJournal.objects.all():
@@ -583,6 +584,7 @@ def choose_drone_toshow(request):
                                                      height=DP.height,
                                                      strig_name=DP.strig_name)
                 drone_value.save()
+                c['chosen_complex_to_show'] = DP.strig_name
         elif detection_id:
             DP = Point.objects.filter(pk=detection_id)[0]
             drone_value = DroneJournal(system_name=DP.system_name,
@@ -601,7 +603,9 @@ def choose_drone_toshow(request):
                                        height=DP.height,
                                        strig_name=DP.strig_name)
             drone_value.save()
-    # return redirect('/journal')
+            c['chosen_complex_to_show'] = DP.strig_name
+            # return redirect('/journal')
+
     return render(request, "journal.html", context=c)
 
 
@@ -694,23 +698,34 @@ def filter_all(request):
         names_arr_sky = names_sky.split(';; ')
         all_drones_s = strizh_drones.filter(strig_name__in=names_arr, pk__in=drones_pk)
         all_drones_a = aero_points.filter(strig_name__in=names_arr_sky, pk__in=drones_pk_aero)
-        if len(names_str) != 0 and len(drones_pk) == 0:
-            all_drones_s = strizh_drones.filter(strig_name__in=names_arr)
+        # if len(names_str) != 0 and len(drones_pk) == 0:
+        #     all_drones_s = strizh_drones.filter(strig_name__in=names_arr)
+        # if len(names_str) == 0 and len(names_sky) == 0:
+        #     if time_start != "Начало" or time_end != "Конец":
+        #         all_drones_s = aero_points.filter(pk__in=drones_pk)
+        #         all_drones_a = aero_points.filter(pk__in=drones_pk_aero)
+        # if len(names_sky) != 0 and len(drones_pk_aero) == 0:
+        #     all_drones_a = aero_points.filter(strig_name__in=names_arr_sky)
+        # if len(all_drones_s) != 0 and len(all_drones_a) != 0:
+        #     all_drones_res = all_drones_s.union(all_drones_a, all=True)
+        #     # len(all_drones_s) == 0 and len(all_drones_a) == 0
+        # else:
+        #     all_drones_res = AeroPoints.objects.none()
+        if len(all_drones_s) != 0 and len(all_drones_a) != 0:
+            all_drones_res = all_drones_s.union(all_drones_a, all=True)
+        else:
+            if len(all_drones_s) == 0:
+                all_drones_res = all_drones_a
+            if len(all_drones_a) == 0:
+                all_drones_res = all_drones_s
 
-        elif len(names_str) == 0 and len(names_sky) == 0:
-            if time_start != "Начало" or time_end != "Конец":
-                all_drones_s = aero_points.filter(pk__in=drones_pk)
-                all_drones_a = aero_points.filter(pk__in=drones_pk_aero)
-        if len(names_sky) != 0 and len(drones_pk_aero) == 0:
-            all_drones_a = aero_points.filter(strig_name__in=names_arr_sky)
+        # all_drones_res = all_drones_s.union(all_drones_a, all=True)
 
-        all_drones_res = all_drones_a.union(all_drones_s, all=True)
         all_drones_res = all_drones_res.order_by(order_sign + table_filter)
 
         # if all([len(all_drones_a), len(all_drones_s)]):
         #     all_drones_res = all_drones_a.union(all_drones_s, all=True)
         #     all_drones_res = all_drones_res.order_by(order_sign + table_filter)
-
 
         c['all_drones_res'] = all_drones_res
     c['form_filter'] = form_filter
@@ -744,6 +759,7 @@ def journal(request):
         all_drones_a = AeroPoints.objects.all().order_by(c['order_sign'] + c['table_filter'])
         all_drones_s = Point.objects.all().order_by(c['order_sign'] + c['table_filter'])
         all_drones_res = all_drones_s.union(all_drones_a)
+        c['all_drones_res'] = all_drones_res
     else:
 
         form_filter = StrizhFilterForm()
@@ -754,22 +770,21 @@ def journal(request):
 
         order_sign = '' if c.get('order_sign') == '+' else '-'
         table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
-        bool_expr = bool(c.get('start_datetime')) or bool(c.get('end_datetime'))
-        if not c.get('all_drones_res') and not bool_expr or len(c) == 3:
-            # не записан в словарь, но есть фильтр времени след-но выводим все
-            all_drones_a = AeroPoints.objects.all().order_by(order_sign + table_filter)
-            all_drones_s = Point.objects.all().order_by(order_sign + table_filter)
-            all_drones_res = all_drones_s.union(all_drones_a)
-            # all_drones_res = AeroPoints.objects.none()
-            all_drones_res = all_drones_res.order_by(order_sign + table_filter)
+        bool_expr = bool(c.get('start_datetime') != 'Начало') or bool(c.get('end_datetime') != 'Конец')
+        if c.get('all_drones_res') is None :
+            # xddx = len(c.get('all_drones_res'))
+            if bool_expr or len(c) == 3:
+                # не записан в словарь, но есть фильтр времени след-но выводим все
+                all_drones_a = AeroPoints.objects.all().order_by(order_sign + table_filter)
+                all_drones_s = Point.objects.all().order_by(order_sign + table_filter)
+                all_drones_res = all_drones_s.union(all_drones_a)
+                all_drones_res = all_drones_res.order_by(order_sign + table_filter)
+                c['all_drones_res'] = all_drones_res
         else:
             # есть в словаре
             all_drones_res = c.get('all_drones_res')
 
 
-
-
-    c['all_drones_res'] = all_drones_res
 
     c['form_filter'] = form_filter
     c['form_filter_skypoint'] = form_filter_skypoint
