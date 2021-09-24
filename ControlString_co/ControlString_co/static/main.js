@@ -44,7 +44,7 @@ var DRONE_COUNTER = 5 // number of iterations to clear drone
 const MAXDRONES = 50;
 
 
-setInterval(refresh, SECONDS_WAIT * 1000);
+// setInterval(refresh, SECONDS_WAIT * 1000);
 
 function map_init_basic(map, options) {
     map.setView([60.013674, 30.452474], 15);

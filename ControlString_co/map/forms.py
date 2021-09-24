@@ -21,9 +21,9 @@ class TimePickForm(ModelForm):
         fields = ['datetime_start', 'datetime_end']
         widgets = {
             'datetime_start': forms.DateTimeInput(
-                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_start_form'}),
+                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_start_form', 'onchange': 'submit();'}),
             'datetime_end': forms.DateTimeInput(
-                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_end_form', })
+                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_end_form', 'onchange': 'submit();'})
         }
 
 

@@ -4,13 +4,13 @@
 
     border: none;
     color: white;
-    padding: 20px;
+    padding: 8px 4px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
+    font-size: 14px;
     margin-left: 10px;
-    border-radius: 10px;
+    border-radius: 4px;
     cursor: pointer;
     user-select: none;
     outline: none;
@@ -21,7 +21,7 @@
     background: #db0909;
     border: none;
     color: white;
-    padding: 20px;
+    padding: 5px 10px;
     text-align: center;
     text-decoration: none;
     display: inline-block;

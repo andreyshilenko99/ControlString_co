@@ -84,8 +84,8 @@ def return_conditions(url):
 def get_info_main(ip1, ip2, name):
     try:
         # TODO UNCOMMENT for working check state
-        mode_ips = [check_state(ip1), check_state(ip2)]
-        # mode_ips = ['all_stop' for _ in range(2)]
+        # mode_ips = [check_state(ip1), check_state(ip2)]
+        mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -350,12 +350,6 @@ def butt_scan(request):
 
                 if mode_ip1 != mode_ip2:
                     mode_ip2 = scan_on_off(strizh.ip2)
-
-                # try:
-                #
-                #     mode_ip2 = scan_on_off(strizh.ip2)
-                #     mode_ips = [mode_ip1, mode_ip2]
-                # except:
                 mode_ips = [mode_ip1, mode_ip2]
                 complex_mode = 'scan_on' if all(
                     [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
@@ -371,8 +365,7 @@ def butt_scan(request):
                 c["button_complex"] = button_complex
                 c['complex_mode_dict'][strizh.name] = complex_mode
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
-                # scan_on_off(strizh.ip1)
-                # scan_on_off(strizh.ip2)
+
     return redirect('/main')
     # return render(request, "main.html", context=c)
 

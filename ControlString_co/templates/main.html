@@ -14,7 +14,7 @@
     <script src="static/js/howler.min.js"></script>
 
 
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.1/howler.min.js"></script>-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.1/howler.min.js"></script>-->
     <meta charset=utf-8>
 
     {% leaflet_js plugins="ALL" %}
@@ -41,8 +41,8 @@
     <div class="map-info" style="margin: 1%">
 
         <div class="row">
-            <div class="col-9 ">
-                <div class="map-box" style="height: 70vh; width:100%; solid:#ffffff">
+            <div class="col-10 ">
+                <div class="map-box" style="height: 65%; width:100%; solid:#ffffff">
                     <div class="row" style="margin: 1%">
                         <a href="menu">
                             <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
@@ -75,42 +75,9 @@
                         {% leaflet_map "map" callback="window.map_init_basic" %}
                     </div>
                 </div>
-                <div class="information-bottom-left" style="height: 5%; margin-top: 2%; border: 0.5vh">
-                    <h3 style="margin-top: 4%"> Информация о засечках </h3>
-                    <div id="detections" style="margin: 2% 0;
-                    width: 100%;">
-                        <table id="detections_table">
-                            <thead>
-                            <tr>
-                                <th>Время</th>
-                                <th>Имя дрона</th>
-                                <th>Хост</th>
-                                <th>Имя поста</th>
-                                <th>Радиус, м</th>
-                                <th>Азимут</th>
-                                <th>Комментарий</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for dron in all_drones_res%}
-                            <!--                                <tbody class="scrollContent">-->
 
-                            <tr>
-                                <td>{{dron.detection_time}}</td>
-                                <td>{{dron.system_name}}</td>
-                                <td>{{dron.ip}}</td>
-                                <td>{{dron.strig_name}}</td>
-                                <td>{% widthratio dron.area_radius_m 1 1 %}</td>
-                                <td>{{ dron.azimuth|get_int }}</td>
-                                <td>{{dron.comment_string}}</td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
-            <div class="col-3">
+            <div class="col-2">
                 <div class="row">
                     <div class="strizhes-all" style="height: 30%; ">
                         <!--border: 0.5vh solid rgb(255,255,255)">-->
@@ -123,24 +90,19 @@
                             <!--                                    </button>-->
                             <!--                                </form>-->
                             <!--                            </div>-->
-                            <div class="row" style="margin-top: 2%;margin-left: 0.5%; width: 100%">
+                            <div class="row" style="margin-top: 2%;margin-left: 0.5%; width: 95%">
 
-                                <div style="width: 100%">
-                                    <h3>
-                                        Управление одним стрижом
-                                    </h3>
+                                <div style="width: 95%">
+                                    <h4>
+                                        Управление стрижами
+                                    </h4>
                                 </div>
                                 <h5>
                                     <form action="choose_nomer_strizha" method="post">
                                         {% csrf_token %}
                                         {{ form }}
-                                        <!--                                        <button class="btn btn-primary" id=change_drone2 name="choose_nomer_strizha"-->
-                                        <!--                                                type="submit">-->
-                                        <!--                                            ввод-->
-                                        <!--                                        </button>-->
-
                                         {% csrf_token %}
-                                        <div class="row" style="margin-top: 5%;margin-left: 0.5%; width: 100%">
+                                        <div class="row" style="margin-top: 5%;margin-left: 0.5%; width: 90%">
 
                                             {% csrf_token %}
                                             <button class="btn btn-primary" name="choose_all_strizhes" type="submit">
@@ -152,8 +114,8 @@
                                     </form>
                                 </h5>
                             </div>
-                            <div class="row" style="margin-left: 2%">
-                                <h5 style="text-align: center; ">
+<!--                            <div class="row" style="margin-left: 2%">-->
+                                <h5 style="text-align: left; margin-left: 2%;width: 220px ">
                                     {% if chosen_strizh != all_strizhes %}
                                     Выбран
                                     {% for striz in chosen_strizh %}
@@ -165,29 +127,30 @@
                                     Выбраны все
                                     {% endif %}
                                 </h5>
-                            </div>
+<!--                            </div>-->
 
                             <div class="strizh-each" style="margin-left: 2%">
                                 <div class="row">
                                     {% if button_complex != 'red_scan' %}
                                     <form action='butt_scan' method='GET'>
-                                        <button class="button-green" style="width: 150px;" type='submit'> Сканирование
+                                        <button class="button-green" style="width: 120px;" type='submit'> Сканирование
+                                            <!--                                        <button class="btn btn-success" style="width: 150px;" type='submit'> Сканирование-->
                                         </button>
                                     </form>
                                     {% else %}
                                     <form action='butt_scan' method='GET'>
-                                        <button class="button-green-red" style="width: 150px;" type='submit'>
+                                        <button class="button-green-red" style="width: 120px;" type='submit'>
                                             Сканирование
                                         </button>
                                     </form>
                                     {% endif %}
                                     {% if button_complex != 'red_jammer' %}
                                     <form action='butt_glush' method='GET'>
-                                        <button class="button-green" style="width: 150px;"> Глушение</button>
+                                        <button class="button-green" style="width: 120px;"> Глушение</button>
                                     </form>
                                     {% else %}
                                     <form action='butt_glush' method='GET'>
-                                        <button class="button-green-red" style="width: 150px;"> Глушение</button>
+                                        <button class="button-green-red" style="width: 120px;"> Глушение</button>
                                     </form>
                                     {% endif %}
                                     <!--                                <form action='butt_gps' method='GET'>-->
@@ -203,23 +166,23 @@
                 </div>
                 <div class="row">
 
-                    <div class="information-bottom" style="height: 65%; margin-top: 2%; width: 100%">
+                    <div class="information-bottom" style="height: 65%; margin-top: 2%; width: 95%">
                         <!--                    border: 0.5vh solid rgb(255,255,255)">-->
                         <form action='main' method='GET'>
                             {% for striz in chosen_strizh %}
                             {% if striz != 'None' %}
                             {% if complex_state_dict|getkey:striz == 'включен' %}
-                            <div class="row" style="margin-left: 2.2%">
-                                <h4 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 4%;">
+<!--                            <div class="row" style="margin-left: 2.2%">-->
+                                <h5 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 5%;">
                                     {{action_strizh|getkey:striz}}
-                                </h4>
-                            </div>
+                                </h5>
+<!--                            </div>-->
 
 
                             {% else %}
                             <div class="row" style="margin-left: 2.2%">
-                                <h4 style="font-weight:600; font-family: Calibri, sans-serif; margin-left: 4%; color: #a10202">
-                                    Необходимо включить {{striz}} </h4>
+                                <h5 style="font-weight:600; font-family: Calibri, sans-serif; margin-left: 4%; color: #a10202">
+                                    Необходимо включить {{striz}} </h5>
 
 
                             </div>
@@ -233,16 +196,16 @@
                         <form action='main' style="margin: 2% 7%" method='GET'>
                             {% for striz in chosen_strizh %}
                             {% if striz != 'None' %}
-                            <h5> Температура: {{ temperature_dict|getkey:striz }} </h5>
-                            <h5> Влажность: {{ humidity_dict|getkey:striz }} </h5>
-                            <h5> Состояние: {{ weather_state_dict|getkey:striz }} </h5>
-                            <h5> Стриж:
+                            <h6> Температура: {{ temperature_dict|getkey:striz }} </h6>
+                            <h6> Влажность: {{ humidity_dict|getkey:striz }} </h6>
+                            <h6> Состояние: {{ weather_state_dict|getkey:striz }} </h6>
+                            <h6> {{striz}}:
                                 {% if complex_state_dict|getkey:striz == 'включен' %}
                                 <span style="color: #027d1e"> {{ complex_state_dict|getkey:striz }} </span>
                                 {% else %}
                                 <span style="color: #a10202"> {{ complex_state_dict|getkey:striz }} </span>
                                 {% endif %}
-                            </h5>
+                            </h6>
 
                             {% endif %}
                             {% endfor %}
@@ -251,31 +214,31 @@
                         <div class="row">
                             <div class="col-11">
                                 <div class="box-scroll"
-                                     style="height: 200px; margin: 2% 7%; background-color: #F6F6F6FF">
+                                     style="height: 100px; margin: 2% 7%; background-color: #F6F6F6FF">
                                     <form action='main' style="margin: 2% 2%" method='GET'>
                                         {% for striz in chosen_strizh %}
                                         {% if striz != 'None' %}
                                         {% if weather_state_dict|getkey:striz == 'ошибка соединения с uniping' %}
-                                        <h5 style="color: #aa0505">
+                                        <h6 style="color: #aa0505">
                                             {{striz}}:
                                             {{ complex_state_dict|getkey:striz }}.
                                             {{ weather_state_dict|getkey:striz }}
-                                        </h5>
+                                        </h6>
                                         {% elif 'выключен' in complex_state_dict|getkey:striz %}
                                         {% if complex_state_dict|getkey:striz == 'выключен вентилятор'%}
-                                        <h5 style="color: #b36c00">
+                                        <h6 style="color: #b36c00">
                                             {{striz}}:
                                             {{ complex_state_dict|getkey:striz }}
-                                        </h5>
+                                        </h6>
                                         {% else %}
-                                        <h5 style="color: #aa0505">
+                                        <h6 style="color: #aa0505">
                                             {{striz}}:
                                             {{ complex_state_dict|getkey:striz }}
-                                        </h5>
+                                        </h6>
                                         {% endif %}
                                         {% elif 'включен' in complex_state_dict|getkey:striz %}
-                                        <h5 style="color: #165c27"> {{striz}}:
-                                            {{ complex_state_dict|getkey:striz }} </h5>
+                                        <h6 style="color: #165c27"> {{striz}}:
+                                            {{ complex_state_dict|getkey:striz }} </h6>
                                         {% endif %}
                                         {% endif %}
                                         {% endfor %}
@@ -287,7 +250,7 @@
                         <div class="row">
                             <div class="col-11">
                                 <div class="box-scroll"
-                                     style="height: 150px; margin: 2% 7%; background-color: #F6F6F6FF">
+                                     style="height: 100px; margin: 2% 7%; background-color: #F6F6F6FF">
 
                                     <form action='show_logs' style="margin: 2% 2%" method='GET'>
 
@@ -338,8 +301,52 @@
                 </div>
             </div>
         </div>
+
+        <div class="information-bottom-left" style="height: 5%; margin-top: 1%; border: 0.5vh">
+            <h3> Информация о засечках </h3>
+            <div id="detections" style="margin: 1% 0;
+                    width: 95%;">
+                <table id="detections_table">
+                    <thead>
+                    <tr>
+                        <th>Время</th>
+                        <th>Имя дрона</th>
+                        <th>ID дрона</th>
+                        <th>Имя поста</th>
+                        <th>Высота, м</th>
+                        <th>Хост</th>
+                        <th>Несущая частота</th>
+                        <th>Проп. спос.</th>
+                        <th>Радиус, м</th>
+                        <th>Азимут</th>
+                        <th>Комментарий</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for dron in all_drones_res%}
+                    <!--                                <tbody class="scrollContent">-->
+
+                    <tr>
+                        <td>{{dron.detection_time}}</td>
+                        <td>{{dron.system_name}}</td>
+                        <td>{{dron.drone_id}}</td>
+                        <td>{{dron.strig_name}}</td>
+                        <td>{% widthratio dron.height 1 1 %}</td>
+                        <td>{{dron.ip}}</td>
+                        <td>{% widthratio dron.center_freq 1 1 %}</td>
+                        <td>{% widthratio dron.brandwidth 1 1 %}</td>
+                        <td>{% widthratio dron.area_radius_m 1 1 %}</td>
+                        <td>{{ dron.azimuth|get_int }}</td>
+                        <td>{{dron.comment_string}}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
-
+</div>
 </body>
 </html>

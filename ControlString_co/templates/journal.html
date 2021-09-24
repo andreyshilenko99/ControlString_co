@@ -122,18 +122,19 @@
                             </div>
                             <div class="row" style="margin-left: 0">
                                 {% if filtered_strizhes %}
-                                <span style="text-align: center; font-size: 25px; font-family: sans-serif">
+                                <h5 style="text-align: center; font-size: 22px; ">
                                     Выбрано:
-                                </span>
-                                <span style="text-align: center; color: #1d3e81;font-size: 25px">
+                                </h5>
+                                <br>
+                                <h5 style="text-align: left; color: #1d3e81;font-size: 22px">
                                     {% for f_str in filtered_strizhes %}
                                     {% if filtered_strizhes.count == 1 %}
                                     {{f_str}}
                                     {% elif filtered_strizhes.count > 1 %}
-                                    {{f_str}}, <br>
+                                    {{f_str}}<br>
                                     {% endif %}
                                     {% endfor %}
-                                </span>
+                                </h5>
                             </div>
                             <div class="row" style="margin-left: 0">
                                 <div class="span12 text-center">
@@ -169,11 +170,11 @@
                             </div>
                             <div class="row" style="margin-left: 0">
                                 {% if filtered_skypoints %}
-                                <span style="text-align: center; font-size: 25px">
+                                <h5 style="text-align: center; font-size: 22px">
                                     Skypoint:
-                                </span>
+                                </h5>
 
-                                <span style="text-align: center; color: #1d3e81;font-size: 25px">
+                                <h5 style="text-align: left; color: #1d3e81;font-size: 22px">
                                     {% for f_str in filtered_skypoints %}
                                     {% if filtered_skypoints.count == 1 %}
                                     {{f_str}}
@@ -181,7 +182,7 @@
                                     {{f_str}}, <br>
                                     {% endif %}
                                     {% endfor %}
-                                </span>
+                                </h5>
                             </div>
                             <div class="row" style="margin-left: 0">
                                 <div class="span12 text-center">
@@ -209,11 +210,11 @@
                                 Конец
                             </h4>
                             {{ form_time_pick.datetime_end }}
-                            <input type="submit" class="btn btn-primary"
-                                   name="start_datetime" value="Применить" style="margin-top: 3%;font-size: 16px"/>
+<!--                            <input type="submit" class="btn btn-primary"-->
+<!--                                   name="start_datetime" value="Применить" style="margin-top: 3%;font-size: 16px"/>-->
 
                         </form>
-                        <h5 style="">
+                        <h5 style="margin-top: 1%">
                             Отсортировать по:
                         </h5>
                         <form action="apply_filter_table" method="post">

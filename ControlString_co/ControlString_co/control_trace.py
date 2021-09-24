@@ -14,17 +14,27 @@ def check_state(host):
 
     port = 10100  # The same port as used by the server
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
-    s.send(bytearray(lel))
-    data = s.recv(1024)
+    try:
+        s.settimeout(2)
+        s.connect((host, port))
+        s.send(bytearray(lel))
+        data = s.recv(1024)
+        data = data[9:-8]
+        s.close()
+        print(data)
+    except socket.timeout:
+        s.close()
+        data =  'KAL'
+        print(data)
+
+
     # signal = con.TraceRemoteMessage()
     # print(data)
 
     # data = signal.ParseFromString(data)
-    data = data[9:-8]
+
     # print(data)
-    s.close()
-    print(data)
+
     if data == b'\x00\x10\x00':
         return "all_stop"
     elif data == b'\x01\x10\x00':
