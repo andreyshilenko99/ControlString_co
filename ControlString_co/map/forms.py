@@ -21,9 +21,9 @@ class TimePickForm(ModelForm):
         fields = ['datetime_start', 'datetime_end']
         widgets = {
             'datetime_start': forms.DateTimeInput(
-                attrs={'type': 'datetime-local', 'class': 'form-control'}),
+                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_start_form'}),
             'datetime_end': forms.DateTimeInput(
-                attrs={'type': 'datetime-local', 'class': 'form-control'})
+                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_end_form', })
         }
 
 
@@ -46,7 +46,7 @@ class StrizhFilterForm(ModelForm):
     filtered_strizhes = ModelMultipleChoiceField(queryset=Strizh.objects.all(),
                                                  required=False, to_field_name="name",
                                                  label="")
-    filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '4', 'class': 'myfieldclass',
+    filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '3', 'class': 'myfieldclass',
                                                      'onchange': 'submit();'})
 
     class Meta:
@@ -58,7 +58,7 @@ class SkyPointFilterForm(ModelForm):
     filtered_skypoints = ModelMultipleChoiceField(queryset=SkyPoint.objects.all(),
                                                   required=False, to_field_name="name",
                                                   label="")
-    filtered_skypoints.widget = SelectMultiple(attrs={'id': 'choose_skypoint', 'size': '4', 'class': 'myfieldclass',
+    filtered_skypoints.widget = SelectMultiple(attrs={'id': 'choose_skypoint', 'size': '3', 'class': 'myfieldclass',
                                                       'onchange': 'submit();'
                                                       })
 
@@ -86,8 +86,7 @@ class TableFilterForm(ModelForm):
     AllFields = tuple([(f.name, f.verbose_name) for f in Point._meta.get_fields()])
     field = forms.ChoiceField(choices=AllFields, required=False,
                               label="", initial="detection_time",
-                              widget=Select(attrs={'id': 'name', 'onchange': 'submit();'}))
-
+                              widget=Select(attrs={'id': 'tablefilter', 'onchange': 'submit();'}))
     class Meta:
         model = Point
         fields = ['field']
@@ -97,8 +96,7 @@ class TableOrderForm(ModelForm):
     zz = Point._meta.get_fields()
     AllFields = tuple([('-', 'по убыванию'), ('+', 'по возрастанию')])
     order_sign = forms.ChoiceField(choices=AllFields, required=False, initial="-",
-                                   label="", widget=forms.Select(attrs={'onchange': 'submit();'}))
-
+                                   label="", widget=forms.Select(attrs={'onchange': 'submit();', 'id': 'tableorder'}))
     class Meta:
         model = Point
         fields = ['order_sign']

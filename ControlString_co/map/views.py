@@ -648,7 +648,7 @@ def filter_all(request):
     strizh_value.save()
     order_sign = '' if c.get('order_sign') == '+' else '-'
     table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
-    if request.method == 'GET':
+    if request.method == '':
         form_filter = StrizhFilterForm(request.POST)
         form_filter_skypoint = SkyPointFilterForm(request.POST)
         if form_filter.is_valid():
@@ -827,7 +827,7 @@ def filter_nomer_strizha(request):
         if form_filter.is_valid():
             filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
             c['filtered_strizhes'] = filtered_strizhes
-    return redirect('/journal')
+    return redirect('/filter_all')
     # return render(request, "journal.html", context=c)
 
 
@@ -838,7 +838,7 @@ def filter_nomer_skypoint(request):
         if form_filter_skypoint.is_valid():
             filtered_skypoints = form_filter_skypoint.cleaned_data.get('filtered_skypoints')
             c['filtered_skypoints'] = filtered_skypoints
-    return redirect('/journal')
+    return redirect('/filter_all')
     # return render(request, "journal.html", context=c)
 
 
@@ -867,8 +867,8 @@ def apply_period(request):
         if start and end:
             form_time_pick = TimePickForm(request.POST, initial={'datetime_start': start, 'datetime_end': end})
             c['form_time_pick'] = form_time_pick
-    # return redirect('/journal')
-    return render(request, "journal.html", context=c)
+    return redirect('/filter_all')
+    # return render(request, "journal.html", context=c)
 
 
 def reset_filter(request):

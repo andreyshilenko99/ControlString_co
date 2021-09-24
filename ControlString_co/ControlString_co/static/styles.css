@@ -172,13 +172,12 @@
 }
 
 #journal_button1 {
-    font-size: 17px;
+    font-size: 15px;
+    padding: 5px 15px;
 }
 #journal_button2 {
-    font-size: 17px;
-}
-#journal_button3 {
-    font-size: 17px;
+    font-size: 15px;
+    padding: 5px 8px;
 }
 
 .button-csv {
@@ -392,10 +391,6 @@
 
 }
 
-.myfieldclass {
-    /*background-color: #3e22bf;*/
-    width: 200px
-}
 
 .button-config {
     background-color: #04AA6D;
@@ -430,15 +425,34 @@
 }
 
 #choose_strizh {
-    width: 200px;
+    width: 210px;
     background: #ffffff;
     padding: 5px;
-    border: solid 1px #4b4b4b;
-    float: left;
-    position: relative;
-
-
 }
+
+#choose_skypoint {
+    width: 210px;
+    background: #ffffff;
+    padding: 5px;
+}
+#tablefilter {
+    width: 210px;
+    background: #ffffff;
+    padding: 3px;
+}
+#tableorder {
+    width: 210px;
+    background: #ffffff;
+    padding: 3px;
+}
+
+/*.myfieldclass {*/
+/*    !*background-color: #3e22bf;*!*/
+/*    width: 200px;*/
+/*    background: #ffffff;*/
+/*    padding: 5px;*/
+
+/*}*/
 
 /*#detections{*/
 /*    background-color: rgb(255, 255, 255);*/
@@ -449,6 +463,16 @@
 
 /*}*/
 
+#datetime_start_form {
+    width: 210px;
+    background: rgb(255, 255, 255);
+}
+#datetime_end_form {
+    width: 210px;
+    background: rgb(255, 255, 255);
+    padding: 5px;
+    /*border: solid 1px black;*/
+}
 
 #block1 {
     width: 400px;
