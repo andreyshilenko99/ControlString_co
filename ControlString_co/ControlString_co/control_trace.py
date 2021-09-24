@@ -24,9 +24,8 @@ def check_state(host):
         print(data)
     except socket.timeout:
         s.close()
-        data =  'KAL'
+        data = 'KAL'
         print(data)
-
 
     # signal = con.TraceRemoteMessage()
     # print(data)
@@ -133,4 +132,3 @@ def jammer_on_off(host):
                 return "error"
             else:
                 _try += 1
-

@@ -96,7 +96,7 @@ function map_init_basic(map, options) {
         return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + '100' + ')';
     }
 
-    function draw_tooltip(layer_group, coords, icon_url, size, tooltip_text, blinking='') {
+    function draw_tooltip(layer_group, coords, icon_url, size, tooltip_text, blinking = '') {
         var tooltip_strizh = new L.Tooltip({
             direction: 'bottom',
             permanent: true,
@@ -540,7 +540,7 @@ function map_init_basic(map, options) {
                 layers_track[key] = draw_tooltip(layers_track[key],
                     coords = coords_arr[coords_arr.length - 1],
                     icon_url = 'static/icons/drons/dron_top.png', size = 60,
-                    tooltip_text = '', blinking='blinking')
+                    tooltip_text = '', blinking = 'blinking')
 
                 for (let j = 0; j < coords_arr.length; j++) {
                     let height = heights_arr[j];

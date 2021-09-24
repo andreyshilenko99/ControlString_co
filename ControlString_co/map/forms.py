@@ -21,9 +21,11 @@ class TimePickForm(ModelForm):
         fields = ['datetime_start', 'datetime_end']
         widgets = {
             'datetime_start': forms.DateTimeInput(
-                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_start_form', 'onchange': 'submit();'}),
+                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_start_form',
+                       'onchange': 'submit();'}),
             'datetime_end': forms.DateTimeInput(
-                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_end_form', 'onchange': 'submit();'})
+                attrs={'type': 'datetime-local', 'class': 'form-control', 'id': 'datetime_end_form',
+                       'onchange': 'submit();'})
         }
 
 
@@ -87,6 +89,7 @@ class TableFilterForm(ModelForm):
     field = forms.ChoiceField(choices=AllFields, required=False,
                               label="", initial="detection_time",
                               widget=Select(attrs={'id': 'tablefilter', 'onchange': 'submit();'}))
+
     class Meta:
         model = Point
         fields = ['field']
@@ -97,6 +100,7 @@ class TableOrderForm(ModelForm):
     AllFields = tuple([('-', 'по убыванию'), ('+', 'по возрастанию')])
     order_sign = forms.ChoiceField(choices=AllFields, required=False, initial="-",
                                    label="", widget=forms.Select(attrs={'onchange': 'submit();', 'id': 'tableorder'}))
+
     class Meta:
         model = Point
         fields = ['order_sign']

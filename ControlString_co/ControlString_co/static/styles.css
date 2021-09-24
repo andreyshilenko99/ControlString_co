@@ -175,6 +175,7 @@
     font-size: 15px;
     padding: 5px 15px;
 }
+
 #journal_button2 {
     font-size: 15px;
     padding: 5px 8px;
@@ -277,7 +278,7 @@
     font-size: 20px;
     display: inline-block;
     vertical-align: center;
-     /*margin: 0px 0px;*/
+    /*margin: 0px 0px;*/
 }
 
 .tooltip .tooltiptext::after {
@@ -365,7 +366,7 @@
     /*padding: 4px;*/
     /*background-color: rgb(206, 207, 252);*/
     background-color: transparent;
-    border: 0 transparent ;
+    border: 0 transparent;
     color: #00e9ff;
     white-space: nowrap;
     font-size: 16px;
@@ -381,7 +382,7 @@
     color: #000000;
     white-space: nowrap;
     font-size: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     border-right-color: cyan;
 }
 
@@ -435,11 +436,13 @@
     background: #ffffff;
     padding: 5px;
 }
+
 #tablefilter {
     width: 210px;
     background: #ffffff;
     padding: 3px;
 }
+
 #tableorder {
     width: 210px;
     background: #ffffff;
@@ -467,6 +470,7 @@
     width: 210px;
     background: rgb(255, 255, 255);
 }
+
 #datetime_end_form {
     width: 210px;
     background: rgb(255, 255, 255);

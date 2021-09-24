@@ -4,7 +4,7 @@ import socket
 import time
 
 HOST = '192.168.1.23'  # Standard loopback interface address (localhost)
-PORT = 666        # Port to listen on (non-privileged ports are > 1023)
+PORT = 666  # Port to listen on (non-privileged ports are > 1023)
 #
 # while True:
 #     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
@@ -33,7 +33,6 @@ udp_socket.bind(addr)
 
 # Бесконечный цикл работы программы
 while True:
-
     print('wait data...')
     # recvfrom - получает UDP сообщения
     conn, addr = udp_socket.recvfrom(1024)

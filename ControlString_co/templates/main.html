@@ -114,20 +114,20 @@
                                     </form>
                                 </h5>
                             </div>
-<!--                            <div class="row" style="margin-left: 2%">-->
-                                <h5 style="text-align: left; margin-left: 2%;width: 220px ">
-                                    {% if chosen_strizh != all_strizhes %}
-                                    Выбран
-                                    {% for striz in chosen_strizh %}
-                                    {% if striz != 'None' %}
-                                    {{ striz }}
-                                    {% endif %}
-                                    {% endfor%}
-                                    {% else %}
-                                    Выбраны все
-                                    {% endif %}
-                                </h5>
-<!--                            </div>-->
+                            <!--                            <div class="row" style="margin-left: 2%">-->
+                            <h5 style="text-align: left; margin-left: 2%;width: 220px ">
+                                {% if chosen_strizh != all_strizhes %}
+                                Выбран
+                                {% for striz in chosen_strizh %}
+                                {% if striz != 'None' %}
+                                {{ striz }}
+                                {% endif %}
+                                {% endfor%}
+                                {% else %}
+                                Выбраны все
+                                {% endif %}
+                            </h5>
+                            <!--                            </div>-->
 
                             <div class="strizh-each" style="margin-left: 2%">
                                 <div class="row">
@@ -172,11 +172,11 @@
                             {% for striz in chosen_strizh %}
                             {% if striz != 'None' %}
                             {% if complex_state_dict|getkey:striz == 'включен' %}
-<!--                            <div class="row" style="margin-left: 2.2%">-->
-                                <h5 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 5%;">
-                                    {{action_strizh|getkey:striz}}
-                                </h5>
-<!--                            </div>-->
+                            <!--                            <div class="row" style="margin-left: 2.2%">-->
+                            <h5 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 5%;">
+                                {{action_strizh|getkey:striz}}
+                            </h5>
+                            <!--                            </div>-->
 
 
                             {% else %}
