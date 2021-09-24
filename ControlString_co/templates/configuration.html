@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+{% load leaflet_tags %}
+{% load geojson_tags %}
+
+<html>
+<head>
+
+    <title>Конфигурация</title>
+    <script src="static/src/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/bootstrap-4.0.0/css/bootstrap.min.css">
+    <script src="static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
+    <meta charset=utf-8>
+
+    {% leaflet_js plugins="ALL" %}
+    {% leaflet_css plugins="ALL" %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% csrf_token %}
+
+</head>
+<body style="text-align: left;  background: rgba(113,129,132,0.14) url(static/icons/strizh_images/strizh.png); ">
+<div class="everything" style="margin: 1%">
+    <div class="row">
+        <div class="col-8 ">
+            <div class="map-box" style="width:98%; solid:#ffffff">
+                <div class="row" style="margin: 1%">
+                    <a href="menu">
+                        <img src="static/icons/str_logo.png" alt="on" style="max-width: 40px;">
+                    </a>
+                    <a href="menu">
+                        <button class="button-black" style="margin-left: 10px"> Меню</button>
+                    </a>
+                    <a href="main">
+                        <button class="button-black"> Главная</button>
+                    </a>
+                    <a href="journal" method='GET'>
+                        <button class="button-black"> Журнал</button>
+                    </a>
+                    {% if page_picked == 'configuration' %}
+                    <a href="configuration" method='GET'>
+                        <button class="button-page-picked"> Конфигуратор</button>
+                    </a>
+                    {% else %}
+                    <a href="configuration" method='GET'>
+                        <button class="button-black"> Конфигуратор</button>
+                    </a>
+                    {% endif %}
+
+                    <a href="admin" method='GET'>
+                        <button class="button-black"> Администратор</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin: 20px 70px">
+        <h2>
+            Просмотр блоков АПЕМ, Шелест
+        </h2>
+    </div>
+    <div class="row" style="margin: 20px 70px">
+        <div class="col-4">
+            <div class="row">
+                <div style="width: 100%">
+                    <h3>
+                        Выбор стрижа
+                    </h3>
+                </div>
+                <h5>
+                    <form action="set_strizh" method="post">
+                        {% csrf_token %}
+                        {{ form_strizh }}
+                        <!--                        <button class="btn btn-primary">-->
+                        <!--                            ввод-->
+                        <!--                        </button>-->
+                    </form>
+                </h5>
+            </div>
+
+
+            <div class="row">
+                <h5 style="text-align: center; ">
+                    {% if is_strizh_chosen != 'False' %}
+                    {% for striz in set_strizh_apem %}
+                    {% if striz != 'None' %}
+                    Выбран {{ striz }}
+                    {% endif %}
+                    {% endfor%}
+                    {% else %}
+                    Стриж не выбран
+                    {% endif %}
+                </h5>
+            </div>
+
+            {% if is_strizh_chosen != 'False' %}
+            <div class="row">
+                <form action="new_apem" method="post">
+                    {% csrf_token %}
+                    <button type="submit" name="new_apem" class="btn btn-primary">
+                        Добавить АПЕМ
+                    </button>
+                </form>
+
+            </div>
+
+            <div class="row">
+
+                <div class="row" style="margin-left: 0px">
+                    {% load mytags %}
+                    <!--            <div id="block1">-->
+                    <form action="choose_apem_toshow" method="post">
+                        {% csrf_token %}
+                        {% if form_apem.fields.freq_podavitelya.queryset.count != 0 %}
+                        {{ form_apem }}
+                        <!--                        <button class="button-blue-small" style="margin-top: 20px; margin-left: 40px">-->
+                        <!--                            выбрать-->
+                        <!--                        </button>-->
+
+                        {% else %}
+                        <h3> Необходимо добавить в базу имеющиеся блоки АПЕМ, Шелест </h3>
+                        {% endif %}
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-8">
+            <form action="" method="post">
+
+                {% csrf_token %}
+                {% if apem_change_form.fields %}
+                <div class="row">
+                    <div id="apems_form" style="margin: 0px 50px">
+                        <h3 style="width: 500px"> {{apem_action_message}}
+                        </h3>
+                        {{apem_change_form}}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if initial != 'True' %}
+                <div class="row" style="margin-left: 50px">
+                    <div class="col-3">
+                        <button type="submit" name="set_apem" class="button-config">
+                            Ввод
+                        </button>
+                    </div>
+                    {% if delete_button != 'False' %}
+                    <div class="col-3">
+                        <button type="submit" name="delete_apem" class="button-delete">
+                            Удалить
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!--            <div class="row" style="margin-top: 100px">-->
+                <!--            <form action="delete_apem" method="post">-->
+                <!--                {% csrf_token %}-->
+                <!--                <button class="button-delete">-->
+                <!--                    удалить-->
+                <!--                </button>-->
+
+                <!--            </form>-->
+                <!--        </div>-->
+            </form>
+
+
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+
+</div>
+
+
+</body>
+</html>

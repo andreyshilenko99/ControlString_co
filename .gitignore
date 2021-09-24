@@ -1,4 +1,11 @@
 ### Python template
+.idea/
+**/.idea/workspace.xml 
+**/.idea/tasks.xml
+./postgres_data
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -276,6 +283,10 @@ project/media/
 
 
 .ipython/
-.env
-.envs/*
-!.envs/.local/
+.env
+
+.envs/*
+
+!.envs/.local/
+
+/postgres_data/
