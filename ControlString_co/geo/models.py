@@ -176,10 +176,7 @@ class SkyPoint(models.Model):
     name = models.CharField('Имя устройства', max_length=500, default='Скайпоинт 0 (по умолч.)')
     lat = models.FloatField('Широта', blank=True, null=True)
     lon = models.FloatField('Долгота', blank=True, null=True)
-    # ip1 = models.CharField('IP-адрес стрижа (хост 1)', max_length=500, default='')
-    # ip2 = models.CharField('IP-адрес стрижа (хост 2)', max_length=500, default='')
-    uniping_ip = models.CharField('IP-адрес Uniping', max_length=500, default='')
-    radius = models.FloatField('Радиус', blank=True, null=True, default=500)
+    ip = models.CharField('IP', max_length=500, default='')
 
     def __str__(self):
         return self.name
