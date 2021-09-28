@@ -50,6 +50,7 @@ function refresh_map(map) {
 
 var seconds_wait = 3; // seconds, edit here
 setInterval(refresh, seconds_wait * 1000);
+
 // setInterval(refresh_map, seconds_wait * 1000);
 
 

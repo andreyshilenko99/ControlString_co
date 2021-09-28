@@ -166,7 +166,7 @@ LEAFLET_CONFIG = {
         # ('Satellite Online', 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {'attribution': '&copy; Strizh'}),
         # ('try OSM', 'http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
         # ('Satellite', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
-    #     # ('Open Street Maps Online', 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+        #     # ('Open Street Maps Online', 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
     ],
     'PLUGINS': {
         'draw': {
