@@ -1,18 +1,5 @@
 version: "3.8"
 services:
-  db:
-    container_name: db
-    image: postgres:13-alpine
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres
-      - POSTGRES_PASSWORD=postgres
-      - DB_HOST=db
-
-    volumes:
-      - ./postgres_data:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
   web:
     build: .
     command:
@@ -23,6 +10,18 @@ services:
       - "8000:8000"
     depends_on:
       - db
+  db:
+    container_name: db
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DB_HOST=db
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
   rabbit:
     container_name: rabbitmq
     hostname: rabbit
@@ -30,12 +29,9 @@ services:
     ports:
       - "5672:5672"
     restart: on-failure
-    environment:   
+    environment:
       - RABBITMQ_DEFAULT_USER=rabit
       - RABBITMQ_DEFAULT_PASS=rabit
-
-
-
   celery:
     build:
       context: .

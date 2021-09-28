@@ -26,6 +26,16 @@ var seconds_wait = 3; // seconds, edit here
 setInterval(refresh, seconds_wait * 1000);
 
 function map_init_basic(map, options) {
+    var baselayer = L.tileLayer('http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://openstreetmap.org/copyright">566</a>'
+      }).addTo(map);
+
+    var topLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+      }).addTo(map);
+
 
     L.ClickableTooltip = L.Tooltip.extend({
         onAdd: function (map) {
@@ -136,12 +146,6 @@ function map_init_basic(map, options) {
             .bindTooltip(tooltip_)
             .openTooltip().on('click', clickZoom);
     }
-
-
-    // map.setView([60.013674, 30.452474], 14);
-    // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    //     attribution: '&copy; Strizh'
-    // }).addTo(map);
 
     var layerDrones = L.layerGroup().addTo(map);
     var layerStrizhes = L.layerGroup().addTo(map);
@@ -284,7 +288,7 @@ function map_init_basic(map, options) {
                     console.log('map.getZoom()', map.getZoom())
                     map.fitBounds(L.latLngBounds(c2, c1), {padding: [10, 10]});
                     // map.setZoom(map.getZoom() );
-                    map.setView(strizh_center, map.getZoom() - 2 );
+                    map.setView(strizh_center, map.getZoom() - 2);
                 }
 
                 // Отрисовка подписи к дрону в секторе + layerDrones
@@ -355,8 +359,8 @@ function map_init_basic(map, options) {
 
             var polyline = new L.Polyline(coords_arr, {
                 // color: getRandomColor(),
-                // color: '#ff0000',
-                color: random_rgba(),
+                color: '#ff775c',
+                // color: random_rgba(),
                 // color: 'rgb(255,242,0)',
                 weight: 5,
                 opacity: 0.9,

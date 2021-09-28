@@ -15,7 +15,7 @@ def check_state(host):
     port = 10100  # The same port as used by the server
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        s.settimeout(2)
+        s.settimeout(5)
         s.connect((host, port))
         s.send(bytearray(lel))
         data = s.recv(1024)

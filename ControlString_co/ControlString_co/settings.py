@@ -24,7 +24,6 @@ SECRET_KEY = 'django-insecure-g*kuum+*d!@-s(h8&0*#ald#4rsf-6r3z=d@fwai2a29xlhbx(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = ["*"]
 
 # SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -154,6 +153,7 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 LEAFLET_CONFIG = {
     'SPATIAL_EXTENT': (29.315, 58.999, 31.477, 61.022),
     'DEFAULT_CENTER': (60.013674, 30.452474),
@@ -161,12 +161,18 @@ LEAFLET_CONFIG = {
     'DEFAULT_ZOOM': 15,
     'MIN_ZOOM': 10,
     'MAX_ZOOM': 18,
-    'TILES': [('lol', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'})],
+    'TILES': [
+        # ('Satellite', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+        # ('Open Street Maps Online', 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+        # ('Open Street Maps SPB', 'http://localhost:8000/static/spb/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+        ('try OSM', 'http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+    ],
     'PLUGINS': {
         'draw': {
             'css': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.css',
                     '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css',
-                    '/static/styles.css',
+                    '/static/styles/leaflet_custom.css',
+                    '/static/styles/styles.css',
                     ],
 
             #
@@ -188,7 +194,6 @@ LEAFLET_CONFIG = {
 
     }
 }
-
 SERIALIZATION_MODULES = {
     "geojson": "django.contrib.gis.serializers.geojson",
 }

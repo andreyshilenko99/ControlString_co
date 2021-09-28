@@ -47,10 +47,10 @@ const MAXDRONES = 50;
 // setInterval(refresh, SECONDS_WAIT * 1000);
 
 function map_init_basic(map, options) {
-    map.setView([60.013674, 30.452474], 15);
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; Strizh'
-    }).addTo(map);
+    // map.setView([60.013674, 30.452474], 15);
+    // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    //     attribution: '&copy; Strizh'
+    // }).addTo(map);
 
     L.ClickableTooltip = L.Tooltip.extend({
         onAdd: function (map) {

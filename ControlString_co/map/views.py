@@ -84,8 +84,8 @@ def return_conditions(url):
 def get_info_main(ip1, ip2, name):
     try:
         # TODO UNCOMMENT for working check state
-        # mode_ips = [check_state(ip1), check_state(ip2)]
-        mode_ips = ['all_stop' for _ in range(2)]
+        mode_ips = [check_state(ip1), check_state(ip2)]
+        # mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -291,7 +291,8 @@ def render_main_page(request):
         complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
 
         c["action_strizh"][strizh.name] = action_strizh
-        c["button_complex"] = button_complex
+        if not c.get('button_complex'):
+            c["button_complex"] = button_complex
 
         c['complex_mode_dict'][strizh.name] = complex_mode
         # c['complex_mode_dict'][strizh.name] = mode_ips[0]
@@ -418,6 +419,7 @@ def butt_glush(request):
                 if mode != 'scan_on':
                     jammer_on_off(strizh.ip1)
                 mode = check_state(strizh.ip1)
+                # TODO check with connected apems
                 action_complex = 'включено' if mode == 'jammer_on' else 'выключено'
                 button_complex = 'red_jammer' if mode == 'jammer_on' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]

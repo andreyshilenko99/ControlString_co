@@ -37,7 +37,8 @@ class StrizhForm(ModelForm):
     # self.fields['chosen_strizh'].initial = kwargs.get('initial', None)
     chosen_strizh = ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
                                      required=False, to_field_name="name",
-                                     label="", widget=Select(attrs={'id': 'name', 'onchange': 'submit();'}))
+                                     label="", widget=Select(attrs={'id': 'name', 'onchange': 'submit();',
+                                                                    'class': 'form-strizh',}))
 
     class Meta:
         model = Strizh
