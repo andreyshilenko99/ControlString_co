@@ -92,8 +92,11 @@
                             <button class="button-black"> Администратор</button>
                         </a>
                     </div>
-                    <div class="leaflet-container" style="border: 0.5vh ">
-                        {% leaflet_map "map" callback="window.map_init_basic" %}
+                    <div class="leaflet-container" style="border: 0.5vh " id="map">
+
+                        <script type="text/javascript">
+                            map_init_basic()
+                        </script>
                     </div>
 
 

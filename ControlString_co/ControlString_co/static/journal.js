@@ -2,6 +2,7 @@ var last_id = 0;
 
 function refresh() {
 
+
     $.getJSON('/geo/journal_view/', function (data) {
         var current_id = data.features[0].properties.pk;
         console.log('data ', data)
@@ -22,21 +23,39 @@ function refresh() {
     })
 }
 
-var seconds_wait = 3; // seconds, edit here
-setInterval(refresh, seconds_wait * 1000);
 
-function map_init_basic(map, options) {
-    var baselayer = L.tileLayer('http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', {
+function refresh_map(map) {
+    var map1 = L.tileLayer('http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://openstreetmap.org/copyright">566</a>'
-      }).addTo(map);
-
-    var topLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    });
+    var map2 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-      }).addTo(map);
+    });
+
+    map = L.map('map', {
+        layers: [map1] // only add one!
+    }).setView([60.013674, 30.452474], 15);
+
+    var baseLayers = {
+        "OSM Mapnik": map1,
+        "Landscape": map2
+    };
+    var xx = L.control.layers(baseLayers).addTo(map);
+    console.log('control', xx)
+    return map
+}
 
 
+var seconds_wait = 3; // seconds, edit here
+setInterval(refresh, seconds_wait * 1000);
+// setInterval(refresh_map, seconds_wait * 1000);
+
+
+function map_init_basic(map, options) {
+    map = refresh_map(map)
+    console.log('map', map)
     L.ClickableTooltip = L.Tooltip.extend({
         onAdd: function (map) {
             L.Tooltip.prototype.onAdd.call(this, map);
