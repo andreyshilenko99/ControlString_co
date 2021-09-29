@@ -23,40 +23,28 @@ function refresh() {
     })
 }
 
-
-function refresh_map(map) {
-    var map1 = L.tileLayer('http://localhost:8000/static/spb_osm_new_/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://openstreetmap.org/copyright">566</a>'
-    });
-    var map2 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-    });
-
-    map = L.map('map', {
-        layers: [map1] // only add one!
-    }).setView([60.013674, 30.452474], 15);
-
-    var baseLayers = {
-        "OSM Mapnik": map1,
-        "Landscape": map2
-    };
-    var xx = L.control.layers(baseLayers).addTo(map);
-    console.log('control', xx)
-    return map
-}
-
-
-var seconds_wait = 3; // seconds, edit here
+var seconds_wait = 5; // seconds, edit here
 setInterval(refresh, seconds_wait * 1000);
 
-// setInterval(refresh_map, seconds_wait * 1000);
 
+function map_init_basic() {
+    var map = L.map(('map'))
+    if (chosen_map_link.length === 0) {
+        if (map_link_default.length !== 0) {
+            var map_link = map_link_default;
+        } else {
+            map_link = 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png'
+        }
+    } else {
+        map_link = chosen_map_link
+    }
+    map.setView([60.013674, 30.452474], 14);
+    L.tileLayer(map_link, {
+        attribution: '&copy; Strizh'
+    }).addTo(map);
 
-function map_init_basic(map, options) {
-    map = refresh_map(map)
     console.log('map', map)
+
     L.ClickableTooltip = L.Tooltip.extend({
         onAdd: function (map) {
             L.Tooltip.prototype.onAdd.call(this, map);

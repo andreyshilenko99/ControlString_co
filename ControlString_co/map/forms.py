@@ -3,7 +3,7 @@ from django.forms import ModelForm, Select, ModelChoiceField, ModelMultipleChoic
     TextInput, SelectMultiple
 from django.forms import CheckboxSelectMultiple
 
-from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration, SkyPoint
+from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration, SkyPoint, Maps
 # from django.forms import widgets
 
 from django.forms import IntegerField, TextInput, NumberInput, ModelForm
@@ -149,3 +149,23 @@ class ApemsChangingForm(ModelForm):
             'canal_podavitelya': NumberInput(attrs={'class': 'form-control', 'placeholder': 'Канал подавителя'}),
             'usileniye_db': NumberInput(attrs={'class': 'form-control', 'placeholder': 'Усиление, дб'}),
         }
+
+
+class MapChoosingForm(ModelForm):
+    # maps = Maps._meta.get_fields()
+    # maps = Maps.objects.all()
+    # AllFields = tuple([(f.map_link, f.map_name) for f in maps])
+    AllFields = tuple([
+        ('http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', 'Спутник'),
+        # ('http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', 'QGIS Open Street Maps'),
+        ('http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png', 'QGIS new'),
+        ('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Спутник Онлайн'),
+        ('http://{s}.tile.osm.org/{z}/{x}/{y}.png', 'OSM Онлайн'),
+    ])
+    chosen_map = forms.ChoiceField(choices=AllFields, required=False,
+                              label="", initial="Спутник",
+                              widget=Select(attrs={'id': 'mapchoosing', 'onchange': 'submit();'}))
+
+    class Meta:
+        model = Maps
+        fields = ['chosen_map']

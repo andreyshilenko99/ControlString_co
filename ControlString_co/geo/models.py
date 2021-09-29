@@ -280,3 +280,22 @@ class TimePick(models.Model):
     class Meta:
         verbose_name = 'Время'
         verbose_name_plural = 'Время'
+
+
+class Maps(models.Model):
+    # datetime = models.DateTimeField()
+    map_link = models.CharField('Источник тайлов для карты (z/x/y)', max_length=500, default='http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png',
+                                   error_messages={'required': ''}
+                                   )
+    map_name = models.CharField('название карты', max_length=500,
+                                default='Спутниковая съемка',
+                                error_messages={'required': ''}
+                                )
+
+    def __str__(self):
+        return '{} {}'.format(self.map_name, self.map_link)
+
+    class Meta:
+        verbose_name = 'Карта'
+        verbose_name_plural = 'Карты'
+

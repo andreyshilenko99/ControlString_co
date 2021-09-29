@@ -41,6 +41,7 @@ urlpatterns = [
     path('show_logs', views.show_logs),
 
     path('journal', views.journal),
+    path('get_map_form', views.get_map_form),
     path('track_page', views.track_page),
     path('filter_nomer_strizha', views.filter_nomer_strizha),
     path('filter_nomer_skypoint', views.filter_nomer_skypoint),

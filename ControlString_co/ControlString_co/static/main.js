@@ -38,19 +38,32 @@ function refresh() {
 
 // drone display time before clearing = SECONDS_WAIT*DRONE_COUNTER
 var SECONDS_WAIT = 3; // seconds, edit here
-var DRONE_COUNTER = 5 // number of iterations to clear drone
+var DRONE_COUNTER = 4 // number of iterations to clear drone
 
 // number of drones in a trajectory for showing on a map
 const MAXDRONES = 50;
 
 
-// setInterval(refresh, SECONDS_WAIT * 1000);
+setInterval(refresh, SECONDS_WAIT * 1000);
 
-function map_init_basic(map, options) {
-    // map.setView([60.013674, 30.452474], 15);
-    // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    //     attribution: '&copy; Strizh'
-    // }).addTo(map);
+function map_init_basic() {
+    var map = L.map(('map'))
+    // console.log('chosen_map_link', chosen_map_link)
+    // if (chosen_map_link.length === 0) {
+    //     if (map_link_default.length !== 0) {
+    //         var map_link = map_link_default;
+    //     } else {
+    //         map_link = 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png'
+    //     }
+    // } else {
+    //     map_link = chosen_map_link
+    // }
+    var map_link = 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png'
+    console.log('map_link', map_link)
+    map.setView([60.013674, 30.452474], 14);
+    L.tileLayer(map_link, {
+        attribution: '&copy; Strizh'
+    }).addTo(map);
 
     L.ClickableTooltip = L.Tooltip.extend({
         onAdd: function (map) {
