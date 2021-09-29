@@ -32,3 +32,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 #let pip install required packages
 RUN pip install -r requirements.txt
+
+COPY ControlString_co/runserv.sh ./runserv.sh
+RUN chmod +x ./runserv.sh

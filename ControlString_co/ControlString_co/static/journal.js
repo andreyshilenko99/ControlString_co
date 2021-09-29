@@ -25,7 +25,7 @@ function refresh() {
 
 
 function refresh_map(map) {
-    var map1 = L.tileLayer('http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', {
+    var map1 = L.tileLayer('http://localhost:8000/static/spb_osm_new_/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://openstreetmap.org/copyright">566</a>'
     });

@@ -39,7 +39,7 @@ def trace():
                                   area_sector_end_grad=float(signal_dict['location']['areaSectorEndGrad']),
                                   area_radius_m=float(signal_dict['location']['areaRadiusM']),
                                   ip=i,
-                                  current_time=datetime.datetime.now(),
+                                  current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                                   height=0,
                                   strig_name=strizh)
                     point.save()

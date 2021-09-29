@@ -1,10 +1,12 @@
 from django.contrib.gis.db import models
 import django.contrib.gis.db.models as M
+import datetime
 
 from django.db import models
 from django.apps import apps
 import django.contrib.gis.geos as G
 from django.contrib.postgres.fields import ArrayField
+
 
 class Point(models.Model):
     drone_id = models.IntegerField('Идентификатор дрона', default='')
@@ -173,7 +175,6 @@ class Strizh(models.Model):
         ordering = ['name']
 
 
-
 class SkyPoint(models.Model):
     name = models.CharField('Имя устройства', max_length=500, default='Скайпоинт 0 (по умолч.)')
     lat = models.FloatField('Широта', blank=True, null=True)
@@ -263,3 +264,19 @@ class ApemsConfiguration(models.Model):
         verbose_name = 'Конфигурация АПЕМ'
         verbose_name_plural = 'АПЕМы'
         ordering = ['-freq_podavitelya']
+
+
+class TimePick(models.Model):
+    # datetime = models.DateTimeField()
+    time_now = datetime.datetime.now()
+    d_st = time_now.replace(year=2020)
+    d_end = time_now.replace(year=2050)
+    datetime_start = models.DateTimeField(blank=True, default=d_st)
+    datetime_end = models.DateTimeField(blank=True, default=d_end)
+
+    def __str__(self):
+        return '{} --- {}'.format(self.datetime_start, self.datetime_end)
+
+    class Meta:
+        verbose_name = 'Время'
+        verbose_name_plural = 'Время'

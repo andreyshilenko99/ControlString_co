@@ -9,7 +9,7 @@ from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfigur
 from django.forms import IntegerField, TextInput, NumberInput, ModelForm
 from django import forms
 
-from .models import TimePick
+from geo.models import TimePick
 
 
 class TimePickForm(ModelForm):

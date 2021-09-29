@@ -606,19 +606,20 @@ def choose_drone_toshow(request):
 def reset_filter_strizh(request):
     global c
     c['filtered_strizhes'] = ''
-    return redirect('/journal')
+    return redirect('/filter_all')
     # return render(request, "journal.html", context=c)
 
 
 def reset_filter_skypoint(request):
     global c
     c['filtered_skypoints'] = ''
-    return redirect('/journal')
+    return redirect('/filter_all')
     # return render(request, "journal.html", context=c)
 
 
 def filter_all(request):
     global c
+    xx = c
     # TODO maybe delete this condition and value
     if not c.get('saved_table'):
         c['saved_table'] = False
