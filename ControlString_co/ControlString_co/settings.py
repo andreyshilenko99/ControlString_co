@@ -85,23 +85,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ControlString_co.wsgi.application'
 
-# CELERY_BROKER_URL = 'amqp://localhost'
-# # CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
-CELERY_BROKER_URL = 'amqp://rabit:rabit@rabbit:5672'
-CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = 'amqp://localhost'
+# CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+# Docker config
+# CELERY_BROKER_URL = 'amqp://rabit:rabit@rabbit:5672'
+# CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TIMEZONE = 'Europe/Moscow'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': 'stuff',
+        'USER': 'dron',
         'PASSWORD': '555',
         'HOST': 'localhost',
         'PORT': '5432', }
 }
-
+# Docker config
 # DATABASES = {
 #     'default': {
 #         # 'ENGINE': 'django.contrib.gis.db.backends.postgis',

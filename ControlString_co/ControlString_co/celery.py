@@ -11,6 +11,7 @@ from celery.schedules import crontab
 from celery import shared_task
 from ControlString_co.trace import trace
 from ControlString_co.check_uniping import main_check
+from ControlString_co.skyPoint import skypoint
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ControlString_co.settings')
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
@@ -22,14 +23,6 @@ CELERYD_CONCURRENCY = 1
 CELERYD_PREFETCH_MULTIPLIER = 1
 CELERY_ACKS_LATE = True
 
-# @app.on_after_configure.connect
-# def setup_periodic_tasks(sender, **kwargs):
-#     # import celery.bin.amqp
-#     # amqp = celery.bin.amqp.amqp(app=app)
-#     # amqp.run('queue.purge', 'name_of_your_queue')
-#     sender.add_periodic_task(3, trace_host, name='host1')
-#     sender.add_periodic_task(3, trace_host, name='host2')
-#     sender.add_periodic_task(10, uniping_info, name='uniping')
 
 
 app.conf.beat_schedule = {
@@ -42,6 +35,10 @@ app.conf.beat_schedule = {
         'task': 'uniping',
         'schedule': crontab(minute='*/1'),
     },
+    'aeroScope': {
+        'task': 'aeroScope',
+        'schedule': timedelta(seconds=1),
+    },
 }
 
 
@@ -53,6 +50,12 @@ def get_info_trace():
 @shared_task(name='uniping')
 def uniping():
     main_check()
+
+from ControlString_co.skyPoint import are_you_alive
+
+@shared_task(name='aeroScope')
+def aeroScope():
+    skypoint()
 
 # @app.task
 # def uniping_info():

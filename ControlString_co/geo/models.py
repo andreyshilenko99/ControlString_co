@@ -6,6 +6,7 @@ from django.apps import apps
 import django.contrib.gis.geos as G
 from django.contrib.postgres.fields import ArrayField
 
+
 class Point(models.Model):
     drone_id = models.IntegerField('Идентификатор дрона', default='')
     system_name = models.CharField('Имя дрона', max_length=500)
@@ -169,7 +170,6 @@ class Strizh(models.Model):
         verbose_name = 'Стриж'
         verbose_name_plural = 'Стрижи'
         ordering = ['name']
-
 
 
 class SkyPoint(models.Model):
