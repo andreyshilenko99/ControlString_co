@@ -23,7 +23,7 @@ def skypoint():
                     msg = json.loads(msg)
                     print(type(msg))
                     if msg != "NoNewData":
-                        point = aeroPoint(drone_id=0, system_name=str(msg[0]),
+                        point = aeroPoint(drone_id=str(msg[0]), system_name=str(msg[0]),
                                           center_freq=0,
                                           brandwidth=0,
                                           detection_time=str(msg[4]),
