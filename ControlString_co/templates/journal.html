@@ -16,7 +16,7 @@
     <!--    <link rel="stylesheet" type="text/css" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">-->
 
     <!--    <link rel="stylesheet" type="text/css" href="/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css">-->
-    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/styles.css">
 
 
     <link rel="stylesheet" type="text/css" href="/static/bootstrap-4.0.0/css/bootstrap.min.css">
@@ -30,7 +30,7 @@
     <script src="/static/src/datepicker-widget.js"></script>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.1/howler.min.js"></script>
+    <script src="static/js/howler.min.js"></script>
 
     <!--    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"-->
     <!--        rel="stylesheet">-->
@@ -51,6 +51,8 @@
     <script type="text/javascript" src="/static/journal.js"></script>
     <script type="text/javascript">
         const chosen_complex_to_show = "{{ chosen_complex_to_show }}";
+        const chosen_map_link = "{{ chosen_map_link }}";
+        const map_link_default = "{{ map_link_default }}";
 
 
     </script>
@@ -91,9 +93,17 @@
                         <a href="admin" method='GET'>
                             <button class="button-black"> Администратор</button>
                         </a>
+                        <form action="get_map_form" method="post">
+                            {% csrf_token%}
+                            {{map_form}}
+                        </form>
+
                     </div>
-                    <div class="leaflet-container" style="border: 0.5vh ">
-                        {% leaflet_map "map" callback="window.map_init_basic" %}
+                    <div class="leaflet-container" style="border: 0.5vh " id="map">
+
+                        <script type="text/javascript">
+                            map_init_basic()
+                        </script>
                     </div>
 
 
@@ -344,6 +354,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
 

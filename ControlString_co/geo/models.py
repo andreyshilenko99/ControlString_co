@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 import django.contrib.gis.db.models as M
+import datetime
 
 from django.db import models
 from django.apps import apps
@@ -16,6 +17,8 @@ class Point(models.Model):
     comment_string = models.CharField('Комментарии', max_length=500)
     drone_lat = models.FloatField('Широта')
     drone_lon = models.FloatField('Долгота')
+    remote_lat = models.FloatField('Широта пульта', default=0)
+    remote_lon = models.FloatField('Долгота пульта', default=0)
     azimuth = models.CharField('Азимут', max_length=500)
     area_sector_start_grad = models.FloatField('Внутренний радиус сектора')
     area_sector_end_grad = models.FloatField('Внешний радиус сектора')
@@ -52,10 +55,10 @@ class AeroPoints(models.Model):
     # lat = models.FloatField('Широта')
     # lon = models.FloatField('Долгота')
     # drone_coords = ArrayField(ArrayField(models.FloatField(max_length=10)))
-    drone_lat = models.FloatField(max_length=10)
-    drone_lon = models.FloatField(max_length=10)
-    # remote_coords = models.FloatField(max_length=10)
-    # home_coords = models.FloatField(max_length=10)
+    drone_lat = models.FloatField(max_length=10, default=0)
+    drone_lon = models.FloatField(max_length=10, default=0)
+    remote_lat = models.FloatField('Широта пульта', default=0)
+    remote_lon = models.FloatField('Долгота пульта', default=0)
     azimuth = models.CharField('Азимут', max_length=500, default='')
     area_sector_start_grad = models.FloatField('Внутренний радиус сектора', default=0)
     area_sector_end_grad = models.FloatField('Внешний радиус сектора', default=0)
@@ -261,3 +264,38 @@ class ApemsConfiguration(models.Model):
         verbose_name = 'Конфигурация АПЕМ'
         verbose_name_plural = 'АПЕМы'
         ordering = ['-freq_podavitelya']
+
+
+class TimePick(models.Model):
+    # datetime = models.DateTimeField()
+    time_now = datetime.datetime.now()
+    d_st = time_now.replace(year=2020)
+    d_end = time_now.replace(year=2050)
+    datetime_start = models.DateTimeField(blank=True, default=d_st)
+    datetime_end = models.DateTimeField(blank=True, default=d_end)
+
+    def __str__(self):
+        return '{} --- {}'.format(self.datetime_start, self.datetime_end)
+
+    class Meta:
+        verbose_name = 'Время'
+        verbose_name_plural = 'Время'
+
+
+class Maps(models.Model):
+    # datetime = models.DateTimeField()
+    map_link = models.CharField('Источник тайлов для карты (z/x/y)', max_length=500, default='http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png',
+                                   error_messages={'required': ''}
+                                   )
+    map_name = models.CharField('название карты', max_length=500,
+                                default='Спутниковая съемка',
+                                error_messages={'required': ''}
+                                )
+
+    def __str__(self):
+        return '{} {}'.format(self.map_name, self.map_link)
+
+    class Meta:
+        verbose_name = 'Карта'
+        verbose_name_plural = 'Карты'
+

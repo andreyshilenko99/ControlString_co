@@ -24,7 +24,6 @@ SECRET_KEY = 'django-insecure-g*kuum+*d!@-s(h8&0*#ald#4rsf-6r3z=d@fwai2a29xlhbx(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = ["*"]
 
 # SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -85,34 +84,33 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ControlString_co.wsgi.application'
 
-CELERY_BROKER_URL = 'amqp://localhost'
-# CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
-# Docker config
-# CELERY_BROKER_URL = 'amqp://rabit:rabit@rabbit:5672'
-# CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_BROKER_URL = 'amqp://localhost'
+# # CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+CELERY_BROKER_URL = 'amqp://rabit:rabit@rabbit:5672'
+CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TIMEZONE = 'Europe/Moscow'
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': '555',
+#         'HOST': 'localhost',
+#         'PORT': '5432', }
+# }
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'stuff',
-        'USER': 'dron',
-        'PASSWORD': '555',
-        'HOST': 'localhost',
+        # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
         'PORT': '5432', }
 }
-# Docker config
-# DATABASES = {
-#     'default': {
-#         # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': 'postgres',
-#         'HOST': 'db',
-#         'PORT': '5432', }
-# }
 
 # AUTH_PASSWORD_VALIDATORS = [
 #     {
@@ -155,6 +153,7 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 LEAFLET_CONFIG = {
     'SPATIAL_EXTENT': (29.315, 58.999, 31.477, 61.022),
     'DEFAULT_CENTER': (60.013674, 30.452474),
@@ -162,12 +161,19 @@ LEAFLET_CONFIG = {
     'DEFAULT_ZOOM': 15,
     'MIN_ZOOM': 10,
     'MAX_ZOOM': 18,
-    'TILES': [('lol', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'})],
+    'TILES': [
+        # ('Open Street Maps SPB', 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+            ('Open Street Maps Online', 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+        # ('Satellite Online', 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {'attribution': '&copy; Strizh'}),
+        # ('try OSM', 'http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+        # ('Satellite', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+    ],
     'PLUGINS': {
         'draw': {
             'css': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.css',
                     '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css',
-                    '/static/styles.css',
+                    '/static/styles/leaflet_custom.css',
+                    '/static/styles/styles.css',
                     ],
 
             #
@@ -189,7 +195,6 @@ LEAFLET_CONFIG = {
 
     }
 }
-
 SERIALIZATION_MODULES = {
     "geojson": "django.contrib.gis.serializers.geojson",
 }

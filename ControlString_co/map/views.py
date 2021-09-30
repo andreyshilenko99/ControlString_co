@@ -15,13 +15,14 @@ from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
 
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration, \
-    SkyPoint, AeroPoints, DroneTrajectoryJournal
+    SkyPoint, AeroPoints, DroneTrajectoryJournal, Maps
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm, \
-    TableFilterForm, TableOrderForm, SkyPointFilterForm
+    TableFilterForm, TableOrderForm, SkyPointFilterForm, MapChoosingForm
 from .forms import TimePickForm
 
 from ControlString_co.control_trace import scan_on_off, check_state, jammer_on_off
 from ControlString_co.shelest_jam import set_gain
+
 
 DEGREE_SIGN = u"\u2103"
 chosen_strizh = 0
@@ -84,8 +85,8 @@ def return_conditions(url):
 def get_info_main(ip1, ip2, name):
     try:
         # TODO UNCOMMENT for working check state
-        # mode_ips = [check_state(ip1), check_state(ip2)]
-        mode_ips = ['all_stop' for _ in range(2)]
+        mode_ips = [check_state(ip1), check_state(ip2)]
+        # mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -269,6 +270,7 @@ def render_main_page(request):
     c['start_datetime'] = ''
     c['end_datetime'] = ''
     c['page_picked'] = 'main'
+    c['map_link_default'] = 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png'
 
     temperature_dict = {}
     humidity_dict = {}
@@ -278,6 +280,12 @@ def render_main_page(request):
         c['complex_state_dict'] = {}
     c['complex_mode_dict'] = {}
     c['action_strizh'] = {}
+
+    map_form = MapChoosingForm(initial={'chosen_map': c.get('chosen_map_link')})
+    c['map_form'] = map_form
+    if len(map_form.fields['chosen_map'].choices) == 0:
+        map_obj = Maps(map_link=c['map_link_default'], map_name='Спутник')
+        map_obj.save()
 
     strizhes = Strizh.objects.order_by('-lon').all()
     for strizh in strizhes:
@@ -291,7 +299,8 @@ def render_main_page(request):
         complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
 
         c["action_strizh"][strizh.name] = action_strizh
-        c["button_complex"] = button_complex
+        if not c.get('button_complex'):
+            c["button_complex"] = button_complex
 
         c['complex_mode_dict'][strizh.name] = complex_mode
         # c['complex_mode_dict'][strizh.name] = mode_ips[0]
@@ -418,6 +427,7 @@ def butt_glush(request):
                 if mode != 'scan_on':
                     jammer_on_off(strizh.ip1)
                 mode = check_state(strizh.ip1)
+                # TODO check with connected apems
                 action_complex = 'включено' if mode == 'jammer_on' else 'выключено'
                 button_complex = 'red_jammer' if mode == 'jammer_on' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
@@ -547,6 +557,18 @@ def show_logs(request):
     # return render(request, "main.html", context=c)
 
 
+def get_map_form(request):
+    global c
+    if request.method == "POST":
+        chosen_map_link = request.POST.get('chosen_map')
+        c['chosen_map_link'] = chosen_map_link
+        c['map_form'] = MapChoosingForm(request.POST)
+
+    try:
+        return redirect(f"/{c.get('page_picked')}")
+    except:
+        render(request, "configuration.html", context=c)
+
 def choose_drone_toshow(request):
     global c
     if request.method == 'POST':
@@ -604,19 +626,20 @@ def choose_drone_toshow(request):
 def reset_filter_strizh(request):
     global c
     c['filtered_strizhes'] = ''
-    return redirect('/journal')
+    return redirect('/filter_all')
     # return render(request, "journal.html", context=c)
 
 
 def reset_filter_skypoint(request):
     global c
     c['filtered_skypoints'] = ''
-    return redirect('/journal')
+    return redirect('/filter_all')
     # return render(request, "journal.html", context=c)
 
 
 def filter_all(request):
     global c
+    xx = c
     # TODO maybe delete this condition and value
     if not c.get('saved_table'):
         c['saved_table'] = False
@@ -723,6 +746,8 @@ def journal(request):
     c['end_datetime'] = c.get('end_datetime', '')
     xx = c
     c['page_picked'] = 'journal'
+    c['map_link_default'] = 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png'
+
     for el_db in DroneTrajectoryJournal.objects.all():
         el_db.delete()
     for el_db in DroneJournal.objects.all():
@@ -748,6 +773,10 @@ def journal(request):
         #                                        'end_datetime': c.get('end_datetime') })
 
         form_filter = StrizhFilterForm()
+        map_form = MapChoosingForm(initial={'chosen_map': c.get('chosen_map_link')})
+        if len(map_form.fields['chosen_map'].choices) == 0:
+            map_obj = Maps(map_link=c['map_link_default'], map_name='Спутник')
+            map_obj.save()
         form_filter_skypoint = SkyPointFilterForm()
         form_filter_table = c.get('form_filter_table', TableFilterForm())
         form_order_table = c.get('form_order_table', TableOrderForm())
@@ -769,6 +798,7 @@ def journal(request):
             all_drones_res = c.get('all_drones_res')
     # c['form_time_pick'] = form_time_pick
     c['form_filter'] = form_filter
+    c['map_form'] = map_form
     c['form_filter_skypoint'] = form_filter_skypoint
     c['form_filter_table'] = form_filter_table
     c['form_order_table'] = form_order_table

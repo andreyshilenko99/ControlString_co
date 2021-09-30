@@ -3,13 +3,13 @@ from django.forms import ModelForm, Select, ModelChoiceField, ModelMultipleChoic
     TextInput, SelectMultiple
 from django.forms import CheckboxSelectMultiple
 
-from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration, SkyPoint
+from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration, SkyPoint, Maps
 # from django.forms import widgets
 
 from django.forms import IntegerField, TextInput, NumberInput, ModelForm
 from django import forms
 
-from .models import TimePick
+from geo.models import TimePick
 
 
 class TimePickForm(ModelForm):
@@ -37,7 +37,8 @@ class StrizhForm(ModelForm):
     # self.fields['chosen_strizh'].initial = kwargs.get('initial', None)
     chosen_strizh = ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
                                      required=False, to_field_name="name",
-                                     label="", widget=Select(attrs={'id': 'name', 'onchange': 'submit();'}))
+                                     label="", widget=Select(attrs={'id': 'name', 'onchange': 'submit();',
+                                                                    'class': 'form-strizh',}))
 
     class Meta:
         model = Strizh
@@ -148,3 +149,23 @@ class ApemsChangingForm(ModelForm):
             'canal_podavitelya': NumberInput(attrs={'class': 'form-control', 'placeholder': 'Канал подавителя'}),
             'usileniye_db': NumberInput(attrs={'class': 'form-control', 'placeholder': 'Усиление, дб'}),
         }
+
+
+class MapChoosingForm(ModelForm):
+    # maps = Maps._meta.get_fields()
+    # maps = Maps.objects.all()
+    # AllFields = tuple([(f.map_link, f.map_name) for f in maps])
+    AllFields = tuple([
+        ('http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', 'Спутник'),
+        # ('http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', 'QGIS Open Street Maps'),
+        ('http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png', 'QGIS new'),
+        ('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Спутник Онлайн'),
+        ('http://{s}.tile.osm.org/{z}/{x}/{y}.png', 'OSM Онлайн'),
+    ])
+    chosen_map = forms.ChoiceField(choices=AllFields, required=False,
+                              label="", initial="Спутник",
+                              widget=Select(attrs={'id': 'mapchoosing', 'onchange': 'submit();'}))
+
+    class Meta:
+        model = Maps
+        fields = ['chosen_map']

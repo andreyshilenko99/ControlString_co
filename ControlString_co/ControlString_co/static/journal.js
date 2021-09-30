@@ -2,6 +2,7 @@ var last_id = 0;
 
 function refresh() {
 
+
     $.getJSON('/geo/journal_view/', function (data) {
         var current_id = data.features[0].properties.pk;
         console.log('data ', data)
@@ -22,10 +23,27 @@ function refresh() {
     })
 }
 
-var seconds_wait = 3; // seconds, edit here
+var seconds_wait = 5; // seconds, edit here
 setInterval(refresh, seconds_wait * 1000);
 
-function map_init_basic(map, options) {
+
+function map_init_basic() {
+    var map = L.map(('map'))
+    if (chosen_map_link.length === 0) {
+        if (map_link_default.length !== 0) {
+            var map_link = map_link_default;
+        } else {
+            map_link = 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png'
+        }
+    } else {
+        map_link = chosen_map_link
+    }
+    map.setView([60.013674, 30.452474], 14);
+    L.tileLayer(map_link, {
+        attribution: '&copy; Strizh'
+    }).addTo(map);
+
+    console.log('map', map)
 
     L.ClickableTooltip = L.Tooltip.extend({
         onAdd: function (map) {
@@ -136,12 +154,6 @@ function map_init_basic(map, options) {
             .bindTooltip(tooltip_)
             .openTooltip().on('click', clickZoom);
     }
-
-
-    // map.setView([60.013674, 30.452474], 14);
-    // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    //     attribution: '&copy; Strizh'
-    // }).addTo(map);
 
     var layerDrones = L.layerGroup().addTo(map);
     var layerStrizhes = L.layerGroup().addTo(map);
@@ -284,7 +296,7 @@ function map_init_basic(map, options) {
                     console.log('map.getZoom()', map.getZoom())
                     map.fitBounds(L.latLngBounds(c2, c1), {padding: [10, 10]});
                     // map.setZoom(map.getZoom() );
-                    map.setView(strizh_center, map.getZoom() - 2 );
+                    map.setView(strizh_center, map.getZoom() - 2);
                 }
 
                 // Отрисовка подписи к дрону в секторе + layerDrones
@@ -355,8 +367,8 @@ function map_init_basic(map, options) {
 
             var polyline = new L.Polyline(coords_arr, {
                 // color: getRandomColor(),
-                // color: '#ff0000',
-                color: random_rgba(),
+                color: '#ff775c',
+                // color: random_rgba(),
                 // color: 'rgb(255,242,0)',
                 weight: 5,
                 opacity: 0.9,
