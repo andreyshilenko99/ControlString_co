@@ -9,7 +9,7 @@ from django.contrib.postgres.fields import ArrayField
 
 
 class Point(models.Model):
-    drone_id = models.IntegerField('Идентификатор дрона', default='')
+    drone_id = models.CharField('Идентификатор дрона', default='', max_length=500)
     system_name = models.CharField('Имя дрона', max_length=500)
     center_freq = models.FloatField('Несущая частота')
     brandwidth = models.FloatField('Пропускная способность')
@@ -46,7 +46,7 @@ class Point(models.Model):
 
 
 class AeroPoints(models.Model):
-    drone_id = models.IntegerField('Идентификатор дрона', default=0)
+    drone_id = models.CharField('Идентификатор дрона', default='0', max_length=500)
     system_name = models.CharField('Имя дрона', max_length=500, default='')
     center_freq = models.FloatField('Несущая частота', default=0)
     brandwidth = models.FloatField('Пропускная способность', default=0)
@@ -85,14 +85,19 @@ class AeroPoints(models.Model):
 
 
 class DroneJournal(models.Model):
-    drone_id = models.IntegerField('Идентификатор дрона', default=0)
+    drone_id = models.CharField('Идентификатор дрона', default='0', max_length=500)
     system_name = models.CharField('Имя дрона', max_length=500, default='')
     center_freq = models.FloatField('Несущая частота', default=0)
     brandwidth = models.FloatField('Пропускная способность', default=0)
-    detection_time = models.CharField('Время обнаружения', max_length=500, default='')
+    detection_time = models.CharField('Время обнаружения', max_length=500)
     comment_string = models.CharField('Комментарии', max_length=500, default='')
-    drone_lat = models.FloatField('Широта', default=0)
-    drone_lon = models.FloatField('Долгота', default=0)
+    # lat = models.FloatField('Широта')
+    # lon = models.FloatField('Долгота')
+    # drone_coords = ArrayField(ArrayField(models.FloatField(max_length=10)))
+    drone_lat = models.FloatField(max_length=10, default=0)
+    drone_lon = models.FloatField(max_length=10, default=0)
+    remote_lat = models.FloatField('Широта пульта', default=0)
+    remote_lon = models.FloatField('Долгота пульта', default=0)
     azimuth = models.CharField('Азимут', max_length=500, default='')
     area_sector_start_grad = models.FloatField('Внутренний радиус сектора', default=0)
     area_sector_end_grad = models.FloatField('Внешний радиус сектора', default=0)
@@ -100,7 +105,7 @@ class DroneJournal(models.Model):
     ip = models.CharField('IP-адрес стрижа', max_length=500, default='')
     current_time = models.CharField('Время засечки', max_length=500, default='')
     height = models.FloatField('Высота (м)', default=0)
-    strig_name = models.CharField('Имя стрижа', max_length=500, default='')
+    strig_name = models.CharField('Имя устройства', max_length=500, default='')
 
     def __str__(self):
         prop_spos = 'Bandwidth: {} МГц'.format(round(self.brandwidth, 2))
@@ -119,19 +124,19 @@ class DroneJournal(models.Model):
 
 
 class DroneTrajectoryJournal(models.Model):
-    drone_id = models.IntegerField('Идентификатор дрона', default=0)
+    drone_id = models.CharField('Идентификатор дрона', default='0', max_length=500)
     system_name = models.CharField('Имя дрона', max_length=500, default='')
     center_freq = models.FloatField('Несущая частота', default=0)
     brandwidth = models.FloatField('Пропускная способность', default=0)
-    detection_time = models.CharField('Время обнаружения', max_length=500, default='')
+    detection_time = models.CharField('Время обнаружения', max_length=500)
     comment_string = models.CharField('Комментарии', max_length=500, default='')
     # lat = models.FloatField('Широта')
     # lon = models.FloatField('Долгота')
     # drone_coords = ArrayField(ArrayField(models.FloatField(max_length=10)))
     drone_lat = models.FloatField(max_length=10, default=0)
     drone_lon = models.FloatField(max_length=10, default=0)
-    # remote_coords = models.FloatField(max_length=10)
-    # home_coords = models.FloatField(max_length=10)
+    remote_lat = models.FloatField('Широта пульта', default=0)
+    remote_lon = models.FloatField('Долгота пульта', default=0)
     azimuth = models.CharField('Азимут', max_length=500, default='')
     area_sector_start_grad = models.FloatField('Внутренний радиус сектора', default=0)
     area_sector_end_grad = models.FloatField('Внешний радиус сектора', default=0)
@@ -165,6 +170,7 @@ class Strizh(models.Model):
     ip2 = models.CharField('IP-адрес стрижа (хост 2)', max_length=500, default='')
     uniping_ip = models.CharField('IP-адрес Uniping', max_length=500, default='')
     radius = models.FloatField('Радиус', blank=True, null=True, default=500)
+    seconds_drone_show = models.IntegerField('Длительность отображения дрона', default=10)
 
     def __str__(self):
         return self.name

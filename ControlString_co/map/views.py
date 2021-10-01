@@ -85,8 +85,8 @@ def return_conditions(url):
 def get_info_main(ip1, ip2, name):
     try:
         # TODO UNCOMMENT for working check state
-        mode_ips = [check_state(ip1), check_state(ip2)]
-        # mode_ips = ['all_stop' for _ in range(2)]
+        # mode_ips = [check_state(ip1), check_state(ip2)]
+        mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -589,6 +589,8 @@ def choose_drone_toshow(request):
                                                      comment_string=DP.comment_string,
                                                      drone_lat=DP.drone_lat,
                                                      drone_lon=DP.drone_lon,
+                                                     remote_lat=DP.remote_lat,
+                                                     remote_lon=DP.remote_lon,
                                                      azimuth=DP.azimuth,
                                                      area_sector_start_grad=DP.area_sector_start_grad,
                                                      area_sector_end_grad=DP.area_sector_end_grad,
@@ -601,13 +603,16 @@ def choose_drone_toshow(request):
                 c['chosen_complex_to_show'] = DP.strig_name
         elif detection_id:
             DP = Point.objects.filter(pk=detection_id)[0]
-            drone_value = DroneJournal(system_name=DP.system_name,
+            drone_value = DroneJournal(drone_id='0',
+                                       system_name=DP.system_name,
                                        center_freq=DP.center_freq,
                                        brandwidth=DP.brandwidth,
                                        detection_time=DP.detection_time,
                                        comment_string=DP.comment_string,
                                        drone_lat=DP.drone_lat,
                                        drone_lon=DP.drone_lon,
+                                       remote_lat=0,
+                                       remote_lon=0,
                                        azimuth=DP.azimuth,
                                        area_sector_start_grad=DP.area_sector_start_grad,
                                        area_sector_end_grad=DP.area_sector_end_grad,

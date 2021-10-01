@@ -25,7 +25,7 @@ def trace():
                 signal_dict = json_format.MessageToDict(signal)
                 print(signal_dict)
                 if signal_dict:
-                    point = Point(drone_id=0,
+                    point = Point(drone_id='0',
                                   system_name=str(signal_dict['systemName']),
                                   center_freq=signal_dict['centerFrequencyHz'],
                                   brandwidth=signal_dict['bandwidthHz'], detection_time=signal_dict['detectionTime'],

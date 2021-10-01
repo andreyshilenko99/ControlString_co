@@ -15,7 +15,6 @@ from geo.models import TimePick
 class TimePickForm(ModelForm):
     datetime_start = forms.DateTimeInput(format='%Y-%m-%d %H:%M')
     datetime_end = forms.DateTimeInput(format='%Y-%m-%d %H:%M')
-
     class Meta:
         model = TimePick
         fields = ['datetime_start', 'datetime_end']
@@ -30,16 +29,10 @@ class TimePickForm(ModelForm):
 
 
 class StrizhForm(ModelForm):
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    # self.initial['chosen_strizh'] = None
-    # self.initial['chosen_strizh'] = kwargs.get('initial', None)
-    # self.fields['chosen_strizh'].initial = kwargs.get('initial', None)
     chosen_strizh = ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
                                      required=False, to_field_name="name",
                                      label="", widget=Select(attrs={'id': 'name', 'onchange': 'submit();',
-                                                                    'class': 'form-strizh',}))
-
+                                                                    'class': 'form-strizh', }))
     class Meta:
         model = Strizh
         fields = ['chosen_strizh']
@@ -51,7 +44,6 @@ class StrizhFilterForm(ModelForm):
                                                  label="")
     filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '3', 'class': 'myfieldclass',
                                                      'onchange': 'submit();'})
-
     class Meta:
         model = Strizh
         fields = ['filtered_strizhes']
@@ -64,7 +56,6 @@ class SkyPointFilterForm(ModelForm):
     filtered_skypoints.widget = SelectMultiple(attrs={'id': 'choose_skypoint', 'size': '3', 'class': 'myfieldclass',
                                                       'onchange': 'submit();'
                                                       })
-
     class Meta:
         model = Strizh
         fields = ['filtered_skypoints']
@@ -78,7 +69,6 @@ class DroneFilterForm(ModelForm):
                                             label="")
     drone_toshow.widget = SelectMultiple(attrs={'id': 'detections', 'size': '8',
                                                 })
-
     class Meta:
         model = Point
         fields = ['drone_toshow']
@@ -90,7 +80,6 @@ class TableFilterForm(ModelForm):
     field = forms.ChoiceField(choices=AllFields, required=False,
                               label="", initial="detection_time",
                               widget=Select(attrs={'id': 'tablefilter', 'onchange': 'submit();'}))
-
     class Meta:
         model = Point
         fields = ['field']
@@ -101,7 +90,6 @@ class TableOrderForm(ModelForm):
     AllFields = tuple([('-', 'по убыванию'), ('+', 'по возрастанию')])
     order_sign = forms.ChoiceField(choices=AllFields, required=False, initial="-",
                                    label="", widget=forms.Select(attrs={'onchange': 'submit();', 'id': 'tableorder'}))
-
     class Meta:
         model = Point
         fields = ['order_sign']
@@ -115,29 +103,19 @@ class ApemsConfigurationForm(ModelForm):
                                            )
     apem_toshow.widget = SelectMultiple(attrs={'size': 12, 'id': 'block1', 'onchange': 'submit();'
                                                })
-
     class Meta:
         model = ApemsConfiguration
         fields = ['apem_toshow']
 
 
-#         widgets = {
-#             'apem_toshow': Select(attrs={'size': 12, 'id': 'block2'
-#                            })
-# ,
-#         }
-
-
 class ApemsChangingForm(ModelForm):
     AllApems = ApemsConfiguration.objects.all().order_by('-freq_podavitelya')
-
     class Meta:
         CHOICES = Strizh.objects.all()
         model = ApemsConfiguration
         fields = ['strizh_name', 'freq_podavitelya', 'deg_podavitelya', 'type_podavitelya',
                   'type_podavitelya', 'ip_podavitelya', 'canal_podavitelya', 'usileniye_db'
                   ]
-
         widgets = {
             'strizh_name': TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя стрижа'}),
             'freq_podavitelya': NumberInput(attrs={'class': 'form-control', 'required': 'False',
@@ -152,19 +130,17 @@ class ApemsChangingForm(ModelForm):
 
 
 class MapChoosingForm(ModelForm):
-    # maps = Maps._meta.get_fields()
-    # maps = Maps.objects.all()
-    # AllFields = tuple([(f.map_link, f.map_name) for f in maps])
     AllFields = tuple([
         ('http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', 'Спутник'),
         # ('http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', 'QGIS Open Street Maps'),
-        ('http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png', 'QGIS new'),
-        ('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Спутник Онлайн'),
+        ('http://localhost:8000/static/max_tiles/{z}/{x}/{y}.png', 'MAX Maps'),
+        ('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+         'Спутник Онлайн'),
         ('http://{s}.tile.osm.org/{z}/{x}/{y}.png', 'OSM Онлайн'),
     ])
     chosen_map = forms.ChoiceField(choices=AllFields, required=False,
-                              label="", initial="Спутник",
-                              widget=Select(attrs={'id': 'mapchoosing', 'onchange': 'submit();'}))
+                                   label="", initial="Спутник",
+                                   widget=Select(attrs={'id': 'mapchoosing', 'onchange': 'submit();'}))
 
     class Meta:
         model = Maps

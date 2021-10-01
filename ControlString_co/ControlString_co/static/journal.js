@@ -40,10 +40,10 @@ function map_init_basic() {
     }
     map.setView([60.013674, 30.452474], 14);
     L.tileLayer(map_link, {
-        attribution: '&copy; Strizh'
+        attribution: '&copy; Cerrera'
     }).addTo(map);
 
-    console.log('map', map)
+    console.log('map', map);
 
     L.ClickableTooltip = L.Tooltip.extend({
         onAdd: function (map) {
@@ -110,32 +110,45 @@ function map_init_basic() {
         return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + '100' + ')';
     }
 
-    function draw_tooltip(map, coords, icon_url, size, tooltip_text) {
-        var tooltip_strizh = new L.ClickableTooltip({
+    function draw_tooltip(layer_group, coords, icon_url, size, tooltip_text, is_strizh = false, blinking = '') {
+        var tooltip_strizh = new L.Tooltip({
             direction: 'bottom',
             permanent: true,
             noWrap: true,
             opacity: 1
         });
-        let logoMarkerStyleStrizh = L.Icon.extend({
-            options: {
-                iconSize: [size, size],
-                iconAnchor: [size / 2, size / 2],
-                popupAnchor: [0, size],
-                // className: 'blinking'
-            }
-        });
+        if (!is_strizh) {
+            var logoMarkerStyleStrizh = L.Icon.extend({
+                options: {
+                    iconSize: [size, size],
+                    iconAnchor: [size / 2, size / 2],
+                    popupAnchor: [0, size],
+                    className: blinking
+                }
+            });
+        } else {
+            logoMarkerStyleStrizh = L.Icon.extend({
+                options: {
+                    iconSize: [size, size],
+                    iconAnchor: [size / 2, size],
+                    popupAnchor: [0, -1 * size],
+                    className: blinking
+                }
+            });
+        }
         var logoMarkerStrizh = new logoMarkerStyleStrizh({
             iconUrl: icon_url
         });
         var mark = L.marker(coords,
             {icon: logoMarkerStrizh})
-            .addTo(map)
+            .addTo(layer_group)
         if (tooltip_text) {
             tooltip_strizh.setContent(tooltip_text);
             mark.bindTooltip(tooltip_strizh).openTooltip().on('click', clickZoom);
         }
+        return layer_group
     }
+
 
     function place_text(map, coords, text) {
         var tooltip_ = new L.Tooltip({
@@ -143,7 +156,7 @@ function map_init_basic() {
             noWrap: true,
             permanent: true,
             opacity: 1,
-            offset: L.point({x: -12, y: 24}),
+            offset: L.point({x: -12, y: -12}),
             className: 'leaflet-tooltip-height'
         }).setContent(text.toString());
 
@@ -160,11 +173,24 @@ function map_init_basic() {
     var counter_periodic = -1;
     counter_periodic = counter_periodic + 1;
 
+    // Отрисовка аэропупа
+    $.getJSON('/geo/skypoint_view/', function (skypoint_data) {
+            console.log('skypoint_data', skypoint_data)
+            for (let n = 0; n < skypoint_data.features.length; n++) {
+                let sky_name = skypoint_data.features[n].properties.name;
+                let lat = skypoint_data.features[n].properties.lat;
+                let lon = skypoint_data.features[n].properties.lon;
+                let sky_coords = new L.LatLng(lat, lon)
+                draw_tooltip(map, coords = sky_coords,
+                    icon_url = 'static/icons/skypoint_markers/green.png', size = 60,
+                    tooltip_text = sky_name, is_strizh = true)
+            }
+        });
 
+    // отрисовка радиуса вокруг стрижа
     $.getJSON('/geo/drone_journal/', function (data) {
         let arc1;
         let str1;
-        let name1;
         let logoMarkerStyle = L.Icon.extend({
             options: {
                 iconSize: [46, 46],
@@ -177,9 +203,6 @@ function map_init_basic() {
         $.getJSON('/geo/strizh_view/', function (strizh_data) {
             let len_strizh_data = strizh_data.features.length;
             let strizh_map_name = {};
-
-            // var logoMarkerStrizh = L.icon.pulse({iconSize:[20,20],color:'red', iconUrl: 'static/icons/g3.gif'});
-
             let logoMarkerStyleStrizh = L.Icon.extend({
                 options: {
                     iconSize: [80, 80],
@@ -188,7 +211,6 @@ function map_init_basic() {
                 }
             });
             var logoMarkerStrizh = new logoMarkerStyleStrizh({
-                // iconUrl: 'static/icons/strizh_blue_pulse.gif'
                 iconUrl: 'static/icons/strizh_markers/blue.png'
             });
 
@@ -224,14 +246,12 @@ function map_init_basic() {
             console.log('data ', data)
             // статичная отрисовка радиуса вокруг стрижа, стрижа и его подписи
             if (data.features.length !== 0) {
-                // let radius = parseFloat(data.features[0].properties.area_radius_m);
                 let area_sector_start_grad = parseFloat(data.features[0].properties.area_sector_start_grad);
                 let area_sector_end_grad = parseFloat(data.features[0].properties.area_sector_end_grad);
                 console.log('strizh_map_name', strizh_map_name)
                 console.log('data.features[0].properties.strig_name', data.features[0].properties.strig_name)
                 console.log('strizh_map_name[data.features[0].properties.strig_name]',
                     strizh_map_name[data.features[0].properties.strig_name])
-
                 console.log('strizh_map_name[data.features[0].properties.strig_name]',
                     strizh_map_name[data.features[0].properties.strig_name])
 
@@ -278,11 +298,10 @@ function map_init_basic() {
 
                 if (chosen_complex_to_show !== '') {
                     // initial_draw_strizh = 1;
-
                     // // let r_y = Math.abs((radius - 400)) * 0.000008998
-                    let r_y = radius * 0.000008998
+                    let r_y = radius * 0.000017784
                     // // let r_x = Math.abs((radius - 400)) * 0.000017784
-                    let r_x = radius * 0.000017784
+                    let r_x = radius * 0.000008998
 
 
                     let max_lat = strizh_center[0] + r_x
@@ -294,15 +313,24 @@ function map_init_basic() {
                     let c2 = L.latLng(max_lat, max_lon);
 
                     console.log('map.getZoom()', map.getZoom())
-                    map.fitBounds(L.latLngBounds(c2, c1), {padding: [10, 10]});
+                    map.fitBounds(L.latLngBounds(c2, c1));
                     // map.setZoom(map.getZoom() );
-                    map.setView(strizh_center, map.getZoom() - 2);
+                    map.setView(strizh_center, map.getZoom() - 1);
                 }
 
                 // Отрисовка подписи к дрону в секторе + layerDrones
                 //TODO current_time
-                let podpis = data.features[0].properties.detection_time.substr(0, 19) + '.  ' +
-                    data.features[0].properties.system_name + '.  ' + data.features[0].properties.comment_string
+
+                let podpis = "<dl> <dt> Время </dt> "
+                    + "<dd>" + data.features[0].properties.detection_time.substr(0, 19) + "</dd>"
+                    + "<dt>Имя Дрона </dt>"
+                    + "<dd>" + data.features[0].properties.system_name + "</dd>"
+                    + "<dt>Комментарий </dt>"
+                    + "<dd>" + data.features[0].properties.comment_string + "</dd>"
+                    + "</dl>"
+
+                // podpis = data.features[0].properties.detection_time.substr(0, 19) + '.  ' +
+                //     data.features[0].properties.system_name + '.  ' + data.features[0].properties.comment_string
 
                 console.log('podpis', podpis)
 
@@ -315,7 +343,6 @@ function map_init_basic() {
                     className: 'leaflet-tooltip-own'
                 })
                     .setContent(podpis);
-
                 // Отрисовка дрона в секторе + layerDrones
                 L.marker([strizh_center[0] + d_y,
                     strizh_center[1] + d_x], {icon: logoMarker}).addTo(layerDrones)
@@ -323,38 +350,43 @@ function map_init_basic() {
             }
         });
 
-
         console.log('chosen_complex_to_show', chosen_complex_to_show)
     })
 
 
+    // отрисовка траектории - skypoint
     $.getJSON('/geo/drone_journal_view_traj/', function (data) {
         console.log('data    drone_journal_view_traj', data)
         // var points_coords = {}
         var points_data = {}
         var n_elements = data.features.length;
 
-        draw_tooltip(map,
-            coords = [60.013674, 30.442474],
-            icon_url = 'static/icons/controller/pad.svg', size = 50, tooltip_text = '')
 
-
-        draw_tooltip(map,
-            coords = [60.015, 30.47],
-            icon_url = 'static/icons/home/home2.png', size = 50, tooltip_text = '')
+        // отрисовка координат дома (пока не доступно)
+        // draw_tooltip(map,
+        //     coords = [60.015, 30.47],
+        //     icon_url = 'static/icons/home/home2.png', size = 50, tooltip_text = '')
 
         for (let i = 0; i < n_elements; i++) {
             var aero_value = data.features[i].properties;
             var drone_id = aero_value.drone_id;
             var drone_lat = aero_value.drone_lat;
             var drone_lon = aero_value.drone_lon;
+            var remote_lat = aero_value.remote_lat;
+            var remote_lon = aero_value.remote_lon;
+            console.log('aero_value', aero_value)
+            console.log('remote_lon', remote_lon)
             var height = aero_value.height;
             if (!points_data[drone_id] || isEmpty(points_data[drone_id])) {
                 points_data[drone_id] = {}
                 points_data[drone_id].coords = [new L.LatLng(drone_lat, drone_lon)];
+                points_data[drone_id].remote_coords = [new L.LatLng(remote_lat, remote_lon)];
                 points_data[drone_id].heights = [height];
+
+
             } else {
                 points_data[drone_id].coords.push(new L.LatLng(drone_lat, drone_lon))
+                points_data[drone_id].remote_coords.push(new L.LatLng(remote_lat, remote_lon))
                 points_data[drone_id].heights.push(height)
             }
         }
@@ -363,6 +395,7 @@ function map_init_basic() {
         console.log('points_data', points_data)
         for (const [keys, values_data] of Object.entries(points_data)) {
             var coords_arr = values_data.coords
+            var coords_remote_arr = values_data.remote_coords
             var heights_arr = values_data.heights
 
             var polyline = new L.Polyline(coords_arr, {
@@ -383,7 +416,10 @@ function map_init_basic() {
             draw_tooltip(map,
                 coords = coords_arr[0],
                 icon_url = 'static/icons/route/stop.svg', size = 60, tooltip_text = '')
-
+            draw_tooltip(map,
+                coords = coords_remote_arr[coords_remote_arr.length - 1],
+                icon_url = 'static/icons/controller/pad.svg', size = 50,
+                tooltip_text = '')
             if (chosen_complex_to_show !== '') {
                 // initial_draw_strizh = 1;
                 // let avg = average(coords_arr)
@@ -395,7 +431,7 @@ function map_init_basic() {
                 let height = heights_arr[j];
                 let coords = coords_arr[j];
                 if (j !== 0 && j !== coords_arr.length - 1) {
-                    place_text(map, coords, height)
+                    place_text(map, coords, height + ' м.')
                 }
                 // map.addLayer(strizh_layers[strizh_name])
             }

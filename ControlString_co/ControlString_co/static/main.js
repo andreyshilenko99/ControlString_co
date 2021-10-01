@@ -36,33 +36,34 @@ function refresh() {
     })
 }
 
-// drone display time before clearing = SECONDS_WAIT*DRONE_COUNTER
-var SECONDS_WAIT = 3; // seconds, edit here
+
+var SECONDS_WAIT = 2; // seconds, edit here
 var DRONE_COUNTER = 4 // number of iterations to clear drone
 
 // number of drones in a trajectory for showing on a map
 const MAXDRONES = 50;
 
-
 setInterval(refresh, SECONDS_WAIT * 1000);
 
+
 function map_init_basic() {
+    // drone display time before clearing = SECONDS_WAIT*DRONE_COUNTER
     var map = L.map(('map'))
-    // console.log('chosen_map_link', chosen_map_link)
-    // if (chosen_map_link.length === 0) {
-    //     if (map_link_default.length !== 0) {
-    //         var map_link = map_link_default;
-    //     } else {
-    //         map_link = 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png'
-    //     }
-    // } else {
-    //     map_link = chosen_map_link
-    // }
-    var map_link = 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png'
+    console.log('chosen_map_link', chosen_map_link)
+    if (chosen_map_link.length === 0) {
+        if (map_link_default.length !== 0) {
+            var map_link = map_link_default;
+        } else {
+            map_link = 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png'
+        }
+    } else {
+        map_link = chosen_map_link
+    }
+    // var map_link = 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png'
     console.log('map_link', map_link)
     map.setView([60.013674, 30.452474], 14);
     L.tileLayer(map_link, {
-        attribution: '&copy; Strizh'
+        attribution: '&copy; Cerrera'
     }).addTo(map);
 
     L.ClickableTooltip = L.Tooltip.extend({
@@ -76,6 +77,25 @@ function map_init_basic() {
             el.style.pointerEvents = 'auto';
         }
     });
+
+    function get_strizhes_ajax() {
+        var strizhes_ajax = $.ajax({
+            url: '/geo/strizh_view/',
+            async: false
+        }).responseText;
+        return strizhes_ajax
+    }
+
+    function get_counter_dict() {
+        var strizhes_ajax = JSON.parse(get_strizhes_ajax())
+        console.log('strizhes_ajax', strizhes_ajax)
+        let drone_counter_obj = {}
+        for (let j = 0; j < strizhes_ajax.features.length; j++) {
+            var name_st = strizhes_ajax.features[j].properties.name
+            drone_counter_obj[name_st] = Math.floor(strizhes_ajax.features[j].properties.seconds_drone_show / SECONDS_WAIT)
+        }
+        return drone_counter_obj
+    }
 
     function clickZoom(e) {
         map.setView(e.target.getLatLng(), 15);
@@ -109,21 +129,32 @@ function map_init_basic() {
         return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + '100' + ')';
     }
 
-    function draw_tooltip(layer_group, coords, icon_url, size, tooltip_text, blinking = '') {
+    function draw_tooltip(layer_group, coords, icon_url, size, tooltip_text, is_strizh = false, blinking = '') {
         var tooltip_strizh = new L.Tooltip({
             direction: 'bottom',
             permanent: true,
             noWrap: true,
             opacity: 1
         });
-        let logoMarkerStyleStrizh = L.Icon.extend({
-            options: {
-                iconSize: [size, size],
-                iconAnchor: [size / 2, size / 2],
-                popupAnchor: [0, size],
-                className: blinking
-            }
-        });
+        if (!is_strizh) {
+            var logoMarkerStyleStrizh = L.Icon.extend({
+                options: {
+                    iconSize: [size, size],
+                    iconAnchor: [size / 2, size / 2],
+                    popupAnchor: [0, size],
+                    className: blinking
+                }
+            });
+        } else {
+            logoMarkerStyleStrizh = L.Icon.extend({
+                options: {
+                    iconSize: [size, size],
+                    iconAnchor: [size / 2, size],
+                    popupAnchor: [0, -1 * size],
+                    className: blinking
+                }
+            });
+        }
         var logoMarkerStrizh = new logoMarkerStyleStrizh({
             iconUrl: icon_url
         });
@@ -131,7 +162,7 @@ function map_init_basic() {
             {icon: logoMarkerStrizh})
             .addTo(layer_group)
         if (tooltip_text) {
-            tooltip_strizh.setContent('PIZDA');
+            tooltip_strizh.setContent(tooltip_text);
             mark.bindTooltip(tooltip_strizh).openTooltip()
         }
         return layer_group
@@ -143,7 +174,7 @@ function map_init_basic() {
             noWrap: true,
             permanent: true,
             opacity: 1,
-            offset: L.point({x: -12, y: 24}),
+            offset: L.point({x: -12, y: -12}),
             className: 'leaflet-tooltip-height'
         }).setContent(text.toString());
 
@@ -195,7 +226,22 @@ function map_init_basic() {
     var pks_tracked = {}
 
     function refreshMarkers() {
-        // counter_periodic = counter_periodic + 1;
+        $.getJSON('/geo/skypoint_view/', function (skypoint_data) {
+            console.log('skypoint_data', skypoint_data)
+            for (let n = 0; n < skypoint_data.features.length; n++) {
+                let sky_name = skypoint_data.features[n].properties.name;
+                let lat = skypoint_data.features[n].properties.lat;
+                let lon = skypoint_data.features[n].properties.lon;
+                let sky_coords = new L.LatLng(lat, lon)
+                draw_tooltip(map, coords = sky_coords,
+                    icon_url = 'static/icons/skypoint_markers/green.png', size = 60,
+                    tooltip_text = sky_name, is_strizh = true)
+            }
+        });
+
+        var drone_counter_dict = get_counter_dict()
+        console.log('drone_counter_dict', drone_counter_dict)
+        console.log('drone_counter', drone_counter)
         $.getJSON('/geo/data/', function (data) {
                 let arc1;
                 let sector1;
@@ -222,6 +268,7 @@ function map_init_basic() {
                                 strizh_data.features[j].properties.lon, radius];
                             let dx_radius = radius * 0.000008998;
                             let radius_x = strizh_map_name[strizh_data.features[j].properties.name][0] - dx_radius;
+                            let DRONE_COUNTER = Math.floor(strizh_data.features[j].properties.seconds_drone_show / SECONDS_WAIT)
                             let strizh_radius_coords = [radius_x, strizh_map_name[strizh_data.features[j].properties.name][1]];
 
                             if (!flag_state[strizh_name] || isEmpty(flag_state[strizh_name])) {
@@ -253,7 +300,6 @@ function map_init_basic() {
                                 if (!strizh_layers[strizh_name]) {
                                     strizh_layers[strizh_name] = L.layerGroup().addTo(map);
                                 }
-                                console.log('complex_mode', complex_mode)
                                 if (complex_state[strizh_name] === 'включен' ||
                                     complex_state[strizh_name] === 'выключен вентилятор') {
                                     if (complex_mode[strizh_name] === 'scan_on') {
@@ -338,8 +384,7 @@ function map_init_basic() {
                                 // задан цвет
                                 if (Object.keys(dron_colors).includes(data.features[i].properties.system_name)) {
                                     if (data_drawn.has(data.features[i].properties.system_name)) {
-                                        // counter_drone_period = 3;
-                                        drone_counter[d_id] = [DRONE_COUNTER, strizh_name];
+                                        drone_counter[d_id] = [drone_counter_dict[strizh_name], strizh_name];
 
                                     }
                                 }
@@ -347,7 +392,6 @@ function map_init_basic() {
                                 else if (!Object.keys(dron_colors).includes(data.features[i].properties.system_name)) {
                                     dron_colors[data.features[i].properties.system_name] = getRandomColor();
                                 }
-                                // counter_drone_period = 0;
                                 drone_counter[d_id] = [0, strizh_name];
                             }
                             data_drawn.add(data.features[i].properties.system_name);
@@ -420,8 +464,13 @@ function map_init_basic() {
 
                             // Отрисовка подписи к дрону в секторе + layer Drones
                             //TODO current_time
-                            let podpis = data.features[i].properties.detection_time.substr(0, 19) + '.  ' +
-                                data.features[i].properties.system_name + '.  ' + data.features[i].properties.comment_string
+                            let podpis = "<dl> <dt> Время </dt> "
+                                + "<dd>" + data.features[0].properties.detection_time.substr(0, 19) + "</dd>"
+                                + "<dt>Имя Дрона </dt>"
+                                + "<dd>" + data.features[0].properties.system_name + "</dd>"
+                                + "<dt>Комментарий </dt>"
+                                + "<dd>" + data.features[0].properties.comment_string + "</dd>"
+                                + "</dl>"
 
                             var tooltip_drone = L.tooltip({
                                 maxWidth: 2000,
@@ -446,13 +495,13 @@ function map_init_basic() {
                 );
             }
         )
+        console.log('complex_mode', complex_mode)
 
         // cycle to iterate through layers
         for (const [key, value] of Object.entries(drone_counter)) {
             let name = value[1];
             let dron_id = parseInt(key);
-
-            if (value[0] === DRONE_COUNTER) {
+            if (value[0] === drone_counter_dict[name]) {
                 delete flag_state[name][dron_id];
                 delete drone_counter[key];
                 if (drone_layers[key]) {
@@ -517,9 +566,6 @@ function map_init_basic() {
             let all_ids = Object.keys(DronesTraj);
             let difference = all_ids.filter(x => !ids_tracked.includes(x));
 
-            console.log('DronesTraj', DronesTraj);
-
-
             for (const [key, values_data] of Object.entries(DronesTraj)) {
                 if (initial_draw_track === 0) {
                     init_tracks_number += values_data.pks.length
@@ -567,8 +613,6 @@ function map_init_basic() {
 
                 DronesTraj[key].counter += 1;
             }
-            console.log('tracks_number', tracks_number);
-            console.log('init_tracks_number', init_tracks_number);
             for (let key of Object.keys(DronesTraj)) {
                 if (tracks_number !== init_tracks_number) {
                     layers_track[key].addTo(map)

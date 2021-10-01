@@ -30,7 +30,7 @@ def skypoint():
                                           comment_string=str('-'),
                                           drone_lat=float(msg[1][0]),
                                           drone_lon=float(msg[1][1]),
-                                          azimuth='-',
+                                          azimuth='azimuth 0',
                                           area_sector_start_grad=float(0),
                                           area_sector_end_grad=float(0),
                                           area_radius_m=float(0),

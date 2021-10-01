@@ -17,6 +17,7 @@
 
     <!--    <link rel="stylesheet" type="text/css" href="/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css">-->
     <link rel="stylesheet" type="text/css" href="/static/styles/styles.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/leaflet_custom.css">
 
 
     <link rel="stylesheet" type="text/css" href="/static/bootstrap-4.0.0/css/bootstrap.min.css">
@@ -298,7 +299,7 @@
                                         <th>Высота, м</th>
                                         <th>Хост</th>
                                         <th>Несущая частота</th>
-                                        <th>Проп. спос.</th>
+                                        <th>Полоса проп.</th>
                                         <th>Радиус, м</th>
                                         <th>Азимут</th>
                                         <th>Комментарий</th>
@@ -321,12 +322,11 @@
                                         <td>{{ dron.azimuth|get_int }}</td>
                                         <td>{{dron.comment_string}}</td>
                                         <td>
-                                            {% if dron.drone_id != 0 %}
+                                            {% if dron.drone_id != '0' and dron.drone_id != 0 %}
                                             <button type="submit" class="btn btn-primary" name="drone_id"
                                                     value="{{ dron.drone_id }}"> Траектория
                                             </button>
                                             {% else %}
-
                                             <button type="submit" class="btn btn-primary" name="detection_id"
                                                     value="{{ dron.pk }}"> Радиус
                                             </button>
