@@ -6,7 +6,7 @@ from .models import Point, Strizh, DroneJournal, AeroPoints, DroneTrajectoryJour
 
 
 def geojson_view(request):
-    geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-detection_time'))
+    geom_as_geojson = serialize('geojson', Point.objects.all().order_by('-current_time'))
     return HttpResponse(geom_as_geojson, content_type='geojson')
 
 

@@ -118,9 +118,9 @@ def get_info_main(ip1, ip2, name):
 
 def journal_view(request):
     global c
-    x = Point.objects.all().order_by('-detection_time')
+    x = Point.objects.all().order_by('-current_time')
     order_sign = '' if c.get('order_sign') == '+' else '-'
-    table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
+    table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'current_time'
     try:
         y = Point.objects.all().order_by(order_sign + table_filter)
         geom_as_geojson = serialize('geojson', y)
@@ -326,10 +326,10 @@ def render_main_page(request):
         form = StrizhForm()
     c['form'] = form
     # TODO current_time
-    all_drones_a = AeroPoints.objects.all().order_by('-detection_time')
-    all_drones_s = Point.objects.all().order_by('-detection_time')
+    all_drones_a = AeroPoints.objects.all().order_by('-current_time')
+    all_drones_s = Point.objects.all().order_by('-current_time')
     all_drones_res = all_drones_s.union(all_drones_a)
-    all_drones_res = all_drones_res.order_by('-detection_time')
+    all_drones_res = all_drones_res.order_by('-current_time')
 
     c['all_drones_res'] = all_drones_res
     c['all_strizhes'] = [s.name for s in strizhes]
@@ -668,7 +668,7 @@ def filter_all(request):
                                  start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
     strizh_value.save()
     order_sign = '' if c.get('order_sign') == '+' else '-'
-    table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
+    table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'current_time'
     if request.method == '':
         form_filter = StrizhFilterForm(request.POST)
         form_filter_skypoint = SkyPointFilterForm(request.POST)
@@ -707,14 +707,14 @@ def filter_all(request):
         all_complexes = set()
         for drone in strizh_drones:
             all_complexes.add(drone.strig_name)
-            if time_start_datetime <= get_datetime_drone(drone.detection_time) <= time_end_datetime:
+            if time_start_datetime <= get_datetime_drone(drone.current_time) <= time_end_datetime:
                 drones_pk.append(drone.pk)
         drones_pk_aero = []
 
         all_complexes_aero = set()
         for drone_aero in aero_points:
             all_complexes_aero.add(drone_aero.strig_name)
-            if time_start_datetime <= get_datetime_drone(drone_aero.detection_time) <= time_end_datetime:
+            if time_start_datetime <= get_datetime_drone(drone_aero.current_time) <= time_end_datetime:
                 drones_pk_aero.append(drone_aero.pk)
         names_str = filter_values[0].filtered_strizhes
         names_sky = filter_values[0].filtered_skypoints
@@ -765,7 +765,7 @@ def journal(request):
         form_filter_table = TableFilterForm(request.POST)
         form_order_table = TableOrderForm(request.POST)
         c['order_sign'] = '-'
-        c['table_filter'] = 'detection_time'
+        c['table_filter'] = 'current_time'
         all_drones_a = AeroPoints.objects.all().order_by(c['order_sign'] + c['table_filter'])
         all_drones_s = Point.objects.all().order_by(c['order_sign'] + c['table_filter'])
         all_drones_res = all_drones_s.union(all_drones_a)
@@ -788,7 +788,7 @@ def journal(request):
         # form_order_table = TableOrderForm()
 
         order_sign = '' if c.get('order_sign') == '+' else '-'
-        table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
+        table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'current_time'
         bool_expr = bool(c.get('start_datetime') != '') or bool(c.get('end_datetime') != '')
         if c.get('all_drones_res') is None:
             if bool_expr or len(c) <= 5:
@@ -830,7 +830,7 @@ def apply_filter_table(request):
 
 def apply_order_table(request):
     if request.method == 'POST':
-        table_filter = 'detection_time' if not c.get('table_filter') else c.get('table_filter')
+        table_filter = 'current_time' if not c.get('table_filter') else c.get('table_filter')
         order_sign = request.POST.get('order_sign', c.get('order_sign'))
         order_sign2 = '' if order_sign == '+' else '-'
         all_drones_res = c.get('all_drones_res')
@@ -904,7 +904,7 @@ def reset_filter(request):
     c['filtered_strizhes'] = ''
     c['filtered_skypoints'] = ''
     c['saved_table'] = False
-    c['table_filter'] = 'detection_time'
+    c['table_filter'] = 'current_time'
     c['order_sign'] = '-'
     c['start_datetime'] = ''
     c['end_datetime'] = ''
@@ -919,11 +919,11 @@ def reset_filter(request):
     if request.method == 'POST':
 
         # form_filter_table = TableFilterForm(request.POST)
-        # form_drone_alldrones = Point.objects.all().order_by('-detection_time')
-        all_drones_a = AeroPoints.objects.all().order_by('-detection_time')
-        all_drones_s = Point.objects.all().order_by('-detection_time')
+        # form_drone_alldrones = Point.objects.all().order_by('-current_time')
+        all_drones_a = AeroPoints.objects.all().order_by('-current_time')
+        all_drones_s = Point.objects.all().order_by('-current_time')
         all_drones_res = all_drones_s.union(all_drones_a)
-        all_drones_res = all_drones_res.order_by('-detection_time')
+        all_drones_res = all_drones_res.order_by('-current_time')
 
         c['all_drones_res'] = all_drones_res
 
@@ -964,7 +964,7 @@ def export_csv(request):
             writer = csv.writer(f)
             azimuth = int(re.findall('[0-9]+', dr.azimuth)[0])
             row = dr.system_name, dr.strig_name, dr.drone_id, dr.center_freq, dr.brandwidth, \
-                  dr.detection_time, dr.comment_string, (dr.drone_lat, dr.drone_lon), azimuth, \
+                  dr.current_time, dr.comment_string, (dr.drone_lat, dr.drone_lon), azimuth, \
                   dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip, dr.height
 
             writer.writerow(row)

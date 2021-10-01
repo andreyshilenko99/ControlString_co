@@ -30,7 +30,7 @@ class Point(models.Model):
 
     def __str__(self):
         prop_spos = 'Пропускная способность: {} МГц'.format(round(self.brandwidth, 2))
-        arr_to_return = [self.detection_time, self.system_name, str(int(self.area_sector_start_grad)) + '°-' +
+        arr_to_return = [self.current_time, self.system_name, str(int(self.area_sector_start_grad)) + '°-' +
                          str(int(self.area_sector_end_grad)) + '° ', self.azimuth, 'host:', self.ip,
                          self.strig_name, prop_spos, self.comment_string,
                          str(int(self.area_radius_m)) + 'м.']
@@ -38,7 +38,7 @@ class Point(models.Model):
 
         str_to_return = ', '.join(arr_strings)
         # return str_to_return
-        return str(self.detection_time)
+        return str(self.current_time)
 
     class Meta:
         verbose_name_plural = 'Дроны'
@@ -109,7 +109,7 @@ class DroneJournal(models.Model):
 
     def __str__(self):
         prop_spos = 'Bandwidth: {} МГц'.format(round(self.brandwidth, 2))
-        arr_to_return = [self.detection_time, self.system_name, int(self.area_sector_start_grad), '° -',
+        arr_to_return = [self.current_time, self.system_name, int(self.area_sector_start_grad), '° -',
                          int(self.area_sector_end_grad), '° ', self.azimuth, 'host:' + str(self.ip),
                          self.strig_name, prop_spos, self.comment_string,
                          self.area_radius_m, 'м.']
@@ -148,7 +148,7 @@ class DroneTrajectoryJournal(models.Model):
 
     def __str__(self):
         prop_spos = 'Bandwidth: {} МГц'.format(round(self.brandwidth, 2))
-        arr_to_return = [self.detection_time, self.system_name, int(self.area_sector_start_grad), '° -',
+        arr_to_return = [self.current_time, self.system_name, int(self.area_sector_start_grad), '° -',
                          int(self.area_sector_end_grad), '° ', self.azimuth, 'host:' + str(self.ip),
                          self.strig_name, prop_spos, self.comment_string,
                          self.area_radius_m, 'м.']

@@ -322,18 +322,13 @@ function map_init_basic() {
                 //TODO current_time
 
                 let podpis = "<dl> <dt> Время </dt> "
-                    + "<dd>" + data.features[0].properties.detection_time.substr(0, 19) + "</dd>"
+                    + "<dd>" + data.features[0].properties.current_time.substr(0, 19) + "</dd>"
                     + "<dt>Имя Дрона </dt>"
                     + "<dd>" + data.features[0].properties.system_name + "</dd>"
                     + "<dt>Комментарий </dt>"
                     + "<dd>" + data.features[0].properties.comment_string + "</dd>"
                     + "</dl>"
-
-                // podpis = data.features[0].properties.detection_time.substr(0, 19) + '.  ' +
-                //     data.features[0].properties.system_name + '.  ' + data.features[0].properties.comment_string
-
                 console.log('podpis', podpis)
-
                 var tooltip_drone = L.tooltip({
                     maxWidth: 2000,
                     direction: 'top',

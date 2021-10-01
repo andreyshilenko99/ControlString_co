@@ -63,7 +63,7 @@ class SkyPointFilterForm(ModelForm):
 
 class DroneFilterForm(ModelForm):
     names_arr = []
-    AllDrones = Point.objects.all().order_by('-detection_time')
+    AllDrones = Point.objects.all().order_by('-current_time')
     drone_toshow = ModelMultipleChoiceField(queryset=AllDrones,
                                             required=False, to_field_name="pk",
                                             label="")
@@ -78,7 +78,7 @@ class TableFilterForm(ModelForm):
     zz = Point._meta.get_fields()
     AllFields = tuple([(f.name, f.verbose_name) for f in Point._meta.get_fields()])
     field = forms.ChoiceField(choices=AllFields, required=False,
-                              label="", initial="detection_time",
+                              label="", initial="current_time",
                               widget=Select(attrs={'id': 'tablefilter', 'onchange': 'submit();'}))
     class Meta:
         model = Point
