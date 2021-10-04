@@ -275,8 +275,8 @@ class ApemsConfiguration(models.Model):
 class TimePick(models.Model):
     # datetime = models.DateTimeField()
     time_now = datetime.datetime.now()
-    d_st = time_now.replace(year=2020)
-    d_end = time_now.replace(year=2050)
+    d_st = time_now.replace(year=2020).strftime('%Y-%m-%d %H:%M:%S')
+    d_end = time_now.replace(year=2050).strftime('%Y-%m-%d %H:%M:%S')
     datetime_start = models.DateTimeField(blank=True, default=d_st)
     datetime_end = models.DateTimeField(blank=True, default=d_end)
 

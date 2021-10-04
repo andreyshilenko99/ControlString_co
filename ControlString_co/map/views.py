@@ -23,7 +23,6 @@ from .forms import TimePickForm
 from ControlString_co.control_trace import scan_on_off, check_state, jammer_on_off
 from ControlString_co.shelest_jam import set_gain
 
-
 DEGREE_SIGN = u"\u2103"
 chosen_strizh = 0
 logs = ''
@@ -85,8 +84,8 @@ def return_conditions(url):
 def get_info_main(ip1, ip2, name):
     try:
         # TODO UNCOMMENT for working check state
-        # mode_ips = [check_state(ip1), check_state(ip2)]
-        mode_ips = ['all_stop' for _ in range(2)]
+        mode_ips = [check_state(ip1), check_state(ip2)]
+        # mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -562,12 +561,12 @@ def get_map_form(request):
     if request.method == "POST":
         chosen_map_link = request.POST.get('chosen_map')
         c['chosen_map_link'] = chosen_map_link
-        c['map_form'] = MapChoosingForm(request.POST)
-
+        c['map_form'] = MapChoosingForm(request.POST, initial={'chosen_map': c.get('chosen_map_link')})
     try:
         return redirect(f"/{c.get('page_picked')}")
     except:
-        render(request, "configuration.html", context=c)
+        render(request, "journal.html", context=c)
+
 
 def choose_drone_toshow(request):
     global c
@@ -779,6 +778,7 @@ def journal(request):
 
         form_filter = StrizhFilterForm()
         map_form = MapChoosingForm(initial={'chosen_map': c.get('chosen_map_link')})
+        c['map_form'] = map_form
         if len(map_form.fields['chosen_map'].choices) == 0:
             map_obj = Maps(map_link=c['map_link_default'], map_name='Спутник')
             map_obj.save()
@@ -791,7 +791,7 @@ def journal(request):
         table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'current_time'
         bool_expr = bool(c.get('start_datetime') != '') or bool(c.get('end_datetime') != '')
         if c.get('all_drones_res') is None:
-            if bool_expr or len(c) <= 5:
+            if bool_expr or len(c) <= 6:
                 # не записан в словарь, но есть фильтр времени след-но выводим все
                 all_drones_a = AeroPoints.objects.all().order_by(order_sign + table_filter)
                 all_drones_s = Point.objects.all().order_by(order_sign + table_filter)
@@ -803,7 +803,7 @@ def journal(request):
             all_drones_res = c.get('all_drones_res')
     # c['form_time_pick'] = form_time_pick
     c['form_filter'] = form_filter
-    c['map_form'] = map_form
+
     c['form_filter_skypoint'] = form_filter_skypoint
     c['form_filter_table'] = form_filter_table
     c['form_order_table'] = form_order_table

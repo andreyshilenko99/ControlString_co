@@ -33,7 +33,7 @@ function map_init_basic() {
         if (map_link_default.length !== 0) {
             var map_link = map_link_default;
         } else {
-            map_link = 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png'
+            map_link = 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png'
         }
     } else {
         map_link = chosen_map_link
@@ -175,17 +175,17 @@ function map_init_basic() {
 
     // Отрисовка аэропупа
     $.getJSON('/geo/skypoint_view/', function (skypoint_data) {
-            console.log('skypoint_data', skypoint_data)
-            for (let n = 0; n < skypoint_data.features.length; n++) {
-                let sky_name = skypoint_data.features[n].properties.name;
-                let lat = skypoint_data.features[n].properties.lat;
-                let lon = skypoint_data.features[n].properties.lon;
-                let sky_coords = new L.LatLng(lat, lon)
-                draw_tooltip(map, coords = sky_coords,
-                    icon_url = 'static/icons/skypoint_markers/green.png', size = 60,
-                    tooltip_text = sky_name, is_strizh = true)
-            }
-        });
+        console.log('skypoint_data', skypoint_data)
+        for (let n = 0; n < skypoint_data.features.length; n++) {
+            let sky_name = skypoint_data.features[n].properties.name;
+            let lat = skypoint_data.features[n].properties.lat;
+            let lon = skypoint_data.features[n].properties.lon;
+            let sky_coords = new L.LatLng(lat, lon)
+            draw_tooltip(map, coords = sky_coords,
+                icon_url = 'static/icons/skypoint_markers/green.png', size = 60,
+                tooltip_text = sky_name, is_strizh = true)
+        }
+    });
 
     // отрисовка радиуса вокруг стрижа
     $.getJSON('/geo/drone_journal/', function (data) {
@@ -321,16 +321,26 @@ function map_init_basic() {
                 // Отрисовка подписи к дрону в секторе + layerDrones
                 //TODO current_time
 
-                let podpis = "<dl> <dt> Время </dt> "
+                let podpis = "<dl style='overflow-wrap: break-word;" +
+                    "word-wrap: break-word; white-space: nowrap;'> " +
+                    "<dt> Время </dt> "
                     + "<dd>" + data.features[0].properties.current_time.substr(0, 19) + "</dd>"
                     + "<dt>Имя Дрона </dt>"
                     + "<dd>" + data.features[0].properties.system_name + "</dd>"
-                    + "<dt>Комментарий </dt>"
-                    + "<dd>" + data.features[0].properties.comment_string + "</dd>"
+                    + "<dt>Комментарий </dt>";
+                if (data.features[0].properties.comment_string.length >= 70) {
+                    podpis += "<dd>" + data.features[0].properties.comment_string.slice(0, 70) + "</dd>"
+                        + "<dd>" + data.features[0].properties.comment_string.slice(70, data.features[0].properties.comment_string.length) + "</dd>" + "<br>"
+                        + "</dl>"
+                } else {
+                    podpis += "<dd>" + data.features[0].properties.comment_string + "</dd>"
                     + "</dl>"
+                }
+
+
                 console.log('podpis', podpis)
                 var tooltip_drone = L.tooltip({
-                    maxWidth: 2000,
+                    maxWidth: 400,
                     direction: 'top',
                     offset: L.point({x: 0, y: -20}),
                     permanent: true,

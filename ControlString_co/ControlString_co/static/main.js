@@ -50,7 +50,7 @@ function map_init_basic() {
     // drone display time before clearing = SECONDS_WAIT*DRONE_COUNTER
     var map = L.map(('map'))
     console.log('chosen_map_link', chosen_map_link)
-    if (chosen_map_link.length === 0) {
+    if (chosen_map_link.length === 0 || !chosen_map_link) {
         if (map_link_default.length !== 0) {
             var map_link = map_link_default;
         } else {
@@ -287,13 +287,14 @@ function map_init_basic() {
                             });
                             if (isEmpty(flag_state[strizh_name])) {
                                 tooltip_strizh.setContent(strizh_name);
+
                                 tooltip_radius = L.tooltip({
                                     color: 'transparent',
                                     direction: 'center',
                                     noWrap: true,
                                     permanent: true,
                                     opacity: 1,
-                                    offset: L.point({x: -12, y: 18}),
+                                    offset: L.point({x: -12, y: -18}),
                                     className: 'leaflet-tooltip-radius'
                                 }).setContent(radius.toString() + ' м.');
 
@@ -344,7 +345,7 @@ function map_init_basic() {
                                 })
                                     .addTo(strizh_layers[strizh_name])
                                     .bindTooltip(tooltip_radius)
-                                    .openTooltip();
+                                // .openTooltip();
                                 map.addLayer(strizh_layers[strizh_name])
                             }
 
@@ -385,7 +386,6 @@ function map_init_basic() {
                                 if (Object.keys(dron_colors).includes(data.features[i].properties.system_name)) {
                                     if (data_drawn.has(data.features[i].properties.system_name)) {
                                         drone_counter[d_id] = [drone_counter_dict[strizh_name], strizh_name];
-
                                     }
                                 }
                                 // не задан цвет
@@ -464,12 +464,13 @@ function map_init_basic() {
 
                             // Отрисовка подписи к дрону в секторе + layer Drones
                             //TODO current_time
-                            let podpis = "<dl> <dt> Время </dt> "
+                            let podpis = "<dl style='max-width:400px;word-wrap: break-word;'> " +
+                                "<dt> Время </dt> "
                                 + "<dd>" + data.features[0].properties.current_time.substr(0, 19) + "</dd>"
                                 + "<dt>Имя Дрона </dt>"
                                 + "<dd>" + data.features[0].properties.system_name + "</dd>"
                                 + "<dt>Комментарий </dt>"
-                                + "<dd>" + data.features[0].properties.comment_string + "</dd>"
+                                + "<dd style=' white-space: pre-wrap;'>" + data.features[0].properties.comment_string + "</dd>"
                                 + "</dl>"
 
                             var tooltip_drone = L.tooltip({

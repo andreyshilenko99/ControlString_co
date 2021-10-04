@@ -90,27 +90,27 @@ CELERY_BROKER_URL = 'amqp://rabit:rabit@rabbit:5672'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TIMEZONE = 'Europe/Moscow'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': '555',
-#         'HOST': 'localhost',
-#         'PORT': '5432', }
-# }
-
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'PASSWORD': '555',
+        'HOST': 'localhost',
         'PORT': '5432', }
 }
+
+# DATABASES = {
+#     'default': {
+#         # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'db',
+#         'PORT': '5432', }
+# }
 
 # AUTH_PASSWORD_VALIDATORS = [
 #     {

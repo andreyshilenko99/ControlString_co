@@ -132,7 +132,7 @@ class ApemsChangingForm(ModelForm):
 class MapChoosingForm(ModelForm):
     AllFields = tuple([
         ('http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', 'Спутник'),
-        # ('http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', 'QGIS Open Street Maps'),
+        ('http://localhost:8000/static/TilesSatellite/{z}/{x}/{y}.png', 'Спутник 2'),
         ('http://localhost:8000/static/max_tiles/{z}/{x}/{y}.png', 'MAX Maps'),
         ('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
          'Спутник Онлайн'),
