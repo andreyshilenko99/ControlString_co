@@ -962,7 +962,7 @@ def export_csv(request):
         for dr in drones_filtered_strizh:
             writer = csv.writer(f)
             azimuth = int(re.findall('[0-9]+', dr.azimuth)[0])
-            row = dr.system_name, dr.strig_name, dr.drone_id, round(dr.center_freq / 1e9, 3), round(dr.brandwidth, 0), \
+            row = dr.system_name, dr.strig_name, dr.drone_id, round(dr.center_freq / 1e9, 3), round(dr.brandwidth/1e6, 0), \
                   dr.current_time, dr.comment_string, (dr.drone_lat, dr.drone_lon), azimuth, \
                   dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip, dr.height
 
