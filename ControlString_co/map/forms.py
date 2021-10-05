@@ -15,6 +15,7 @@ from geo.models import TimePick
 class TimePickForm(ModelForm):
     datetime_start = forms.DateTimeInput(format='%Y-%m-%d %H:%M')
     datetime_end = forms.DateTimeInput(format='%Y-%m-%d %H:%M')
+
     class Meta:
         model = TimePick
         fields = ['datetime_start', 'datetime_end']
@@ -33,6 +34,7 @@ class StrizhForm(ModelForm):
                                      required=False, to_field_name="name",
                                      label="", widget=Select(attrs={'id': 'name', 'onchange': 'submit();',
                                                                     'class': 'form-strizh', }))
+
     class Meta:
         model = Strizh
         fields = ['chosen_strizh']
@@ -44,6 +46,7 @@ class StrizhFilterForm(ModelForm):
                                                  label="")
     filtered_strizhes.widget = SelectMultiple(attrs={'id': 'choose_strizh', 'size': '3', 'class': 'myfieldclass',
                                                      'onchange': 'submit();'})
+
     class Meta:
         model = Strizh
         fields = ['filtered_strizhes']
@@ -56,6 +59,7 @@ class SkyPointFilterForm(ModelForm):
     filtered_skypoints.widget = SelectMultiple(attrs={'id': 'choose_skypoint', 'size': '3', 'class': 'myfieldclass',
                                                       'onchange': 'submit();'
                                                       })
+
     class Meta:
         model = Strizh
         fields = ['filtered_skypoints']
@@ -69,6 +73,7 @@ class DroneFilterForm(ModelForm):
                                             label="")
     drone_toshow.widget = SelectMultiple(attrs={'id': 'detections', 'size': '8',
                                                 })
+
     class Meta:
         model = Point
         fields = ['drone_toshow']
@@ -80,6 +85,7 @@ class TableFilterForm(ModelForm):
     field = forms.ChoiceField(choices=AllFields, required=False,
                               label="", initial="current_time",
                               widget=Select(attrs={'id': 'tablefilter', 'onchange': 'submit();'}))
+
     class Meta:
         model = Point
         fields = ['field']
@@ -90,6 +96,7 @@ class TableOrderForm(ModelForm):
     AllFields = tuple([('-', 'по убыванию'), ('+', 'по возрастанию')])
     order_sign = forms.ChoiceField(choices=AllFields, required=False, initial="-",
                                    label="", widget=forms.Select(attrs={'onchange': 'submit();', 'id': 'tableorder'}))
+
     class Meta:
         model = Point
         fields = ['order_sign']
@@ -103,6 +110,7 @@ class ApemsConfigurationForm(ModelForm):
                                            )
     apem_toshow.widget = SelectMultiple(attrs={'size': 12, 'id': 'block1', 'onchange': 'submit();'
                                                })
+
     class Meta:
         model = ApemsConfiguration
         fields = ['apem_toshow']
@@ -110,6 +118,7 @@ class ApemsConfigurationForm(ModelForm):
 
 class ApemsChangingForm(ModelForm):
     AllApems = ApemsConfiguration.objects.all().order_by('-freq_podavitelya')
+
     class Meta:
         CHOICES = Strizh.objects.all()
         model = ApemsConfiguration
@@ -133,7 +142,7 @@ class MapChoosingForm(ModelForm):
     AllFields = tuple([
         ('http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', 'Спутник'),
         ('http://localhost:8000/static/TilesSatellite/{z}/{x}/{y}.png', 'Спутник 2'),
-        ('http://localhost:8000/static/max_tiles/{z}/{x}/{y}.png', 'MAX Maps'),
+        ('http://localhost:8000/static/max_tiles/{z}/{x}/{y}.png', 'Схема'),
         ('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
          'Спутник Онлайн'),
         ('http://{s}.tile.osm.org/{z}/{x}/{y}.png', 'OSM Онлайн'),

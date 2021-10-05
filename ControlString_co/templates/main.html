@@ -319,10 +319,10 @@
                         <th>Имя поста</th>
                         <th>Высота, м</th>
                         <th>Хост</th>
-                        <th>Несущая частота</th>
-                        <th>Проп. спос.</th>
+                        <th>Несущая частота (ГГц)</th>
+                        <th>Полоса проп. (МГц)</th>
                         <th>Радиус, м</th>
-                        <th>Азимут</th>
+                        <th>Азимут &deg</th>
                         <th>Комментарий</th>
                     </tr>
                     </thead>
@@ -337,8 +337,8 @@
                         <td>{{dron.strig_name}}</td>
                         <td>{% widthratio dron.height 1 1 %}</td>
                         <td>{{dron.ip}}</td>
-                        <td>{% widthratio dron.center_freq 1 1 %}</td>
-                        <td>{% widthratio dron.brandwidth 1 1 %}</td>
+                        <td>{{ dron.center_freq|division3:1e9 }}</td>
+                        <td>{% widthratio dron.brandwidth 1e6 1 %}</td>
                         <td>{% widthratio dron.area_radius_m 1 1 %}</td>
                         <td>{{ dron.azimuth|get_int }}</td>
                         <td>{{dron.comment_string}}</td>

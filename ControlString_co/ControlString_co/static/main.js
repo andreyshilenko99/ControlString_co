@@ -1,9 +1,5 @@
 var last_id = 0;
 
-function isEmpty(obj) {
-    return Object.keys(obj).length === 0;
-}
-
 
 function refresh() {
     $.getJSON('/geo/data/', function (data) {
@@ -110,24 +106,6 @@ function map_init_basic() {
         marker_st.openPopup();
     }
 
-
-    function onlyUnique(value, index, self) {
-        return self.indexOf(value) === index;
-    }
-
-    function getRandomColor() {
-        let letters = '0123456789ABCDEF';
-        let color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    function random_rgba() {
-        var o = Math.round, r = Math.random, s = 255;
-        return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + '100' + ')';
-    }
 
     function draw_tooltip(layer_group, coords, icon_url, size, tooltip_text, is_strizh = false, blinking = '') {
         var tooltip_strizh = new L.Tooltip({

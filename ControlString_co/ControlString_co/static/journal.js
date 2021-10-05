@@ -29,6 +29,7 @@ setInterval(refresh, seconds_wait * 1000);
 
 function map_init_basic() {
     var map = L.map(('map'))
+    // отображение карты, которая была выбрана, если не выбрана, то берем дефолтную
     if (chosen_map_link.length === 0) {
         if (map_link_default.length !== 0) {
             var map_link = map_link_default;
@@ -61,6 +62,7 @@ function map_init_basic() {
         map.setView(e.target.getLatLng(), 15);
     }
 
+    // отрисованная траектория должна помещаться в экран, зум устанавливается на средние координаты
     function track_map_bounds(map, coords_arr) {
         let coords_lat = [];
         let coords_lon = [];
@@ -81,33 +83,13 @@ function map_init_basic() {
         let c1 = L.latLng(min_lat, min_lon);
         let c2 = L.latLng(max_lat, max_lon);
         map.fitBounds(L.latLngBounds(c2, c1));
-        console.log('map.getZoom()', map.getZoom())
-        console.log('mean_coords:', mean_coords);
-        map.setZoom(map.getZoom() - 1);
-        map.setView(mean_coords, map.getZoom() - 1);
+        // map.setZoom(map.getZoom() - 1);
+        // map.setView(mean_coords, map.getZoom() - 1);
         return map
     }
 
     function isEmpty(obj) {
         return Object.keys(obj).length === 0;
-    }
-
-    function onlyUnique(value, index, self) {
-        return self.indexOf(value) === index;
-    }
-
-    function getRandomColor() {
-        let letters = '0123456789ABCDEF';
-        let color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    function random_rgba() {
-        var o = Math.round, r = Math.random, s = 255;
-        return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + '100' + ')';
     }
 
     function draw_tooltip(layer_group, coords, icon_url, size, tooltip_text, is_strizh = false, blinking = '') {
@@ -173,7 +155,7 @@ function map_init_basic() {
     var counter_periodic = -1;
     counter_periodic = counter_periodic + 1;
 
-    // Отрисовка аэропупа
+    // Отрисовка иконки skypoint
     $.getJSON('/geo/skypoint_view/', function (skypoint_data) {
         console.log('skypoint_data', skypoint_data)
         for (let n = 0; n < skypoint_data.features.length; n++) {
@@ -181,7 +163,7 @@ function map_init_basic() {
             let lat = skypoint_data.features[n].properties.lat;
             let lon = skypoint_data.features[n].properties.lon;
             let sky_coords = new L.LatLng(lat, lon)
-            draw_tooltip(map, coords = sky_coords,
+            draw_tooltip(layerStrizhes, coords = sky_coords,
                 icon_url = 'static/icons/skypoint_markers/green.png', size = 60,
                 tooltip_text = sky_name, is_strizh = true)
         }
@@ -196,7 +178,6 @@ function map_init_basic() {
                 iconSize: [46, 46],
                 iconAnchor: [23, 23],
                 popupAnchor: [0, -46],
-                // className: 'blinking'
             }
         });
 
@@ -215,12 +196,9 @@ function map_init_basic() {
             });
 
             for (let j = 0; j < len_strizh_data; j++) {
-
                 strizh_map_name[strizh_data.features[j].properties.name] = [strizh_data.features[j].properties.lat,
                     strizh_data.features[j].properties.lon, strizh_data.features[j].properties.radius];
-
                 console.log('strizh_data: ', strizh_data.features[j].properties)
-
                 if (counter_periodic <= 10) {
                     if (counter_periodic === 10) {
                         counter_periodic = 0;
@@ -244,7 +222,7 @@ function map_init_basic() {
             }
             let logoMarker = new logoMarkerStyle({iconUrl: 'static/icons/drons/znak_dron.png', color: '#ff0000'});
             console.log('data ', data)
-            // статичная отрисовка радиуса вокруг стрижа, стрижа и его подписи
+            // отрисовка радиуса вокруг стрижа, стрижа и его подписи
             if (data.features.length !== 0) {
                 let area_sector_start_grad = parseFloat(data.features[0].properties.area_sector_start_grad);
                 let area_sector_end_grad = parseFloat(data.features[0].properties.area_sector_end_grad);
@@ -276,8 +254,8 @@ function map_init_basic() {
 
                 } else {
                     let angle = (90 - (area_sector_start_grad + 30)) / 180 * Math.PI;
-                    var d_y = r_y * Math.sin(angle);
-                    var d_x = r_x * Math.cos(angle);
+                    d_y = r_y * Math.sin(angle);
+                    d_x = r_x * Math.cos(angle);
                     arc1 = L.circle(strizh_center, {
                         color: '#0296f8',
                         // fillColor: "#f1b44e",
@@ -315,7 +293,7 @@ function map_init_basic() {
                     console.log('map.getZoom()', map.getZoom())
                     map.fitBounds(L.latLngBounds(c2, c1));
                     // map.setZoom(map.getZoom() );
-                    map.setView(strizh_center, map.getZoom() - 1);
+                    // map.flyTo(strizh_center, map.getZoom() - 1);
                 }
 
                 // Отрисовка подписи к дрону в секторе + layerDrones
@@ -334,7 +312,7 @@ function map_init_basic() {
                         + "</dl>"
                 } else {
                     podpis += "<dd>" + data.features[0].properties.comment_string + "</dd>"
-                    + "</dl>"
+                        + "</dl>"
                 }
 
 
@@ -358,7 +336,6 @@ function map_init_basic() {
         console.log('chosen_complex_to_show', chosen_complex_to_show)
     })
 
-
     // отрисовка траектории - skypoint
     $.getJSON('/geo/drone_journal_view_traj/', function (data) {
         console.log('data    drone_journal_view_traj', data)
@@ -367,9 +344,9 @@ function map_init_basic() {
         var n_elements = data.features.length;
 
 
-        // отрисовка координат дома (пока не доступно)
+        // отрисовка координат дома (пока не доступно их получение)
         // draw_tooltip(map,
-        //     coords = [60.015, 30.47],
+        //     coords = [lat, long],
         //     icon_url = 'static/icons/home/home2.png', size = 50, tooltip_text = '')
 
         for (let i = 0; i < n_elements; i++) {

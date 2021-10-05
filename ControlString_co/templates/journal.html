@@ -12,54 +12,29 @@
     {% leaflet_js %}
     {% leaflet_css %}
     <title>Журнал</title>
-
-    <!--    <link rel="stylesheet" type="text/css" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">-->
-
-    <!--    <link rel="stylesheet" type="text/css" href="/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css">-->
+    <!--    styles-->
     <link rel="stylesheet" type="text/css" href="/static/styles/styles.css">
     <link rel="stylesheet" type="text/css" href="/static/styles/leaflet_custom.css">
-
-
+    <link rel="stylesheet" type="text/css" href="/static/src/css/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="/static/datepicker-widget.css">
     <link rel="stylesheet" type="text/css" href="/static/bootstrap-4.0.0/css/bootstrap.min.css">
+    <!--    lib scripts-->
     <script src="/static/src/jquery-3.2.1.min.js"></script>
     <script src="/static/src/popper.min.js"></script>
     <script src="/static/bootstrap-4.0.0/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/src/css/bootstrap-datetimepicker.css">
-    <link rel="stylesheet" href="/static/datepicker-widget.css">
     <script src="/static/src/moment-with-locales.min.js"></script>
     <script src="/static/src/bootstrap-datetimepicker.min.js"></script>
     <script src="/static/src/datepicker-widget.js"></script>
-
-
     <script src="static/js/howler.min.js"></script>
-
-    <!--    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"-->
-    <!--        rel="stylesheet">-->
-    <!--    <script crossorigin="anonymous" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>-->
-    <!--    <script crossorigin="anonymous" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>-->
-    <!--    <script crossorigin="anonymous" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>-->
-
-    <!--    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css" type="text/css"-->
-    <!--        media="all" rel="stylesheet" />-->
-    <!--&lt;!&ndash;    <link href="datepicker-widget.css" type="text/css" media="all" rel="stylesheet" />&ndash;&gt;-->
-    <!--    <link href="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/css/datepicker-widget.css"-->
-    <!--        type="text/css" media="all" rel="stylesheet" />-->
-    <!--    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>-->
-    <!--    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>-->
-    <!--    <script type="text/javascript" src="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>-->
-
-
+    <!--local scripts-->
     <script type="text/javascript" src="/static/journal.js"></script>
+    <script type="text/javascript" src="/static/utils.js"></script>
     <script type="text/javascript">
         const chosen_complex_to_show = "{{ chosen_complex_to_show }}";
         const chosen_map_link = "{{ chosen_map_link }}";
         const map_link_default = "{{ map_link_default }}";
-
-
     </script>
 </head>
-<!--<body style="background-color:rgba(113,129,132,0.14);">-->
-<!--url(static/icons/strizh_images/strizh3.png);-->
 <body style="text-align: left;  background: rgba(113,129,132,0.24)  ">
 <div class="everything">
     <div class="map-info" style="margin: 1%">
@@ -79,7 +54,7 @@
                             <button class="button-black"> Главная</button>
                         </a>
 
-                        {% if page_picked == 'journal' %}
+                        {% if page_picked == 'journal' or page_picked == 'choose_drone_toshow'%}
                         <a href="journal" method='POST'>
                             <button class="button-page-picked"> Журнал</button>
                         </a>
@@ -298,12 +273,12 @@
                                         <th>Имя поста</th>
                                         <th>Высота, м</th>
                                         <th>Хост</th>
-                                        <th>Несущая частота</th>
-                                        <th>Полоса проп.</th>
+                                        <th>Несущая частота (ГГц)</th>
+                                        <th>Полоса проп. (МГц)</th>
                                         <th>Радиус, м</th>
-                                        <th>Азимут</th>
+                                        <th>Азимут &deg</th>
                                         <th>Комментарий</th>
-                                        <th>Показать</th>
+                                        <th>Отобразить</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -316,8 +291,8 @@
                                         <td>{{dron.strig_name}}</td>
                                         <td>{% widthratio dron.height 1 1 %}</td>
                                         <td>{{dron.ip}}</td>
-                                        <td>{% widthratio dron.center_freq 1 1 %}</td>
-                                        <td>{% widthratio dron.brandwidth 1 1 %}</td>
+                                        <td>{{ dron.center_freq|division3:1e9 }}</td>
+                                        <td>{% widthratio dron.brandwidth 1e6 1 %}</td>
                                         <td>{% widthratio dron.area_radius_m 1 1 %}</td>
                                         <td>{{ dron.azimuth|get_int }}</td>
                                         <td>{{dron.comment_string}}</td>

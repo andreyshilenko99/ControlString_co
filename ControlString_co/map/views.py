@@ -571,6 +571,7 @@ def get_map_form(request):
 def choose_drone_toshow(request):
     global c
     if request.method == 'POST':
+        c['page_picked'] = 'choose_drone_toshow'
         c['chosen_complex_to_show'] = ''
         detection_id = request.POST.get('detection_id')
         drone_id = request.POST.get('drone_id')
@@ -954,7 +955,7 @@ def export_csv(request):
     print(csv_name)
     with open(os.path.join('saved_logs_csv', csv_name), 'w+', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
-        first_row = 'Имя дрона', 'Имя комплекса', 'ID дрона', 'Несущая частота', 'Пропускная способность', \
+        first_row = 'Имя дрона', 'Имя комплекса', 'ID дрона', 'Несущая частота (ГГц)', 'Полоса пропускания (МГц)', \
                     'Время обнаружения', 'Комментарии', 'Координаты дрона', 'Азимут', \
                     'Внутренний радиус сектора (м.)', 'Внешний радиус сектора (м.)', 'Радиус сектора (м)', \
                     'IP-адрес стрижа', 'Высота (м.)'
@@ -963,7 +964,7 @@ def export_csv(request):
         for dr in drones_filtered_strizh:
             writer = csv.writer(f)
             azimuth = int(re.findall('[0-9]+', dr.azimuth)[0])
-            row = dr.system_name, dr.strig_name, dr.drone_id, dr.center_freq, dr.brandwidth, \
+            row = dr.system_name, dr.strig_name, dr.drone_id, round(dr.center_freq / 1e9, 3), round(dr.brandwidth, 0), \
                   dr.current_time, dr.comment_string, (dr.drone_lat, dr.drone_lon), azimuth, \
                   dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip, dr.height
 
