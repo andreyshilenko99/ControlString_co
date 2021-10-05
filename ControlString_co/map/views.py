@@ -84,8 +84,8 @@ def return_conditions(url):
 def get_info_main(ip1, ip2, name):
     try:
         # TODO UNCOMMENT for working check state
-        mode_ips = [check_state(ip1), check_state(ip2)]
-        # mode_ips = ['all_stop' for _ in range(2)]
+        # mode_ips = [check_state(ip1), check_state(ip2)]
+        mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -324,7 +324,6 @@ def render_main_page(request):
     else:
         form = StrizhForm()
     c['form'] = form
-    # TODO current_time
     all_drones_a = AeroPoints.objects.all().order_by('-current_time')
     all_drones_s = Point.objects.all().order_by('-current_time')
     all_drones_res = all_drones_s.union(all_drones_a)
@@ -461,7 +460,6 @@ def turn_on_bp(request):
                 # turn everything on
                 state0 = obtain_state(url, 'вентилятор')
                 if state0 != 'вкл':
-                    # TODO uncomment ventilator
                     # pass
                     send_line_command(url, 'вентилятор_команда', 1)
                 state1 = obtain_state(url, 'БП ПЭВМ')
