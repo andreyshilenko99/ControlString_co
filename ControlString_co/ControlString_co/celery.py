@@ -12,6 +12,8 @@ from celery import shared_task
 from ControlString_co.trace import trace
 from ControlString_co.check_uniping import main_check
 from ControlString_co.skyPoint import skypoint
+from ControlString_co.check_strig import check_strig
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ControlString_co.settings')
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
@@ -31,9 +33,9 @@ app.conf.beat_schedule = {
         'task': 'get_info_trace',
         'schedule': timedelta(seconds=1),
     },
-    'uniping': {
-        'task': 'uniping',
-        'schedule': crontab(minute='*/1'),
+    'check_state': {
+        'task': 'check',
+        'schedule': timedelta(seconds=1),
     },
     'aeroScope': {
         'task': 'aeroScope',
@@ -47,23 +49,15 @@ def get_info_trace():
     trace()
 
 
-@shared_task(name='uniping')
-def uniping():
-    main_check()
+@shared_task(name='check')
+def check():
+    check_strig()
 
-from ControlString_co.skyPoint import are_you_alive
+
 
 @shared_task(name='aeroScope')
 def aeroScope():
     skypoint()
 
-# @app.task
-# def uniping_info():
-#     main_check()
-#
-#
-# @app.task
-# def trace_host():
-#     trace()
 
 

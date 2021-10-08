@@ -1,4 +1,3 @@
-from django.apps import apps
 from pysnmp.hlapi import *
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902
@@ -15,7 +14,7 @@ check_oids = {'npThermoValue.n': '.1.3.6.1.4.1.25728.8800.1.1.2.1',
               'npRelHumSensorStatusH': '.1.3.6.1.4.1.25728.8400.2.5.0'}
 
 control_oids = {'warm': '.1.3.6.1.4.1.25728.8900.1.1.3.1', 'wind': '.1.3.6.1.4.1.25728.8900.1.1.3.2',
-                'control_wind': '.1.3.6.1.4.1.25728.8900.1.1.2.9'}
+                'control_wind': '.1.3.6.1.4.1.25728.8900.1.1.2.9', 'check_heater': '.1.3.6.1.4.1.25728.8900.1.1.2.1'}
 
 
 def snmp_get(community, ip, port, oid):  # опрос uniping
@@ -48,73 +47,56 @@ def snmp_send(community, ip, port, oid):
     )
 
 
-def main_check():
-    srizhes = apps.get_model('geo', 'Strizh').objects.all()
-    for strizh in srizhes:
-        ip_address_host = strizh.uniping_ip
+def main_check(host):
+    dict_state = {'cooler': 'Нет данных', 'temperature_state': 'Нет данных', 'wetness_state': 'Нет данных',
+                  'heater_state': 'Нет данных', 'temperature': 'Нет данных',
+                  'wetness': 'Нет данных'}
+    # dict_state = {'cooler': 'works', 'temperature_state': 'temp_is_ok', 'wetness_state': 'wetness_is_ok',
+    #               'heater_state': 'ok', 'temperature': '34',
+    #               'wetness': '40'}
+    ip_address_host = host
+    try:
         name = (snmp_get(community_string, ip_address_host, port_snmp, temperature))
         print('answer= ' + name)
-        # print(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get(temperature)))
-        # wetness = int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get(wet)))
-        # print(wetness)
-        # Termo = apps.get_model('geo', 'UniPingInfo').objects.all()
-        # state = str(snmp_get(community_string, ip_address_host, port_snmp,
-        #                      control_oids.get('npRelHumSensorStatusH')))
-        # print(state)
-        # termo = Termo(temp=float(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get(temperature))),
-        #               wetness=float(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get(wet))),
-        #               state=str(snmp_get(community_string, ip_address_host, port_snmp,
-        #                                  control_oids.get('npRelHumSensorStatusH'))))
-        # termo.save()
         print(int(snmp_get(community_string, ip_address_host, port_snmp, check_oids.get('npThermoStatus.n'))))
+        dict_state['wetness'] = str(
+            snmp_get(community_string, ip_address_host, port_snmp, check_oids.get('npRelHumSensorValueT')))
+        dict_state['temperature'] = str(
+            snmp_get(community_string, ip_address_host, port_snmp, check_oids.get('npThermoValue.n')))
         if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('wind'))) == 0:
             snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('wind'))
         if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('control_wind'))) == 1:
-            # snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('control_wind'))
-            print("ok")
+            dict_state['cooler'] = 'works'
         else:
-            print("doesnt work cooler")
-
+            dict_state['cooler'] = 'error'
             temp = int(snmp_get(community_string, ip_address_host, port_snmp, check_oids.get('npThermoStatus.n')))
             wetness = int(
                 snmp_get(community_string, ip_address_host, port_snmp, check_oids.get('npRelHumSensorStatusH')))
             print(wetness)
             if temp == 0:
-                print("no termo sense")  # прописать исключения
+                dict_state['temperature'] = 'no_tempo_sense'
             elif temp == 1:
-                if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('warm'))) == 0:
+                if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('check_heater'))) == 0:
                     snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('warm'))
-                # if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('wind'))) == 1:
-                #     snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('wind'))
             elif temp == 3:
-                # if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('wind'))) == 0:
-                #     snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('wind'))
-                # if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('control_wind'))) == 1:
-                #     # snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('control_wind'))
-                #     print("ok")
-                # else:
-                #     print("doesnt work cooler")
-                if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('warm'))) == 1:
+                if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('check_heater'))) == 1:
                     snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('warm'))
+                    dict_state['temperature_state'] = 'tempe_not_ok'
             elif temp == 2:
+                dict_state['temperature_state'] = 'temp_is_ok'
                 if wetness == 0:
+                    dict_state['wetness_state'] = 'no_wetness_sense'
                     print("no wetness sense")
                 elif wetness == 3:
-                    if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('warm'))) == 0:
+                    if int(snmp_get(community_string, ip_address_host, port_snmp,
+                                    control_oids.get('check_heater'))) == 0:
+                        dict_state['wetness_state'] = 'wetness_not_ok'
                         snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('warm'))
-                    # if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('wind'))) == 0:
-                    #     snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('wind'))
-                    # if int(snmp_get(community_string, ip_address_host, port_snmp,
-                    #                 control_oids.get('control_wind'))) == 1:
-                    # snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('control_wind'))
-                    # print("ok")
-                    # else:
-                    #     print("doesnt work cooler")
                 elif wetness == 2:
-                    if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('warm'))) == 1:
+                    if int(snmp_get(community_string, ip_address_host, port_snmp,
+                                    control_oids.get('check_heater'))) == 1:
+                        dict_state['wetness_state'] = 'wetness_is_ok'
                         snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('warm'))
-                    # if int(snmp_get(community_string, ip_address_host, port_snmp, control_oids.get('wind'))) == 1:
-                    #     snmp_send(community_string, ip_address_host, port_snmp, control_oids.get('wind'))
-
-
-
+        return dict_state
+    except TypeError:
+        return dict_state

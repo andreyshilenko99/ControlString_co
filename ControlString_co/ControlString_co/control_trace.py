@@ -1,17 +1,13 @@
 import socket
 import time
-
+from django.apps import apps
 from Trace import trace_remote_pb2 as con
 
 
 def check_state(host):
-    # TODO Исключения
     message = con.TraceRemoteMessage()
     message.message_type = 7
-
     lel = message.SerializeToString()
-    print(message)
-
     port = 10100  # The same port as used by the server
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -21,25 +17,18 @@ def check_state(host):
         data = s.recv(1024)
         data = data[9:-8]
         s.close()
-        print(data)
-    except socket.timeout:
+    except (socket.timeout, ConnectionRefusedError) as e:
         s.close()
         data = 'KAL'
-        print(data)
-
-    # signal = con.TraceRemoteMessage()
-    # print(data)
-
-    # data = signal.ParseFromString(data)
-
-    # print(data)
-
     if data == b'\x00\x10\x00':
         return "all_stop"
     elif data == b'\x01\x10\x00':
         return "scan_on"
     elif data == b'\x00\x10\x01':
         return "jammer_on"
+    elif data == 'KAL':
+        return "no_connect"
+
 
 
 def scan_on_off(host):

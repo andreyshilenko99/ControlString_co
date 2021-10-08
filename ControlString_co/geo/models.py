@@ -284,9 +284,10 @@ class TimePick(models.Model):
 
 class Maps(models.Model):
     # datetime = models.DateTimeField()
-    map_link = models.CharField('Источник тайлов для карты (z/x/y)', max_length=500, default='http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png',
-                                   error_messages={'required': ''}
-                                   )
+    map_link = models.CharField('Источник тайлов для карты (z/x/y)', max_length=500,
+                                default='http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png',
+                                error_messages={'required': ''}
+                                )
     map_name = models.CharField('название карты', max_length=500,
                                 default='Спутниковая съемка',
                                 error_messages={'required': ''}
@@ -298,4 +299,22 @@ class Maps(models.Model):
     class Meta:
         verbose_name = 'Карта'
         verbose_name_plural = 'Карты'
+
+
+class StrigState(models.Model):
+    strig_name = models.CharField(max_length=500)
+    ip1_state = models.CharField(max_length=500)
+    ip2_state = models.CharField(max_length=500)
+    temperature = models.CharField(max_length=500)
+    temperature_state = models.CharField(max_length=500)
+    wetness = models.CharField(max_length=500)
+    wetness_state = models.CharField(max_length=500)
+    cooler = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.strig_name
+
+    class Meta:
+        verbose_name = 'Состояние стрижа'
+        verbose_name_plural = 'Состояния стрижей'
 
