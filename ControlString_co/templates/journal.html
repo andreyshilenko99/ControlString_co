@@ -254,48 +254,50 @@
         <div class="row" style="height: 100%; width:100%; margin-top: 1%;margin-left: 0px; border: 0.5vh">
             <div class="information-bottom-left">
 
-                <form action="choose_drone_toshow" method="post">
-                    <!--                <form action="" method="post">-->
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-12 ">
 
-                            <div id="detections" style="margin: 10px 0;
+                <!--                <form action="" method="post">-->
+
+                <div class="row">
+                    <div class="col-12 ">
+
+                        <div id="detections" style="margin: 10px 0;
                     width: 99%; height: 5%">
-                                {% if all_drones_res.count != 0 %}
+                            {% if all_drones_res.count != 0 %}
 
-                                <table id="detections_table">
-                                    <thead>
-                                    <tr>
-                                        <th>Время</th>
-                                        <th>Имя дрона</th>
-                                        <th>ID дрона</th>
-                                        <th>Имя поста</th>
-                                        <th>Высота, м</th>
-                                        <th>Хост</th>
-                                        <th>Несущая частота (ГГц)</th>
-                                        <th>Полоса проп. (МГц)</th>
-                                        <th>Радиус, м</th>
-                                        <th>Азимут &deg</th>
-                                        <th>Комментарий</th>
-                                        <th>Отобразить</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
+                            <table id="detections_table">
+                                <thead>
+                                <tr>
+                                    <th>Время</th>
+                                    <th>Имя дрона</th>
+                                    <th>ID дрона</th>
+                                    <th>Имя поста</th>
+                                    <th>Высота, м</th>
+                                    <th>Хост</th>
+                                    <th>Несущая частота (ГГц)</th>
+                                    <th>Полоса проп. (МГц)</th>
+                                    <th>Радиус, м</th>
+                                    <th>Азимут &deg</th>
+                                    <th>Комментарий</th>
+                                    <th>Отобразить</th>
+                                </tr>
+                                </thead>
+                                <tbody>
 
-                                    {% for dron in all_drones_res %}
-                                    <tr>
-                                        <td>{{dron.current_time}}</td>
-                                        <td>{{dron.system_name}}</td>
-                                        <td>{{dron.drone_id}}</td>
-                                        <td>{{dron.strig_name}}</td>
-                                        <td>{% widthratio dron.height 1 1 %}</td>
-                                        <td>{{dron.ip}}</td>
-                                        <td>{{ dron.center_freq|division3:1e9 }}</td>
-                                        <td>{% widthratio dron.brandwidth 1e6 1 %}</td>
-                                        <td>{% widthratio dron.area_radius_m 1 1 %}</td>
-                                        <td>{{ dron.azimuth|get_int }}</td>
-                                        <td>{{dron.comment_string}}</td>
+                                {% for dron in all_drones_res %}
+                                <tr>
+                                    <td>{{dron.current_time}}</td>
+                                    <td>{{dron.system_name}}</td>
+                                    <td>{{dron.drone_id}}</td>
+                                    <td>{{dron.strig_name}}</td>
+                                    <td>{% widthratio dron.height 1 1 %}</td>
+                                    <td>{{dron.ip}}</td>
+                                    <td>{{ dron.center_freq|division3:1e9 }}</td>
+                                    <td>{% widthratio dron.brandwidth 1e6 1 %}</td>
+                                    <td>{% widthratio dron.area_radius_m 1 1 %}</td>
+                                    <td>{{ dron.azimuth|get_int }}</td>
+                                    <td>{{dron.comment_string}}</td>
+                                    <form action="choose_drone_toshow" method="post">
+                                        {% csrf_token %}
                                         <td>
                                             {% if dron.drone_id != '0' and dron.drone_id != 0 %}
                                             <button type="submit" class="btn btn-primary" name="drone_id"
@@ -307,24 +309,25 @@
                                             </button>
                                             {% endif %}
                                         </td>
-                                    </tr>
-                                    {% endfor %}
+                                    </form>
+                                </tr>
+                                {% endfor %}
 
-                                    </tbody>
-                                </table>
-                            </div>
+                                </tbody>
+                            </table>
                         </div>
-                        {% else %}
-
-                        <div style="width: 100vh">
-                            <h2 style="color: #3b3b3b;text-align:  center; margin-top: 40px">
-                                По выбранным критериям ничего не найдено
-                            </h2>
-                            {% endif %}
-                        </div>
-
                     </div>
-                </form>
+                    {% else %}
+
+                    <div style="width: 100vh">
+                        <h2 style="color: #3b3b3b;text-align:  center; margin-top: 40px">
+                            По выбранным критериям ничего не найдено
+                        </h2>
+                        {% endif %}
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </div>
