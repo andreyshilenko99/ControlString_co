@@ -30,6 +30,35 @@ function refresh() {
             });
         }
     })
+
+
+}
+
+function get_conditions_ajax() {
+
+    return $.ajax({
+        url: '/geo/conditions_view/',
+        async: false,
+    }).responseText;
+
+}
+
+function get_conditions() {
+    var conditions_ajax = JSON.parse(get_conditions_ajax())
+    console.log('________________________')
+    console.log('conditions_ajax', conditions_ajax)
+    console.log('________________________')
+    for (let i = 0; i < conditions_ajax.features.length; i++) {
+        var uniping_cond = conditions_ajax.features[i].properties.seconds_drone_show;
+        var parentID = document.getElementById('information-right')
+        console.log('parentID', parentID)
+        parentID.getElementsByClassName("temperature_val")[0].innerHTML = 'Температура: ' + uniping_cond;
+        parentID.getElementsByClassName("humidity_val")[0].innerHTML = 'Влажность: ' + uniping_cond;
+        parentID.getElementsByClassName("cooler")[0].innerHTML = 'Вентилятор: ' + uniping_cond;
+        // document.getElementsByClassName("cooler").innerHTML = 'Вентилятор: ' + uniping_cond;
+    }
+
+    // return conditions_ajax
 }
 
 
@@ -39,6 +68,7 @@ var DRONE_COUNTER = 4 // number of iterations to clear drone
 // number of drones in a trajectory for showing on a map
 const MAXDRONES = 50;
 
+setInterval(get_conditions, 10 * 1000);
 setInterval(refresh, SECONDS_WAIT * 1000);
 
 
@@ -237,8 +267,10 @@ function map_init_basic() {
                             // let radius = parseFloat(data.features[i].properties.area_radius_m);
                             let area_sector_start_grad = parseFloat(data.features[i].properties.area_sector_start_grad);
                             let area_sector_end_grad = parseFloat(data.features[i].properties.area_sector_end_grad);
-                            let strizh_center = [strizh_map_name[data.features[i].properties.strig_name][0],
-                                strizh_map_name[data.features[i].properties.strig_name][1]];
+                            console.log('strizh_map_name', strizh_map_name)
+                            console.log('data.features[i].properties.strig_nam', data.features[i].properties.strig_name)
+
+                            let strizh_center = [strizh_map_name[data.features[i].properties.strig_name][0], strizh_map_name[data.features[i].properties.strig_name][1]];
                             let strizh_name = data.features[i].properties.strig_name;
                             let radius = strizh_map_name[data.features[i].properties.strig_name][2];
 
@@ -487,6 +519,7 @@ function map_init_basic() {
             initial_draw_track = 1;
         })
     }
+
     refreshMarkers()
     setInterval(refreshMarkers, SECONDS_WAIT * 1000);
 }

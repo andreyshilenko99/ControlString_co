@@ -32,3 +32,7 @@ def strizh_view(request):
 def skypoint_view(request):
     SkyPoint_as_geojson = serialize('geojson', SkyPoint.objects.all().order_by('-pk'))
     return HttpResponse(SkyPoint_as_geojson, content_type='geojson')
+
+def conditions_view(request):
+    Conditions = serialize('geojson', Strizh.objects.all().order_by('-pk'))
+    return HttpResponse(Conditions, content_type='geojson')

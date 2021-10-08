@@ -176,7 +176,7 @@
                 </div>
                 <div class="row">
 
-                    <div class="information-bottom" style="height: 65%; margin-top: 2%; width: 95%">
+                    <div id="information-right" style="height: 65%; margin-top: 2%; width: 95%">
                         <!--                    border: 0.5vh solid rgb(255,255,255)">-->
                         <form action='main' method='GET'>
                             {% for striz in chosen_strizh %}
@@ -196,57 +196,32 @@
                             {% endfor %}
                         </form>
 
+                        {% if chosen_strizh != all_strizhes or all_strizhes|length == 1 %}
+                        <div id="srizh_condition" style="margin: 2% 7%">
+                            <!--                            <form action='main' style="margin: 2% 7%" method='GET'>-->
+                            <h6 class="temperature_val"></h6>
+                            <h6 class="humidity_val"></h6>
+                            <h6 class="cooler"></h6>
+                            <script>
+                                get_conditions()
+                            </script>
 
-                        {% if chosen_strizh != all_strizhes %}
-                        <form action='main' style="margin: 2% 7%" method='GET'>
-                            {% for striz in chosen_strizh %}
-                            {% if striz != 'None' %}
-                            <h6> Температура: {{ temperature_dict|getkey:striz }} </h6>
-                            <h6> Влажность: {{ humidity_dict|getkey:striz }} </h6>
-                            <h6> Состояние: {{ weather_state_dict|getkey:striz }} </h6>
-                            <h6> {{striz}}:
-                                {% if complex_state_dict|getkey:striz == 'включен' %}
-                                <span style="color: #027d1e"> {{ complex_state_dict|getkey:striz }} </span>
-                                {% else %}
-                                <span style="color: #a10202"> {{ complex_state_dict|getkey:striz }} </span>
-                                {% endif %}
-                            </h6>
+                            <!--                            </form>-->
+                        </div>
 
-                            {% endif %}
-                            {% endfor %}
-                        </form>
+
                         {% elif chosen_strizh == all_strizhes %}
                         <div class="row">
-                            <div class="box-scroll"
+                            <div class="box-scroll" id="multi_conditions"
                                  style="height: 100px; width:250px; margin: 2% 10%; background-color: #F6F6F6FF;justify-content: left">
-                                <form action='main' style="margin: 2% 2%" method='GET'>
-                                    {% for striz in chosen_strizh %}
-                                    {% if striz != 'None' %}
-                                    {% if weather_state_dict|getkey:striz == 'ошибка соединения с uniping' %}
-                                    <h6 style="color: #aa0505">
-                                        {{striz}}:
-                                        {{ complex_state_dict|getkey:striz }}.
-                                        {{ weather_state_dict|getkey:striz }}
-                                    </h6>
-                                    {% elif 'выключен' in complex_state_dict|getkey:striz %}
-                                    {% if complex_state_dict|getkey:striz == 'выключен вентилятор'%}
-                                    <h6 style="color: #b36c00">
-                                        {{striz}}:
-                                        {{ complex_state_dict|getkey:striz }}
-                                    </h6>
-                                    {% else %}
-                                    <h6 style="color: #aa0505">
-                                        {{striz}}:
-                                        {{ complex_state_dict|getkey:striz }}
-                                    </h6>
-                                    {% endif %}
-                                    {% elif 'включен' in complex_state_dict|getkey:striz %}
-                                    <h6 style="color: #165c27"> {{striz}}:
-                                        {{ complex_state_dict|getkey:striz }} </h6>
-                                    {% endif %}
-                                    {% endif %}
-                                    {% endfor %}
-                                </form>
+
+                                <h6 class="temperature_val"></h6>
+                                <h6 class="humidity_val"></h6>
+                                <h6 class="cooler"></h6>
+                                <script>
+                                    get_conditions()
+                                </script>
+
                             </div>
                         </div>
                         {% endif %}
@@ -308,7 +283,7 @@
         </div>
 
         <div class="information-bottom-left" style="height: 5%; margin-top: 1%; border: 0.5vh">
-<!--            <h3> Информация о засечках </h3>-->
+            <!--            <h3> Информация о засечках </h3>-->
             <div id="detections" style="margin: 1% 0;
                     width: 95%;">
                 <table id="detections_table">

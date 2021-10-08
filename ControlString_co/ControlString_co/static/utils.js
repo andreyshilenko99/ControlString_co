@@ -127,7 +127,7 @@ function markerFunction(name, strizh_markers) {
     console.log('strizh_markers[name] ', strizh_markers[name])
     var marker_st = strizh_markers[name];
     var position = marker_st.getLatLng();
-    map.setView(position, 15);
+    // map.setView(position, 15);
     marker_st.openPopup();
 }
 
