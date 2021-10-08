@@ -1,27 +1,32 @@
 var last_id = 0;
+var last_id_sky = 0;
 
 
 function refresh() {
     $.getJSON('/geo/data/', function (data) {
-        var current_id = data.features[0].properties.pk;
-        if (last_id === 0) {
-            last_id = current_id;
-        } else if (last_id !== current_id && last_id !== 0) {
-            last_id = current_id;
-            $.ajax({
-                url: "main",
-                success: function (data) {
-                    $("#detections").load("main #detections");
-                }
-            });
-        }
-    })
+            var current_id = data.features[0].properties.pk;
+            if (last_id === 0) {
+                last_id = current_id;
+            } else if (last_id !== current_id && last_id !== 0) {
+                last_id = current_id;
+                $.ajax({
+                    url: "main",
+                    success: function (data) {
+                        $("#detections").load("main #detections");
+                    }
+                });
+
+            }
+        })
+}
+
+function refresh_sky(){
     $.getJSON('/geo/journal_view_aero/', function (data) {
         var current_id = data.features[0].properties.pk;
-        if (last_id === 0) {
-            last_id = current_id;
-        } else if (last_id !== current_id && last_id !== 0) {
-            last_id = current_id;
+        if (last_id_sky === 0) {
+            last_id_sky = current_id;
+        } else if (last_id_sky !== current_id && last_id_sky !== 0) {
+            last_id_sky = current_id;
             $.ajax({
                 url: "main",
                 success: function (data) {
@@ -30,8 +35,6 @@ function refresh() {
             });
         }
     })
-
-
 }
 
 function get_conditions_ajax() {
@@ -62,14 +65,16 @@ function get_conditions() {
 }
 
 
-var SECONDS_WAIT = 2; // seconds, edit here
+var SECONDS_WAIT = 2; // seconds to refresh drone detections, edit here
+var SECONDS_CONDITIONS_WAIT = 5; // seconds to refresh state of uniping and trace, edit here
 var DRONE_COUNTER = 4 // number of iterations to clear drone
 
 // number of drones in a trajectory for showing on a map
 const MAXDRONES = 50;
 
-setInterval(get_conditions, 10 * 1000);
+setInterval(get_conditions, SECONDS_CONDITIONS_WAIT * 1000);
 setInterval(refresh, SECONDS_WAIT * 1000);
+setInterval(refresh_sky, 3 * 1000);
 
 
 function map_init_basic() {

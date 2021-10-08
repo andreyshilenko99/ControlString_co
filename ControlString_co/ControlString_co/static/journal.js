@@ -1,4 +1,5 @@
 var last_id = 0;
+var last_id_sky = 0;
 
 function refresh() {
 
@@ -6,35 +7,42 @@ function refresh() {
         var current_id = data.features[0].properties.pk;
         if (last_id === 0) {
             last_id = current_id;
-        } else if (last_id !== current_id) {
+        } else if (last_id !== current_id && last_id !== 0) {
+            last_id = current_id;
             $.ajax({
                 url: "journal",
                 success: function (data) {
                     $("#detections").load("journal #detections");
                     // $('#detections').replaceWith($('#detections', data));
-                    last_id = current_id;
                 }
             });
+
         }
+
     })
+}
+
+function refresh_sky() {
     $.getJSON('/geo/journal_view_aero/', function (data) {
         var current_id = data.features[0].properties.pk;
-        if (last_id === 0) {
-            last_id = current_id;
-        } else if (last_id !== current_id && last_id !== 0) {
-            last_id = current_id;
+        if (last_id_sky === 0) {
+            last_id_sky = current_id;
+        } else if (last_id_sky !== current_id && last_id_sky !== 0) {
+            last_id_sky = current_id;
             $.ajax({
-                url: "main",
+                url: "journal",
                 success: function (data) {
-                    $("#detections").load("main #detections");
+                    $("#detections").load("journal #detections");
+                    // $('#detections').replaceWith($('#detections', data));
                 }
             });
         }
     })
 }
 
-var seconds_wait = 5; // seconds, edit here
+var seconds_wait = 1; // seconds, edit here
 setInterval(refresh, seconds_wait * 1000);
+setInterval(refresh_sky, seconds_wait * 1000);
 
 
 function map_init_basic() {

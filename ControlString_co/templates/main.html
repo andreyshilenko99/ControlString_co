@@ -198,17 +198,13 @@
 
                         {% if chosen_strizh != all_strizhes or all_strizhes|length == 1 %}
                         <div id="srizh_condition" style="margin: 2% 7%">
-                            <!--                            <form action='main' style="margin: 2% 7%" method='GET'>-->
                             <h6 class="temperature_val"></h6>
                             <h6 class="humidity_val"></h6>
                             <h6 class="cooler"></h6>
                             <script>
                                 get_conditions()
                             </script>
-
-                            <!--                            </form>-->
                         </div>
-
 
                         {% elif chosen_strizh == all_strizhes %}
                         <div class="row">
@@ -221,7 +217,6 @@
                                 <script>
                                     get_conditions()
                                 </script>
-
                             </div>
                         </div>
                         {% endif %}
