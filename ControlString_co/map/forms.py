@@ -30,15 +30,10 @@ class TimePickForm(ModelForm):
 
 
 class StrizhForm(ModelForm):
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    # self.initial['chosen_strizh'] = None
-    # self.initial['chosen_strizh'] = kwargs.get('initial', None)
-    # self.fields['chosen_strizh'].initial = kwargs.get('initial', None)
     chosen_strizh = ModelChoiceField(queryset=Strizh.objects.all(), empty_label="Выберите стрижа",
                                      required=False, to_field_name="name",
                                      label="", widget=Select(attrs={'id': 'name', 'onchange': 'submit();',
-                                                                    'class': 'form-strizh',}))
+                                                                    'class': 'form-strizh', }))
 
     class Meta:
         model = Strizh
@@ -72,7 +67,7 @@ class SkyPointFilterForm(ModelForm):
 
 class DroneFilterForm(ModelForm):
     names_arr = []
-    AllDrones = Point.objects.all().order_by('-detection_time')
+    AllDrones = Point.objects.all().order_by('-current_time')
     drone_toshow = ModelMultipleChoiceField(queryset=AllDrones,
                                             required=False, to_field_name="pk",
                                             label="")
@@ -88,7 +83,7 @@ class TableFilterForm(ModelForm):
     zz = Point._meta.get_fields()
     AllFields = tuple([(f.name, f.verbose_name) for f in Point._meta.get_fields()])
     field = forms.ChoiceField(choices=AllFields, required=False,
-                              label="", initial="detection_time",
+                              label="", initial="current_time",
                               widget=Select(attrs={'id': 'tablefilter', 'onchange': 'submit();'}))
 
     class Meta:
@@ -121,13 +116,6 @@ class ApemsConfigurationForm(ModelForm):
         fields = ['apem_toshow']
 
 
-#         widgets = {
-#             'apem_toshow': Select(attrs={'size': 12, 'id': 'block2'
-#                            })
-# ,
-#         }
-
-
 class ApemsChangingForm(ModelForm):
     AllApems = ApemsConfiguration.objects.all().order_by('-freq_podavitelya')
 
@@ -137,7 +125,6 @@ class ApemsChangingForm(ModelForm):
         fields = ['strizh_name', 'freq_podavitelya', 'deg_podavitelya', 'type_podavitelya',
                   'type_podavitelya', 'ip_podavitelya', 'canal_podavitelya', 'usileniye_db'
                   ]
-
         widgets = {
             'strizh_name': TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя стрижа'}),
             'freq_podavitelya': NumberInput(attrs={'class': 'form-control', 'required': 'False',
@@ -152,19 +139,17 @@ class ApemsChangingForm(ModelForm):
 
 
 class MapChoosingForm(ModelForm):
-    # maps = Maps._meta.get_fields()
-    # maps = Maps.objects.all()
-    # AllFields = tuple([(f.map_link, f.map_name) for f in maps])
     AllFields = tuple([
         ('http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', 'Спутник'),
-        # ('http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', 'QGIS Open Street Maps'),
-        ('http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png', 'QGIS new'),
-        ('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Спутник Онлайн'),
+        ('http://localhost:8000/static/TilesSatellite/{z}/{x}/{y}.png', 'Спутник 2'),
+        ('http://localhost:8000/static/max_tiles/{z}/{x}/{y}.png', 'Схема'),
+        ('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+         'Спутник Онлайн'),
         ('http://{s}.tile.osm.org/{z}/{x}/{y}.png', 'OSM Онлайн'),
     ])
     chosen_map = forms.ChoiceField(choices=AllFields, required=False,
-                              label="", initial="Спутник",
-                              widget=Select(attrs={'id': 'mapchoosing', 'onchange': 'submit();'}))
+                                   label="", initial="Спутник",
+                                   widget=Select(attrs={'id': 'mapchoosing', 'onchange': 'submit();'}))
 
     class Meta:
         model = Maps

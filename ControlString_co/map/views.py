@@ -23,7 +23,6 @@ from .forms import TimePickForm
 from ControlString_co.control_trace import scan_on_off, check_state, jammer_on_off
 from ControlString_co.shelest_jam import set_gain
 
-
 DEGREE_SIGN = u"\u2103"
 chosen_strizh = 0
 logs = ''
@@ -85,8 +84,8 @@ def return_conditions(url):
 def get_info_main(ip1, ip2, name):
     try:
         # TODO UNCOMMENT for working check state
-        mode_ips = [check_state(ip1), check_state(ip2)]
-        # mode_ips = ['all_stop' for _ in range(2)]
+        # mode_ips = [check_state(ip1), check_state(ip2)]
+        mode_ips = ['all_stop' for _ in range(2)]
     except:
         mode_ips = ['all_stop' for _ in range(2)]
 
@@ -118,9 +117,9 @@ def get_info_main(ip1, ip2, name):
 
 def journal_view(request):
     global c
-    x = Point.objects.all().order_by('-detection_time')
+    x = Point.objects.all().order_by('-current_time')
     order_sign = '' if c.get('order_sign') == '+' else '-'
-    table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
+    table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'current_time'
     try:
         y = Point.objects.all().order_by(order_sign + table_filter)
         geom_as_geojson = serialize('geojson', y)
@@ -325,11 +324,10 @@ def render_main_page(request):
     else:
         form = StrizhForm()
     c['form'] = form
-    # TODO current_time
-    all_drones_a = AeroPoints.objects.all().order_by('-detection_time')
-    all_drones_s = Point.objects.all().order_by('-detection_time')
+    all_drones_a = AeroPoints.objects.all().order_by('-current_time')
+    all_drones_s = Point.objects.all().order_by('-current_time')
     all_drones_res = all_drones_s.union(all_drones_a)
-    all_drones_res = all_drones_res.order_by('-detection_time')
+    all_drones_res = all_drones_res.order_by('-current_time')
 
     c['all_drones_res'] = all_drones_res
     c['all_strizhes'] = [s.name for s in strizhes]
@@ -462,7 +460,6 @@ def turn_on_bp(request):
                 # turn everything on
                 state0 = obtain_state(url, 'вентилятор')
                 if state0 != 'вкл':
-                    # TODO uncomment ventilator
                     # pass
                     send_line_command(url, 'вентилятор_команда', 1)
                 state1 = obtain_state(url, 'БП ПЭВМ')
@@ -562,16 +559,17 @@ def get_map_form(request):
     if request.method == "POST":
         chosen_map_link = request.POST.get('chosen_map')
         c['chosen_map_link'] = chosen_map_link
-        c['map_form'] = MapChoosingForm(request.POST)
-
+        c['map_form'] = MapChoosingForm(request.POST, initial={'chosen_map': c.get('chosen_map_link')})
     try:
         return redirect(f"/{c.get('page_picked')}")
     except:
-        render(request, "configuration.html", context=c)
+        render(request, "journal.html", context=c)
+
 
 def choose_drone_toshow(request):
     global c
     if request.method == 'POST':
+        c['page_picked'] = 'choose_drone_toshow'
         c['chosen_complex_to_show'] = ''
         detection_id = request.POST.get('detection_id')
         drone_id = request.POST.get('drone_id')
@@ -589,6 +587,8 @@ def choose_drone_toshow(request):
                                                      comment_string=DP.comment_string,
                                                      drone_lat=DP.drone_lat,
                                                      drone_lon=DP.drone_lon,
+                                                     remote_lat=DP.remote_lat,
+                                                     remote_lon=DP.remote_lon,
                                                      azimuth=DP.azimuth,
                                                      area_sector_start_grad=DP.area_sector_start_grad,
                                                      area_sector_end_grad=DP.area_sector_end_grad,
@@ -601,13 +601,16 @@ def choose_drone_toshow(request):
                 c['chosen_complex_to_show'] = DP.strig_name
         elif detection_id:
             DP = Point.objects.filter(pk=detection_id)[0]
-            drone_value = DroneJournal(system_name=DP.system_name,
+            drone_value = DroneJournal(drone_id='0',
+                                       system_name=DP.system_name,
                                        center_freq=DP.center_freq,
                                        brandwidth=DP.brandwidth,
                                        detection_time=DP.detection_time,
                                        comment_string=DP.comment_string,
                                        drone_lat=DP.drone_lat,
                                        drone_lon=DP.drone_lon,
+                                       remote_lat=0,
+                                       remote_lon=0,
                                        azimuth=DP.azimuth,
                                        area_sector_start_grad=DP.area_sector_start_grad,
                                        area_sector_end_grad=DP.area_sector_end_grad,
@@ -663,7 +666,7 @@ def filter_all(request):
                                  start_datetime=c['start_datetime'], end_datetime=c['end_datetime'])
     strizh_value.save()
     order_sign = '' if c.get('order_sign') == '+' else '-'
-    table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
+    table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'current_time'
     if request.method == '':
         form_filter = StrizhFilterForm(request.POST)
         form_filter_skypoint = SkyPointFilterForm(request.POST)
@@ -702,14 +705,14 @@ def filter_all(request):
         all_complexes = set()
         for drone in strizh_drones:
             all_complexes.add(drone.strig_name)
-            if time_start_datetime <= get_datetime_drone(drone.detection_time) <= time_end_datetime:
+            if time_start_datetime <= get_datetime_drone(drone.current_time) <= time_end_datetime:
                 drones_pk.append(drone.pk)
         drones_pk_aero = []
 
         all_complexes_aero = set()
         for drone_aero in aero_points:
             all_complexes_aero.add(drone_aero.strig_name)
-            if time_start_datetime <= get_datetime_drone(drone_aero.detection_time) <= time_end_datetime:
+            if time_start_datetime <= get_datetime_drone(drone_aero.current_time) <= time_end_datetime:
                 drones_pk_aero.append(drone_aero.pk)
         names_str = filter_values[0].filtered_strizhes
         names_sky = filter_values[0].filtered_skypoints
@@ -760,7 +763,7 @@ def journal(request):
         form_filter_table = TableFilterForm(request.POST)
         form_order_table = TableOrderForm(request.POST)
         c['order_sign'] = '-'
-        c['table_filter'] = 'detection_time'
+        c['table_filter'] = 'current_time'
         all_drones_a = AeroPoints.objects.all().order_by(c['order_sign'] + c['table_filter'])
         all_drones_s = Point.objects.all().order_by(c['order_sign'] + c['table_filter'])
         all_drones_res = all_drones_s.union(all_drones_a)
@@ -774,6 +777,7 @@ def journal(request):
 
         form_filter = StrizhFilterForm()
         map_form = MapChoosingForm(initial={'chosen_map': c.get('chosen_map_link')})
+        c['map_form'] = map_form
         if len(map_form.fields['chosen_map'].choices) == 0:
             map_obj = Maps(map_link=c['map_link_default'], map_name='Спутник')
             map_obj.save()
@@ -783,10 +787,10 @@ def journal(request):
         # form_order_table = TableOrderForm()
 
         order_sign = '' if c.get('order_sign') == '+' else '-'
-        table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'detection_time'
+        table_filter = c.get('table_filter') if c.get('table_filter', '') != '' else 'current_time'
         bool_expr = bool(c.get('start_datetime') != '') or bool(c.get('end_datetime') != '')
         if c.get('all_drones_res') is None:
-            if bool_expr or len(c) <= 5:
+            if bool_expr or len(c) <= 6:
                 # не записан в словарь, но есть фильтр времени след-но выводим все
                 all_drones_a = AeroPoints.objects.all().order_by(order_sign + table_filter)
                 all_drones_s = Point.objects.all().order_by(order_sign + table_filter)
@@ -798,7 +802,7 @@ def journal(request):
             all_drones_res = c.get('all_drones_res')
     # c['form_time_pick'] = form_time_pick
     c['form_filter'] = form_filter
-    c['map_form'] = map_form
+
     c['form_filter_skypoint'] = form_filter_skypoint
     c['form_filter_table'] = form_filter_table
     c['form_order_table'] = form_order_table
@@ -825,7 +829,7 @@ def apply_filter_table(request):
 
 def apply_order_table(request):
     if request.method == 'POST':
-        table_filter = 'detection_time' if not c.get('table_filter') else c.get('table_filter')
+        table_filter = 'current_time' if not c.get('table_filter') else c.get('table_filter')
         order_sign = request.POST.get('order_sign', c.get('order_sign'))
         order_sign2 = '' if order_sign == '+' else '-'
         all_drones_res = c.get('all_drones_res')
@@ -899,7 +903,7 @@ def reset_filter(request):
     c['filtered_strizhes'] = ''
     c['filtered_skypoints'] = ''
     c['saved_table'] = False
-    c['table_filter'] = 'detection_time'
+    c['table_filter'] = 'current_time'
     c['order_sign'] = '-'
     c['start_datetime'] = ''
     c['end_datetime'] = ''
@@ -914,11 +918,11 @@ def reset_filter(request):
     if request.method == 'POST':
 
         # form_filter_table = TableFilterForm(request.POST)
-        # form_drone_alldrones = Point.objects.all().order_by('-detection_time')
-        all_drones_a = AeroPoints.objects.all().order_by('-detection_time')
-        all_drones_s = Point.objects.all().order_by('-detection_time')
+        # form_drone_alldrones = Point.objects.all().order_by('-current_time')
+        all_drones_a = AeroPoints.objects.all().order_by('-current_time')
+        all_drones_s = Point.objects.all().order_by('-current_time')
         all_drones_res = all_drones_s.union(all_drones_a)
-        all_drones_res = all_drones_res.order_by('-detection_time')
+        all_drones_res = all_drones_res.order_by('-current_time')
 
         c['all_drones_res'] = all_drones_res
 
@@ -949,7 +953,7 @@ def export_csv(request):
     print(csv_name)
     with open(os.path.join('saved_logs_csv', csv_name), 'w+', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
-        first_row = 'Имя дрона', 'Имя комплекса', 'ID дрона', 'Несущая частота', 'Пропускная способность', \
+        first_row = 'Имя дрона', 'Имя комплекса', 'ID дрона', 'Несущая частота (ГГц)', 'Полоса пропускания (МГц)', \
                     'Время обнаружения', 'Комментарии', 'Координаты дрона', 'Азимут', \
                     'Внутренний радиус сектора (м.)', 'Внешний радиус сектора (м.)', 'Радиус сектора (м)', \
                     'IP-адрес стрижа', 'Высота (м.)'
@@ -958,8 +962,8 @@ def export_csv(request):
         for dr in drones_filtered_strizh:
             writer = csv.writer(f)
             azimuth = int(re.findall('[0-9]+', dr.azimuth)[0])
-            row = dr.system_name, dr.strig_name, dr.drone_id, dr.center_freq, dr.brandwidth, \
-                  dr.detection_time, dr.comment_string, (dr.drone_lat, dr.drone_lon), azimuth, \
+            row = dr.system_name, dr.strig_name, dr.drone_id, round(dr.center_freq / 1e9, 3), round(dr.brandwidth/1e6, 0), \
+                  dr.current_time, dr.comment_string, (dr.drone_lat, dr.drone_lon), azimuth, \
                   dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip, dr.height
 
             writer.writerow(row)

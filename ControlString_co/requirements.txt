@@ -16,7 +16,7 @@ django-admin-numeric-filter==0.1.6
 django-bootstrap-datepicker-plus==3.0.5
 django-bootstrap4==3.0.1
 django-geojson==3.2.0
-django-leaflet==0.28.1
+django-leaflet==0.28.0
 django-postgres-copy==2.6.0
 django-queryset-csv==1.1.0
 django-tempus-dominus==5.1.2.14

@@ -6,9 +6,14 @@ import json
 register = template.Library()
 
 
-@register.filter
-def division(value, div):
-    return round((value / div), 2)
+@register.filter(name='division3')
+def division3(value, div):
+    return round((value / div), 3)
+
+
+# @register.filter(name='division0')
+# def division0(value, div):
+#     return round((value / div), 0)
 
 
 @register.filter(name='getkey')

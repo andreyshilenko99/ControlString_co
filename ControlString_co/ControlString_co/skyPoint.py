@@ -30,12 +30,12 @@ def skypoint():
                                           comment_string=str('-'),
                                           drone_lat=float(msg[1][0]),
                                           drone_lon=float(msg[1][1]),
-                                          azimuth='-',
+                                          azimuth='azimuth 0',
                                           area_sector_start_grad=float(0),
                                           area_sector_end_grad=float(0),
                                           area_radius_m=float(0),
                                           ip=i,
-                                          current_time=msg[4], strig_name=oko, height=msg[3])
+                                          current_time=str(msg[4]), strig_name=oko, height=msg[3])
                         point.save()
     except TypeError:
         # TODO Добавить исключение или логи или сообщение для серва4ка чтоб он
