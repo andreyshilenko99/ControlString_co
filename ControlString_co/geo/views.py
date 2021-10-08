@@ -2,7 +2,7 @@ from django.core.serializers import serialize
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from .models import Point, Strizh, DroneJournal, AeroPoints, DroneTrajectoryJournal, SkyPoint
+from .models import Point, Strizh, DroneJournal, AeroPoints, DroneTrajectoryJournal, SkyPoint, StrigState
 
 
 def geojson_view(request):
@@ -34,5 +34,5 @@ def skypoint_view(request):
     return HttpResponse(SkyPoint_as_geojson, content_type='geojson')
 
 def conditions_view(request):
-    Conditions = serialize('geojson', Strizh.objects.all().order_by('-pk'))
+    Conditions = serialize('geojson', StrigState.objects.all().order_by('pk'))
     return HttpResponse(Conditions, content_type='geojson')

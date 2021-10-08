@@ -4,23 +4,23 @@ var last_id_sky = 0;
 
 function refresh() {
     $.getJSON('/geo/data/', function (data) {
-            var current_id = data.features[0].properties.pk;
-            if (last_id === 0) {
-                last_id = current_id;
-            } else if (last_id !== current_id && last_id !== 0) {
-                last_id = current_id;
-                $.ajax({
-                    url: "main",
-                    success: function (data) {
-                        $("#detections").load("main #detections");
-                    }
-                });
+        var current_id = data.features[0].properties.pk;
+        if (last_id === 0) {
+            last_id = current_id;
+        } else if (last_id !== current_id && last_id !== 0) {
+            last_id = current_id;
+            $.ajax({
+                url: "main",
+                success: function (data) {
+                    $("#detections").load("main #detections");
+                }
+            });
 
-            }
-        })
+        }
+    })
 }
 
-function refresh_sky(){
+function refresh_sky() {
     $.getJSON('/geo/journal_view_aero/', function (data) {
         var current_id = data.features[0].properties.pk;
         if (last_id_sky === 0) {
@@ -51,15 +51,38 @@ function get_conditions() {
     console.log('________________________')
     console.log('conditions_ajax', conditions_ajax)
     console.log('________________________')
+    var full_text = ''
     for (let i = 0; i < conditions_ajax.features.length; i++) {
-        var uniping_cond = conditions_ajax.features[i].properties.seconds_drone_show;
+        var strig_name = conditions_ajax.features[i].properties.strig_name;
+        var uniping_temp = conditions_ajax.features[i].properties.temperature;
+        var uniping_hum = conditions_ajax.features[i].properties.wetness;
+        var uniping_cooler = conditions_ajax.features[i].properties.cooler;
+        var ip1_state = conditions_ajax.features[i].properties.ip1_state;
+        var ip2_state = conditions_ajax.features[i].properties.ip2_state;
+
+        var temp_state = conditions_ajax.features[i].properties.temperature_state;
+        var hum_state = conditions_ajax.features[i].properties.wetness_state;
         var parentID = document.getElementById('information-right')
-        console.log('parentID', parentID)
-        parentID.getElementsByClassName("temperature_val")[0].innerHTML = 'Температура: ' + uniping_cond;
-        parentID.getElementsByClassName("humidity_val")[0].innerHTML = 'Влажность: ' + uniping_cond;
-        parentID.getElementsByClassName("cooler")[0].innerHTML = 'Вентилятор: ' + uniping_cond;
-        // document.getElementsByClassName("cooler").innerHTML = 'Вентилятор: ' + uniping_cond;
+        var color = '#9c8600'
+        if (hum_state==='wetness_is_ok' && temp_state === 'temp_is_ok'){
+
+            var color = '#00630d'
+        }
+        full_text = full_text + `<h6 style = "margin-left: 5px; color: ${color}">` + strig_name + '</h6>' +
+            '<h6 style = "margin-left: 5px">' + 'Температура: ' + uniping_temp + "&deg" + '</h6>' +
+            '<h6 style = "margin-left: 5px">' + 'Влажность: ' + uniping_hum + '%'+ '</h6>' +
+            '<h6 style = "margin-left: 5px">' + 'Вентилятор: ' + uniping_cooler + '</h6>' +
+            '<h6 style = "margin-left: 5px">' + 'Хост 1: ' + ip1_state + '</h6>' +
+            '<h6 style = "margin-left: 5px">' + 'Хост 2: ' + ip2_state + '</h6>';
+        console.log('full_text', full_text)
     }
+    parentID.getElementsByClassName("onestrizh")[0].innerHTML = full_text
+
+    // parentID.getElementsByClassName("strig_name")[0].innerHTML = strig_name;
+    // parentID.getElementsByClassName("temperature_val")[0].innerHTML = 'Температура: ' + uniping_temp;
+    // parentID.getElementsByClassName("humidity_val")[0].innerHTML = 'Влажность: ' + uniping_hum;
+    // parentID.getElementsByClassName("cooler")[0].innerHTML = 'Вентилятор: ' + uniping_cooler;
+
 
     // return conditions_ajax
 }

@@ -189,7 +189,7 @@
                             {% else %}
                             <div class="row" style="margin-left: 0; width: 250px">
                                 <h5 style="font-weight:600; font-family: Calibri, sans-serif; margin-left: 7%; color: #a10202">
-                                    Необходимо включить {{striz}} </h5>
+                                    {{striz}} выключен</h5>
                             </div>
                             {% endif %}
                             {% endif %}
@@ -198,9 +198,11 @@
 
                         {% if chosen_strizh != all_strizhes or all_strizhes|length == 1 %}
                         <div id="srizh_condition" style="margin: 2% 7%">
-                            <h6 class="temperature_val"></h6>
-                            <h6 class="humidity_val"></h6>
-                            <h6 class="cooler"></h6>
+                            <h6 class="onestrizh"></h6>
+<!--                            <h6 class="strig_name"></h6>-->
+<!--                            <h6 class="temperature_val"></h6>-->
+<!--                            <h6 class="humidity_val"></h6>-->
+<!--                            <h6 class="cooler"></h6>-->
                             <script>
                                 get_conditions()
                             </script>
@@ -209,11 +211,13 @@
                         {% elif chosen_strizh == all_strizhes %}
                         <div class="row">
                             <div class="box-scroll" id="multi_conditions"
-                                 style="height: 100px; width:250px; margin: 2% 10%; background-color: #F6F6F6FF;justify-content: left">
+                                 style="height: 150px; width:250px; margin: 2% 10%; background-color: #F6F6F6FF;justify-content: left">
 
-                                <h6 class="temperature_val"></h6>
-                                <h6 class="humidity_val"></h6>
-                                <h6 class="cooler"></h6>
+                                <h6 class="onestrizh"></h6>
+<!--                                <h6 class="strig_name"></h6>-->
+<!--                                <h6 class="temperature_val"></h6>-->
+<!--                                <h6 class="humidity_val"></h6>-->
+<!--                                <h6 class="cooler"></h6>-->
                                 <script>
                                     get_conditions()
                                 </script>
