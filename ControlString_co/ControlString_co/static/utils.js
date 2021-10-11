@@ -100,11 +100,15 @@ function get_map_init(set_view) {
         }
     } else {
         map_link = chosen_map_link
+
     }
     if (set_view !== '') {
         map.fitBounds(L.latLngBounds(radius_border[1], radius_border[0]));
     }
-    map.setView(initial_coords, 14);
+    else{
+        map.setView(initial_coords, 14);
+    }
+
     L.tileLayer(map_link, {
         attribution: '&copy; Cerrera'
     }).addTo(map);
@@ -153,7 +157,7 @@ function track_map_bounds(map, coords_arr) {
     let c2 = L.latLng(max_lat, max_lon);
     map.fitBounds(L.latLngBounds(c2, c1));
     // map.setZoom(map.getZoom() - 1);
-    map.setView(mean_coords, map.getZoom() - 1);
+    // map.setView(mean_coords, map.getZoom() - 1);
     return map
 }
 
@@ -169,7 +173,7 @@ function draw_tooltip_main(layer_group, coords, icon_url, size, tooltip_text, is
             options: {
                 iconSize: [size, size],
                 iconAnchor: [size / 2, size / 2],
-                popupAnchor: [0, size],
+                popupAnchor: [ 0, size],
                 className: blinking
             }
         });
@@ -177,7 +181,7 @@ function draw_tooltip_main(layer_group, coords, icon_url, size, tooltip_text, is
         logoMarkerStyleStrizh = L.Icon.extend({
             options: {
                 iconSize: [size, size],
-                iconAnchor: [size / 2, size],
+                iconAnchor: [size / 2, size/ 2],
                 popupAnchor: [0, -1 * size],
                 className: blinking
             }

@@ -53,7 +53,9 @@
     border: 0px solid #000000;
     color: #050000;
     width: 380px;
+    height: 180px;
     max-width: 380px;
+    max-height: 180px;
     /*white-space: nowrap;*/
     font-size: 12px;
     word-wrap: break-word;
