@@ -181,7 +181,7 @@ function draw_tooltip_main(layer_group, coords, icon_url, size, tooltip_text, is
         logoMarkerStyleStrizh = L.Icon.extend({
             options: {
                 iconSize: [size, size],
-                iconAnchor: [size / 2, size/ 2],
+                iconAnchor: [size / 2, size],
                 popupAnchor: [0, -1 * size],
                 className: blinking
             }

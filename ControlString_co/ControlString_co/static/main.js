@@ -38,19 +38,14 @@ function refresh_sky() {
 }
 
 function get_conditions_ajax() {
-
     return $.ajax({
         url: '/geo/conditions_view/',
         async: false,
     }).responseText;
-
 }
 
 function get_conditions() {
     var conditions_ajax = JSON.parse(get_conditions_ajax())
-    console.log('________________________')
-    console.log('conditions_ajax', conditions_ajax)
-    console.log('________________________')
     var full_text = ''
     for (let i = 0; i < conditions_ajax.features.length; i++) {
         var strig_name = conditions_ajax.features[i].properties.strig_name;
@@ -64,17 +59,20 @@ function get_conditions() {
         var hum_state = conditions_ajax.features[i].properties.wetness_state;
         var parentID = document.getElementById('information-right')
         var color = '#9c8600'
-        if (hum_state==='wetness_is_ok' && temp_state === 'temp_is_ok'){
-
+        if (hum_state === 'wetness_is_ok' && temp_state === 'temp_is_ok') {
             var color = '#00630d'
         }
-        full_text = full_text + `<h6 style = "margin-left: 5px; color: ${color}">` + strig_name + '</h6>' +
+        var one_strizh = `<h6 style = "margin-left: 5px; color: ${color}">` + strig_name + '</h6>' +
             '<h6 style = "margin-left: 5px">' + 'Температура: ' + uniping_temp + "&deg" + '</h6>' +
-            '<h6 style = "margin-left: 5px">' + 'Влажность: ' + uniping_hum + '%'+ '</h6>' +
+            '<h6 style = "margin-left: 5px">' + 'Влажность: ' + uniping_hum + '%' + '</h6>' +
             '<h6 style = "margin-left: 5px">' + 'Вентилятор: ' + uniping_cooler + '</h6>' +
             '<h6 style = "margin-left: 5px">' + 'Хост 1: ' + ip1_state + '</h6>' +
             '<h6 style = "margin-left: 5px">' + 'Хост 2: ' + ip2_state + '</h6>';
-        console.log('full_text', full_text)
+        full_text = full_text + one_strizh
+        if (strig_name === chosen_strizh) {
+            full_text = one_strizh;
+            break
+        }
     }
     parentID.getElementsByClassName("onestrizh")[0].innerHTML = full_text
 
@@ -89,7 +87,7 @@ function get_conditions() {
 
 
 var SECONDS_WAIT = 2; // seconds to refresh drone detections, edit here
-var SECONDS_CONDITIONS_WAIT = 5; // seconds to refresh state of uniping and trace, edit here
+var SECONDS_CONDITIONS_WAIT = 1; // seconds to refresh state of uniping and trace, edit here
 var DRONE_COUNTER = 4 // number of iterations to clear drone
 
 // number of drones in a trajectory for showing on a map
@@ -151,7 +149,6 @@ function map_init_basic() {
 
     function refreshMarkers() {
         $.getJSON('/geo/skypoint_view/', function (skypoint_data) {
-            console.log('skypoint_data', skypoint_data)
             for (let n = 0; n < skypoint_data.features.length; n++) {
                 let sky_name = skypoint_data.features[n].properties.name;
                 let lat = skypoint_data.features[n].properties.lat;
@@ -164,8 +161,6 @@ function map_init_basic() {
         });
 
         var drone_counter_dict = get_counter_dict()
-        console.log('drone_counter_dict', drone_counter_dict)
-        console.log('drone_counter', drone_counter)
         $.getJSON('/geo/data/', function (data) {
                 let arc1;
                 let sector1;
@@ -221,17 +216,17 @@ function map_init_basic() {
                                     offset: L.point({x: -12, y: -18}),
                                     className: 'leaflet-tooltip-radius'
                                 }).setContent(radius.toString() + ' м.');
-
+                                console.log('complex_state', complex_state);
                                 if (!strizh_layers[strizh_name]) {
                                     strizh_layers[strizh_name] = L.layerGroup().addTo(map);
                                 }
                                 if (complex_state[strizh_name] === 'включен' ||
                                     complex_state[strizh_name] === 'выключен вентилятор') {
-                                    if (complex_mode[strizh_name] === 'scan_on') {
+                                    if (complex_mode[strizh_name] === 'Сканирование активно') {
                                         // on and scan on, jammer off (3)
                                         col = '#17bd04'
                                         icon_url = 'static/icons/strizh_markers/green_pulse.gif'
-                                    } else if (complex_mode[strizh_name] === 'jammer_on') {
+                                    } else if (complex_mode[strizh_name] === 'Подавление активно') {
                                         // scan off and jammer on (5)
                                         col = '#ff1414'
                                         icon_url = 'static/icons/strizh_markers/red_pulse.gif'
@@ -295,8 +290,6 @@ function map_init_basic() {
                             // let radius = parseFloat(data.features[i].properties.area_radius_m);
                             let area_sector_start_grad = parseFloat(data.features[i].properties.area_sector_start_grad);
                             let area_sector_end_grad = parseFloat(data.features[i].properties.area_sector_end_grad);
-                            console.log('strizh_map_name', strizh_map_name)
-                            console.log('data.features[i].properties.strig_nam', data.features[i].properties.strig_name)
 
                             let strizh_center = [strizh_map_name[data.features[i].properties.strig_name][0], strizh_map_name[data.features[i].properties.strig_name][1]];
                             let strizh_name = data.features[i].properties.strig_name;
@@ -333,12 +326,11 @@ function map_init_basic() {
                             // let r_x = 0.008892 //* 4 / 5
                             let r_x = radius * 0.000017784 //* 4 / 5
                             // scan on, glushenie off  (4)
-                            if (complex_mode[strizh_name] === 'scan_on') {
+                            if (complex_mode[strizh_name] === 'Сканирование активно') {
                                 tooltip_strizh.setContent(strizh_name);
 
                                 flag_state[strizh_name][d_id] = 1;
 
-                                // flag_state[strizh_name] = 4;
                                 strizh_layers[strizh_name].clearLayers()
                                 if (!drone_layers[d_id]) {
                                     drone_layers[d_id] = L.layerGroup().addTo(map);

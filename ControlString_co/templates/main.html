@@ -178,26 +178,10 @@
 
                     <div id="information-right" style="height: 65%; margin-top: 2%; width: 95%">
                         <!--                    border: 0.5vh solid rgb(255,255,255)">-->
-                        <form action='main' method='GET'>
-                            {% for striz in chosen_strizh %}
-                            {% if striz != 'None' %}
-                            {% if complex_state_dict|getkey:striz == 'включен' %}
-                            <!--                            <div class="row" style="margin-left: 2.2%">-->
-                            <h5 style="color: #2c3a97; font-weight:600; font-family: Calibri, sans-serif; margin-left: 6%;">
-                                {{action_strizh|getkey:striz}}
-                            </h5>
-                            {% else %}
-                            <div class="row" style="margin-left: 0; width: 250px">
-                                <h5 style="font-weight:600; font-family: Calibri, sans-serif; margin-left: 7%; color: #a10202">
-                                    {{striz}} выключен</h5>
-                            </div>
-                            {% endif %}
-                            {% endif %}
-                            {% endfor %}
-                        </form>
 
                         {% if chosen_strizh != all_strizhes or all_strizhes|length == 1 %}
                         <div id="srizh_condition" style="margin: 2% 7%">
+
                             <h6 class="onestrizh"></h6>
 <!--                            <h6 class="strig_name"></h6>-->
 <!--                            <h6 class="temperature_val"></h6>-->

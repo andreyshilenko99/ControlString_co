@@ -86,9 +86,9 @@ def get_info_main(ip1, ip2, name):
         # TODO UNCOMMENT for working check state
         # mode_ips = [check_state(ip1), check_state(ip2)]
         # mode_ips = ['Все остановлено' for _ in range(2)]
-        strizh_state = StrigState.objects.all().filter(strig_name=name)
+        strizh_state = StrigState.objects.all().filter(strig_name=name).order_by('-pk')[0]
         mode_ips = [strizh_state.ip1_state, strizh_state.ip2_state]
-
+        #
     except:
         mode_ips = ['Все остановлено' for _ in range(2)]
 
@@ -195,6 +195,7 @@ def choose_nomer_strizha(request):
 
         if form.is_valid() and 'choose_all_strizhes' in request.POST:
             c['chosen_strizh'] = [strizh.name for strizh in strizhes]
+            c['chosen_strizh_json'] = json.dumps(c['chosen_strizh'])
             # form.fields['chosen_strizh'].initial = None
             # form.initial['chosen_strizh'] = [None]
             # c['form'] = form
@@ -355,16 +356,16 @@ def butt_scan(request):
                     mode_ip2 = scan_on_off(strizh.ip2)
                 except:
                     # если не включен трэйс
-                    mode_ip1 = "Все остановлено"
-                    mode_ip2 = "Все остановлено"
+                    mode_ip1 = "all_stop"
+                    mode_ip2 = "all_stop"
 
                 if mode_ip1 != mode_ip2:
                     mode_ip2 = scan_on_off(strizh.ip2)
                 mode_ips = [mode_ip1, mode_ip2]
                 complex_mode = 'Сканирование активно' if all(
-                    [True if x == 'Сканирование активно' else False for x in mode_ips]) else 'Все остановлено'
+                    [True if x == 'scan_on' else False for x in mode_ips]) else 'Все остановлено'
                 complex_mode = 'Подавление активно' if all(
-                    [True if x == 'Подавление активно' else False for x in mode_ips]) else complex_mode
+                    [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
                 print('complex_mode: ', complex_mode)
                 print('mode_ips: ', mode_ips)
                 action_complex = 'включено' if complex_mode == 'Сканирование активно' else 'выключено'
