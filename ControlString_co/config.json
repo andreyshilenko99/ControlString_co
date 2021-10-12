@@ -1,0 +1,38 @@
+{
+  "map_config": {
+    "tiles": [
+      [
+        "http://localhost:8000/static/Tiles/Satellite_1/{z}/{x}/{y}.png",
+        "Спутник"
+      ],
+      [
+        "http://localhost:8000/static/Tiles/Satellite_2/{z}/{x}/{y}.png",
+        "Спутник 2"
+      ],
+      [
+        "http://localhost:8000/static/Tiles/Scheme_1/{z}/{x}/{y}.png",
+        "Схема"
+      ],
+      [
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        "Спутник Онлайн"
+      ],
+      [
+        "https://{s}.tile.osm.org/{z}/{x}/{y}.png",
+        "OSM Онлайн"
+      ]
+    ],
+    "default_link": "http://localhost:8000/static/Tiles/Satellite_1/{z}/{x}/{y}.png"
+  },
+  "uniping": {
+    "login": "user",
+    "password": "555"
+  },
+  "db": {
+    "NAME": "postgres",
+    "USER": "postgres",
+    "PASSWORD": "postgres",
+    "HOST": "db",
+    "PORT": "5432"
+  }
+}

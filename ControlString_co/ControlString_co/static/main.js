@@ -122,6 +122,7 @@ function map_init_basic() {
     var ids_drawn = new Set();
 
     var initial_draw = 0;
+    var initial_sky = 0;
     var initial_draw_track = 0;
     var init_tracks_number = 0;
     var initial_draw_strizh = 0;
@@ -149,15 +150,20 @@ function map_init_basic() {
 
     function refreshMarkers() {
         $.getJSON('/geo/skypoint_view/', function (skypoint_data) {
-            for (let n = 0; n < skypoint_data.features.length; n++) {
-                let sky_name = skypoint_data.features[n].properties.name;
-                let lat = skypoint_data.features[n].properties.lat;
-                let lon = skypoint_data.features[n].properties.lon;
-                let sky_coords = new L.LatLng(lat, lon)
-                draw_tooltip_main(map, coords = sky_coords,
-                    icon_url = 'static/icons/skypoint_markers/green.png', size = 60,
-                    tooltip_text = sky_name, is_strizh = true)
+
+            if (initial_sky === 0) {
+                for (let n = 0; n < skypoint_data.features.length; n++) {
+                    let sky_name = skypoint_data.features[n].properties.name;
+                    let lat = skypoint_data.features[n].properties.lat;
+                    let lon = skypoint_data.features[n].properties.lon;
+                    let sky_coords = new L.LatLng(lat, lon)
+                    draw_tooltip_main(map, coords = sky_coords,
+                        icon_url = 'static/icons/skypoint_markers/green.png', size = 60,
+                        tooltip_text = sky_name, is_strizh = true)
+                }
             }
+            initial_sky = 1;
+
         });
 
         var drone_counter_dict = get_counter_dict()

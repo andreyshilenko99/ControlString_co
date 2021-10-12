@@ -31,9 +31,15 @@ low_t = 10
 high_t = 60
 low_h = 5
 high_h = 85
-auth = ('user', '555')
 message_condition = ''
 c = {}
+
+with open("config.json", encoding='utf-8-sig') as json_cfg:
+    data_conf = json.load(json_cfg)
+try:
+    auth = (data_conf.get('uniping').get('login'), data_conf.get('uniping').get('password'))
+except:
+    auth = ('user', '555')
 
 
 def init_content():
@@ -220,31 +226,6 @@ def choose_nomer_strizha(request):
     # return HttpResponse(c)
 
 
-# def choose_all_strizhes(request):
-#     global c
-#     strizhes = Strizh.objects.order_by('-lon').all()
-#     if request.method == 'POST':
-#         temperature_dict = {}
-#         humidity_dict = {}
-#         weather_state_dict = {}
-#         url_uniping_dict = {}
-#         c['chosen_strizh'] = [strizh.name for strizh in strizhes]
-#
-#         for strizh in strizhes:
-#             url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
-#             temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-#                 return_conditions(url_uniping_dict[strizh.name])
-#             complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
-#             c["button_complex"] = button_complex
-#             c['complex_mode_dict'][strizh.name] = complex_mode
-#             c["action_strizh"][strizh.name] = action_strizh
-#         c['temperature_dict'] = temperature_dict
-#         c['humidity_dict'] = humidity_dict
-#         c['weather_state_dict'] = weather_state_dict
-#         c['url_uniping_dict'] = url_uniping_dict
-#     return render(request, "main.html", context=c)
-
-
 def set_strizh(request):
     global c
     strizhes = Strizh.objects.order_by('-lon').all()
@@ -273,7 +254,11 @@ def render_main_page(request):
     c['start_datetime'] = ''
     c['end_datetime'] = ''
     c['page_picked'] = 'main'
-    c['map_link_default'] = 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png'
+
+    with open("config.json", encoding='utf-8-sig') as json_cfg:
+        data_conf = json.load(json_cfg)
+
+    c['map_link_default'] = data_conf['map_config']['default_link']
 
     temperature_dict = {}
     humidity_dict = {}
@@ -418,8 +403,9 @@ def butt_glush(request):
                 # complex_mode = 'Сканирование активно' if all([True if x == 'Сканирование активно' else False for x in mode_ips]) else 'Все остановлено'
                 # complex_mode = 'Подавление активно' if all(
                 #     [True if x == 'Подавление активно' else False for x in mode_ips]) else complex_mode
-                strizh_state = StrigState.objects.all().filter(strig_name=strizh.name)
-                mode_ips = [strizh_state.ip1_state, strizh_state.ip2_state]
+
+                # strizh_state = StrigState.objects.all().filter(strig_name=strizh.name)
+                # mode_ips = [strizh_state.ip1_state, strizh_state.ip2_state]
 
                 for i, ip_host in enumerate([strizh.ip1, strizh.ip2]):
                     mode_ = check_state(ip_host)
@@ -500,8 +486,7 @@ def turn_on_bp(request):
                 collect_logs(str_log)
                 # render(request, "main.html", context=c)
                 # functioning_loop(request)
-        else:
-            print('EROOOOOOOORRR')
+
     return redirect('/main')
     # return render(request, "main.html", context=c)
 
@@ -757,7 +742,10 @@ def journal(request):
     c['end_datetime'] = c.get('end_datetime', '')
     xx = c
     c['page_picked'] = 'journal'
-    c['map_link_default'] = 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png'
+
+    with open("config.json", encoding='utf-8-sig') as json_cfg:
+        data_conf = json.load(json_cfg)
+    c['map_link_default'] = data_conf['map_config']['default_link']
 
     for el_db in DroneTrajectoryJournal.objects.all():
         el_db.delete()
@@ -970,7 +958,8 @@ def export_csv(request):
         for dr in drones_filtered_strizh:
             writer = csv.writer(f)
             azimuth = int(re.findall('[0-9]+', dr.azimuth)[0])
-            row = dr.system_name, dr.strig_name, dr.drone_id, round(dr.center_freq / 1e9, 3), round(dr.brandwidth/1e6, 0), \
+            row = dr.system_name, dr.strig_name, dr.drone_id, round(dr.center_freq / 1e9, 3), round(dr.brandwidth / 1e6,
+                                                                                                    0), \
                   dr.current_time, dr.comment_string, (dr.drone_lat, dr.drone_lon), azimuth, \
                   dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip, dr.height
 

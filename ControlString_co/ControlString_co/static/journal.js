@@ -288,8 +288,11 @@ function map_init_basic() {
             for (let j = 0; j < coords_arr.length; j++) {
                 let height = heights_arr[j];
                 let coords = coords_arr[j];
-                if (j !== 0 && j !== coords_arr.length - 1) {
-                    place_text(map, coords, height + ' м.')
+                let last_idx = coords_arr.length - 1
+                if (j !== 0 && j !== last_idx) {
+                    // place_text(map, coords, height + ' м.')
+                    place_text(map, coords, height)
+                    map = place_number_detection(map, coords, (last_idx - j).toString(), height)
                 }
             }
         }

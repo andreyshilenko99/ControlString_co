@@ -99,3 +99,12 @@
     border-radius: 40px;
 
 }
+
+.leaflet-tooltip-pane .text {
+  color: red;
+  font-weight: bold;
+  background: transparent;
+  border:0;
+  box-shadow: none;
+  font-size:2em;
+}

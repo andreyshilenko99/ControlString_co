@@ -24,6 +24,7 @@
 
     <!--    <link rel="stylesheet" type="text/css" href="/static/node_modules/leaflet-draw/dist/leaflet.draw-src.css">-->
     <link rel="stylesheet" type="text/css" href="/static/styles.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles/leaflet_custom.css">
 
 
     <link rel="stylesheet" type="text/css" href="/static/bootstrap-4.0.0/css/bootstrap.min.css">
@@ -35,6 +36,8 @@
     <script src="/static/src/moment-with-locales.min.js"></script>
     <script src="/static/src/bootstrap-datetimepicker.min.js"></script>
     <script src="/static/src/datepicker-widget.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.js"></script>
 
     <!--    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"-->
     <!--        rel="stylesheet">-->
@@ -52,7 +55,8 @@
     <!--    <script type="text/javascript" src="//cdn.rawgit.com/monim67/django-bootstrap-datepicker-plus/master/bootstrap_datepicker_plus/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>-->
 
 
-    <script type="text/javascript" src="/static/journal.js"></script>
+    <!--    <script type="text/javascript" src="/static/utils.js"></script>-->
+    <!--    <script type="text/javascript" src="/static/journal.js"></script>-->
 
 
 </head>
@@ -84,8 +88,46 @@
                             <button class="button-black"> Администратор</button>
                         </a>
                     </div>
-                    <div class="leaflet-container" style="border: 0.5vh ">
-                        {% leaflet_map "map" callback="window.map_init_basic" %}
+                    <div class="leaflet-container" id="map" style="border: 0.5vh ">
+                        <script type="text/javascript">
+                            var map = L.map(document.getElementById('map')).setView([60.0245, 30.42], 12);
+                            L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                            }).addTo(map);
+
+                            coords = [60.0245, 30.42]
+                            text = '1'
+                            console.log('coords latlng', [coords[0], coords[1]])
+                            var buildingPoints = [
+                                {
+                                    "type": "Feature",
+                                    "geometry": {
+                                        "type": "Point",
+                                        "coordinates": [coords[1], coords[0]]
+                                    },
+                                    "properties": {
+                                        "text": text,
+                                        "radius": 60
+                                    }
+                                }
+                            ];
+                            var Classroomsamount = new L.geoJson(buildingPoints, {
+                                pointToLayer: function (feature, latlng) {
+                                    return new L.CircleMarker([latlng.lat, latlng.lng], {radius: feature.properties.radius});
+                                },
+                                onEachFeature: function (feature, layer) {
+                                    var text = L.tooltip({
+                                        permanent: true,
+                                        direction: 'center',
+                                        className: 'text'
+                                    })
+                                        .setContent(feature.properties.text)
+                                        .setLatLng(layer.getLatLng());
+                                    text.addTo(map);
+                                }
+                            }).addTo(map);
+
+                        </script>
                     </div>
 
 
@@ -99,141 +141,13 @@
 
 <script>
 
+    function map_init_basic() {
 
-    function isEmpty(obj) {
-        return Object.keys(obj).length === 0;
-    }
-
-    function getRandomColor() {
-        let letters = '0123456789ABCDEF';
-        let color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    function random_rgba() {
-        var o = Math.round, r = Math.random, s = 255;
-        return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + '100' + ')';
-    }
-
-    function draw_tooltip(map, coords, icon_url, size, tooltip_text) {
-        var tooltip_strizh = new L.Tooltip({
-            direction: 'bottom',
-            permanent: true,
-            noWrap: true,
-            opacity: 1
-        });
-        let logoMarkerStyleStrizh = L.Icon.extend({
-            options: {
-                iconSize: [size, size],
-                iconAnchor: [size / 2, size / 2],
-                popupAnchor: [0, size],
-                // className: 'blinking'
-            }
-        });
-        var logoMarkerStrizh = new logoMarkerStyleStrizh({
-            iconUrl: icon_url
-        });
-        var mark = L.marker(coords,
-            {icon: logoMarkerStrizh})
-            .addTo(map)
-        if (tooltip_text) {
-            tooltip_strizh.setContent('PIZDA');
-            mark.bindTooltip(tooltip_strizh).openTooltip()
-        }
-    }
-    function place_text(map, coords, text ) {
-        var tooltip_ = new L.tooltip({
-            direction: 'center',
-            noWrap: true,
-            permanent: true,
-            opacity: 1,
-            offset: L.point({x: -12, y: 24}),
-            className: 'leaflet-tooltip-height'
-        }).setContent(text.toString());
-
-        L.marker(coords, {
-            opacity: 0,
-        })
-            .addTo(map)
-            .bindTooltip(tooltip_)
-            .openTooltip();
-    }
-
-    function map_init_basic(map, options) {
-
-        map.setView([60.013674, 30.452474], 14);
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; Strizh'
-        }).addTo(map);
-
-        $.getJSON('/geo/journal_view_aero/', function (data) {
-            console.log('data', data)
-            // var points_coords = {}
-            var points_data = {}
-            var n_elements = data.features.length;
-
-            draw_tooltip(map,
-                coords = [60.013674, 30.442474],
-                icon_url = 'static/icons/controller/contr1_black.png', size = 50, tooltip_text = '')
-
-
-            draw_tooltip(map,
-                coords = [60.015, 30.55],
-                icon_url = 'static/icons/home.png', size = 50, tooltip_text = '')
-
-            for (let i = 0; i < n_elements; i++) {
-                var aero_value = data.features[i].properties;
-                var drone_id = aero_value.drone_id;
-                var drone_lat = aero_value.drone_lat;
-                var drone_lon = aero_value.drone_lon;
-                var height = aero_value.height;
-                if (!points_data[drone_id] || isEmpty(points_data[drone_id])) {
-                    points_data[drone_id] = {}
-                    points_data[drone_id].coords = [new L.LatLng(drone_lat, drone_lon)];
-                    points_data[drone_id].heights = [height];
-                } else {
-                    points_data[drone_id].coords.push(new L.LatLng(drone_lat, drone_lon))
-                    points_data[drone_id].heights.push(height)
-                }
-            }
-            console.log('points_data', points_data)
-            for (const [keys, values_data] of Object.entries(points_data)) {
-                var coords_arr = values_data.coords
-                var heights_arr = values_data.heights
-
-                var firstpolyline = new L.Polyline(coords_arr, {
-                    // color: getRandomColor(),
-                    // color: '#ff0000',
-                    color: random_rgba(),
-                    // color: 'rgb(255,242,0)',
-                    weight: 5,
-                    opacity: 0.9,
-                    smoothFactor: 0
-                });
-                firstpolyline.addTo(map);
-                map.fitBounds(firstpolyline.getBounds());
-
-                draw_tooltip(map,
-                    coords = coords_arr[0],
-                    icon_url = 'static/icons/route/start_circle.png', size = 60, tooltip_text = '')
-                draw_tooltip(map,
-                    coords = coords_arr[coords_arr.length - 1],
-                    icon_url = 'static/icons/route/finish_circle.png', size = 60, tooltip_text = '')
-
-                for (let j = 0; j < coords_arr.length ; j++) {
-                    var height = heights_arr[j];
-                    var coords = coords_arr[j];
-                    if (j !== 0 && j !== coords_arr.length - 1 ){
-                        place_text(map, coords, height)
-                    }
-                    // map.addLayer(strizh_layers[strizh_name])
-                }
-            }
-
-        });
+        // map.setView([60.013674, 30.452474], 14);
+        // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        //     attribution: '&copy; Strizh'
+        // }).addTo(map);
+        // map = place_number_detection(map, [60.015, 30.48], 'pizda')
 
 
     }
