@@ -100,7 +100,7 @@ setInterval(refresh_sky, 3 * 1000);
 
 function map_init_basic() {
     // drone display time before clearing = SECONDS_WAIT*DRONE_COUNTER
-    var map = get_map_init();
+    var map = get_map_init(chosen_map_link);
 
     function clickZoom(e) {
         map.setView(e.target.getLatLng(), 15);
@@ -157,7 +157,7 @@ function map_init_basic() {
                     let lat = skypoint_data.features[n].properties.lat;
                     let lon = skypoint_data.features[n].properties.lon;
                     let sky_coords = new L.LatLng(lat, lon)
-                    draw_tooltip_main(map, coords = sky_coords,
+                    map = draw_tooltip_main(map, coords = sky_coords,
                         icon_url = 'static/icons/skypoint_markers/green.png', size = 60,
                         tooltip_text = sky_name, is_strizh = true)
                 }
@@ -167,11 +167,13 @@ function map_init_basic() {
         });
 
         var drone_counter_dict = get_counter_dict()
+        // get data from Point model - drone detections from strizhes
         $.getJSON('/geo/data/', function (data) {
                 let arc1;
                 let sector1;
                 let str1;
                 let str_radius;
+                // get data from Strizh model - strizhes information
                 $.getJSON('/geo/strizh_view/', function (strizh_data) {
                         let len_strizh_data = strizh_data.features.length;
                         let strizh_map_name = {};
@@ -441,7 +443,8 @@ function map_init_basic() {
             }
         }
 
-        $.getJSON('/geo/journal_view_aero/', function (data) {
+        // drawing trajectories from skypoint
+        $.getJSON('/geo/journal_view_aero_main/', function (data) {
             var tracks_number = 0;
             let data_len = data.features.length;
             if (data_len > MAXDRONES) {
@@ -528,8 +531,10 @@ function map_init_basic() {
                 for (let j = 0; j < coords_arr.length; j++) {
                     let height = heights_arr[j];
                     let coords = coords_arr[j];
+                    let last_idx = coords_arr.length - 1
                     if (j !== 0 && j !== coords_arr.length - 1) {
                         layers_track[key] = place_text(layers_track[key], coords, height)
+                        layers_track[key] = place_number_detection(layers_track[key], coords, (last_idx - j).toString(), height)
                     }
                     // map.addLayer(strizh_layers[strizh_name])
                 }

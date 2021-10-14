@@ -27,7 +27,7 @@ def journal_view_aero_main(request):
     low_min = time_delta if 0 < time_delta < 60 else 0
     time_border = time_now.replace(minute=low_min).strftime('%Y-%m-%d %H:%M:%S')
 
-    QuerySkypoints =AeroPoints.objects.all().filter(current_time__gte=time_border).order_by('-current_time')
+    QuerySkypoints = AeroPoints.objects.all().filter(current_time__gte=time_border).order_by('-current_time')
     drone_as_geojson = serialize('geojson', QuerySkypoints)
     return HttpResponse(drone_as_geojson, content_type='geojson')
 

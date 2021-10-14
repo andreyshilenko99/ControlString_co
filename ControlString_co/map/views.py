@@ -42,17 +42,22 @@ except:
     auth = ('user', '555')
 
 
+# initialization of dictionary c
 def init_content():
     c = dict(chosen_strizh=[], start_datetime='', end_datetime='')
     return c
 
 
+# render start page
 def index(request):
     global c
     c['page_picked'] = 'index'
     return render(request, "index.html", context=c)
 
 
+# получаем состояние комплекса с юнипинга с помощью отправки запросов.
+# Можно удалить эту функцию и заменить ее на celery check_uniping, проверяющий все состояния.
+# т.о. можно брать состояния из базы
 def return_conditions(url):
     global low_t, high_t, low_h, high_h, c
     global auth
@@ -87,9 +92,10 @@ def return_conditions(url):
     return temperature, humidity, weather_state
 
 
+# Получаем из модели StrigState информацию о состоянии комплекса для отрисовки на главном экране.
+# Кнопка становится красной в случае если система сканирования/подавления включилась
 def get_info_main(ip1, ip2, name):
     try:
-        # TODO UNCOMMENT for working check state
         # mode_ips = [check_state(ip1), check_state(ip2)]
         # mode_ips = ['Все остановлено' for _ in range(2)]
         strizh_state = StrigState.objects.all().filter(strig_name=name).order_by('-pk')[0]
@@ -124,6 +130,7 @@ def get_info_main(ip1, ip2, name):
     return complex_mode, button_complex, action_strizh
 
 
+# TODO понять зачем она нужна
 def journal_view(request):
     global c
     x = Point.objects.all().order_by('-current_time')
@@ -137,6 +144,8 @@ def journal_view(request):
     return HttpResponse(geom_as_geojson, content_type='geojson')
 
 
+# собирает логи о включении/выключени той или иной системы (Апем, аентилятор...)
+# для вывода на главной странице
 def collect_logs(log_string):
     global logs, logs_list
     time_obj = datetime.datetime.now().strftime("%Y-%d-%m  %H:%M:%S")
@@ -146,6 +155,8 @@ def collect_logs(log_string):
     print(log_one)
 
 
+# выставляет корректную температуру при запуске. Не позволяет включить комплекс при
+# неудовлетворительных условиях
 def set_correct_temperature(url, strizh_name, temperature_state):
     global c
     while temperature_state != 0:
@@ -159,10 +170,6 @@ def set_correct_temperature(url, strizh_name, temperature_state):
         elif temperature_state == -1:
             send_line_command(url, 'обогрев', 1)
         time.sleep(60)
-
-
-def back2main(request):
-    return redirect(request.META['HTTP_REFERER'])
 
 
 def choose_nomer_strizha(request):
@@ -740,7 +747,6 @@ def journal(request):
         c = init_content()
     c['start_datetime'] = c.get('start_datetime', '')
     c['end_datetime'] = c.get('end_datetime', '')
-    xx = c
     c['page_picked'] = 'journal'
 
     with open("config.json", encoding='utf-8-sig') as json_cfg:

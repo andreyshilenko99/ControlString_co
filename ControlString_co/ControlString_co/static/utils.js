@@ -68,7 +68,7 @@ function clickZoom(e) {
     map.setView(e.target.getLatLng(), 15);
 }
 
-function get_map_init(set_view) {
+function get_map_init(chosen_map_link, set_view='') {
     var map = L.map(('map'))
     var strizhes_ajax = JSON.parse(get_strizhes_ajax());
     var skypoints_ajax = JSON.parse(get_skypoints_ajax());
@@ -194,7 +194,7 @@ function draw_tooltip_main(layer_group, coords, icon_url, size, tooltip_text, is
         .addTo(layer_group)
     if (tooltip_text) {
         tooltip_strizh.setContent(tooltip_text);
-        mark.bindTooltip(tooltip_strizh).openTooltip()
+        mark.bindTooltip(tooltip_strizh).openTooltip().on('click', clickZoom);
     }
     return layer_group
 }

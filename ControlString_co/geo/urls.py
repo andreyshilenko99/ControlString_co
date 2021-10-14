@@ -7,8 +7,7 @@ from djgeojson.views import GeoJSONLayerView
 from geo import models
 
 from geo.views import geojson_view, conditions_view, drone_journal_view, skypoint_view, strizh_view, journal_view_aero, \
-    journal_view_aero_main, \
-    drone_journal_view_traj
+    journal_view_aero_main, drone_journal_view_traj
 from map.views import journal_view, filter_all
 
 urlpatterns = [

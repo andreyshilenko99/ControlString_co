@@ -46,7 +46,7 @@ setInterval(refresh_sky, seconds_wait * 1000);
 
 
 function map_init_basic() {
-    var map = get_map_init(set_view = chosen_complex_to_show);
+    var map = get_map_init(chosen_map_link, chosen_complex_to_show);
 
     var layerDrones = L.layerGroup().addTo(map);
     var layerStrizhes = L.layerGroup().addTo(map);
