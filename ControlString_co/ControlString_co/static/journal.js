@@ -41,8 +41,9 @@ function refresh_sky() {
 }
 
 var seconds_wait = 1; // seconds, edit here
-setInterval(refresh, seconds_wait * 1000);
-setInterval(refresh_sky, seconds_wait * 1000);
+
+// setInterval(refresh, seconds_wait * 1000);
+// setInterval(refresh_sky, seconds_wait * 1000);
 
 
 function map_init_basic() {

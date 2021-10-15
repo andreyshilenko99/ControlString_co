@@ -159,13 +159,13 @@
                                     {% endif %}
                                     {% if button_complex != 'red_jammer' %}
                                     <form action='butt_glush' method='GET'>
-                                        <button class="button-green" style="width: 113px; margin-left: 5%"> Глушение
+                                        <button class="button-green" style="width: 113px; margin-left: 5%"> Подавление
                                         </button>
                                     </form>
                                     {% else %}
                                     <form action='butt_glush' method='GET'>
                                         <button class="button-green-red" style="width: 113px; margin-left:5%">
-                                            Глушение
+                                            Подавление
                                         </button>
                                     </form>
                                     {% endif %}
@@ -213,13 +213,10 @@
                             <div class="box-scroll"
                                  style="height: 100px; width:250px; margin: 2% 10%; background-color: #F6F6F6FF; justify-content: left">
 
-                                <form action='show_logs' style="margin: 2% 2%" method='GET'>
-
                                     {% for el in logs_list reversed %}
                                     {{ el }} <br>
                                     {% endfor %}
 
-                                </form>
                             </div>
 
                         </div>
@@ -285,7 +282,7 @@
                         <th>Комментарий</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody style="height: 300px">
                     {% for dron in all_drones_res%}
                     <!--                                <tbody class="scrollContent">-->
 

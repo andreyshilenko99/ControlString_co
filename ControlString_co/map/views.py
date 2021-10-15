@@ -25,7 +25,6 @@ from ControlString_co.shelest_jam import set_gain
 
 DEGREE_SIGN = u"\u2103"
 chosen_strizh = 0
-logs = ''
 logs_list = []
 low_t = 10
 high_t = 60
@@ -40,12 +39,6 @@ try:
     auth = (data_conf.get('uniping').get('login'), data_conf.get('uniping').get('password'))
 except:
     auth = ('user', '555')
-
-
-# initialization of dictionary c
-def init_content():
-    c = dict(chosen_strizh=[], start_datetime='', end_datetime='')
-    return c
 
 
 # render start page
@@ -130,7 +123,8 @@ def get_info_main(ip1, ip2, name):
     return complex_mode, button_complex, action_strizh
 
 
-# TODO понять зачем она нужна
+# сортирует в журнале засечки дрона по выбранным критериям
+# не используется если выключено  автообновление
 def journal_view(request):
     global c
     x = Point.objects.all().order_by('-current_time')
@@ -147,12 +141,11 @@ def journal_view(request):
 # собирает логи о включении/выключени той или иной системы (Апем, аентилятор...)
 # для вывода на главной странице
 def collect_logs(log_string):
-    global logs, logs_list
+    global logs_list
     time_obj = datetime.datetime.now().strftime("%Y-%d-%m  %H:%M:%S")
     log_one = time_obj + '   ' + log_string + '\n\t'
     logs_list.append(log_one)
     c['logs_list'] = logs_list
-    print(log_one)
 
 
 # выставляет корректную температуру при запуске. Не позволяет включить комплекс при
@@ -172,6 +165,8 @@ def set_correct_temperature(url, strizh_name, temperature_state):
         time.sleep(60)
 
 
+# отвечает за форму выбора стрижа, получает его состояние и состояние кнопок сканирования/подавления
+# также обрабатывает нажатие на кнопку управление всеми стрижами
 def choose_nomer_strizha(request):
     global c
     strizhes = Strizh.objects.order_by('-lon').all()
@@ -189,9 +184,6 @@ def choose_nomer_strizha(request):
             chosen_strizh = form.cleaned_data.get('chosen_strizh')
             if chosen_strizh:
                 c['chosen_strizh'][0] = chosen_strizh.name
-                # form.fields.get('chosen_strizh').initial = [chosen_strizh.name]
-                # form.initial['chosen_strizh'] = chosen_strizh.name
-                # c['form'] = form
                 form = StrizhForm(request.POST, initial={'chosen_strizh': chosen_strizh.name})
                 c['form'] = form
 
@@ -229,35 +221,12 @@ def choose_nomer_strizha(request):
             c['humidity_dict'] = humidity_dict
             c['weather_state_dict'] = weather_state_dict
     return redirect('/main')
-    # return render(request, "main.html", context=c)
-    # return HttpResponse(c)
 
 
-def set_strizh(request):
-    global c
-    strizhes = Strizh.objects.order_by('-lon').all()
-    c['set_strizh_apem'] = ['None' for _ in range(len(strizhes))]
-    if request.method == 'POST':
-        form_strizh = StrizhForm(request.POST)
-        if form_strizh.is_valid():
-            set_strizh_apem = form_strizh.cleaned_data.get('chosen_strizh')
-            c['set_strizh_apem'][0] = set_strizh_apem.name
-            form_apem = ApemsConfigurationForm(request.POST)
-
-            form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
-                strizh_name=c['set_strizh_apem'][0])
-            c['is_strizh_chosen'] = 'True'
-    else:
-        form_strizh = StrizhForm()
-        form_apem = ApemsConfigurationForm()
-    c['form_strizh'] = form_strizh
-    c['form_apem'] = form_apem
-    return render(request, "configuration.html", context=c)
-
-
+# рендерит главную страницу
+# записывает состояние комплекса в словарь и отправляет в js
 def render_main_page(request):
     global c
-
     c['start_datetime'] = ''
     c['end_datetime'] = ''
     c['page_picked'] = 'main'
@@ -305,8 +274,6 @@ def render_main_page(request):
     c['humidity_dict'] = humidity_dict
     c['weather_state_dict'] = weather_state_dict
     c['url_uniping_dict'] = url_uniping_dict
-    # c['complex_state_dict'] = complex_state_dict
-    # c['complex_state_json'] = json.dumps(complex_state_dict)
 
     if not c.get('chosen_strizh'):
         # c['chosen_strizh'] = ['None' for _ in range(len(strizhes))]
@@ -331,6 +298,8 @@ def render_main_page(request):
     return render(request, "main.html", context=c)
 
 
+# обрабатывает нажатие на кнопку сканирования, выполняет scan_on_off
+# записывает в словарь состояние комплекса, + цвет кнопки
 def butt_scan(request):
     global c
     xx = c
@@ -368,11 +337,15 @@ def butt_scan(request):
                 c["button_complex"] = button_complex
                 c['complex_mode_dict'][strizh.name] = complex_mode
                 c['complex_mode_json'] = json.dumps(c['complex_mode_dict'])
+                collect_logs(c["action_strizh"][strizh.name])
 
     return redirect('/main')
     # return render(request, "main.html", context=c)
 
 
+# обрабатывает нажатие на кнопку подавления, выполняет jammer_on_off,
+# проверяет состояние через check_state (потом можно это убрать, просто брать состояние из БД)
+# записывает в словарь состояние комплекса, + цвет кнопки
 def butt_glush(request):
     global c
     strizh_names = Strizh.objects.all()
@@ -440,8 +413,9 @@ def butt_glush(request):
     # return render(request, "main.html", context=c)
 
 
+# включает комплекс, либо отдельно выбранного стрижа
 def turn_on_bp(request):
-    global c, complex_state, logs
+    global c, complex_state
     xx = c
     for strizh_name in c.get('chosen_strizh'):
         if strizh_name != 'None':
@@ -482,22 +456,23 @@ def turn_on_bp(request):
                     state4 = obtain_state(url, 'ЭВМ1')
                     if state4 != 'вкл':
                         send_impulse(url, 'ЭВМ1', time_pulse=3, action='вкл')
-                    time.sleep(4)
+                    time.sleep(1)
                 if state5 != 'вкл':
                     send_impulse(url, 'ЭВМ2', time_pulse=3, action='вкл')
+                    state5 = obtain_state(url, 'ЭВМ2')
+                    if state5 != 'вкл':
+                        send_impulse(url, 'ЭВМ2', time_pulse=3, action='вкл')
                 time.sleep(1)
                 complex_state = get_complex_state(url)
                 c['complex_state_dict'][strizh_name] = complex_state
                 c['complex_state_json'] = json.dumps(c['complex_state_dict'])
                 str_log = strizh_name + ': ' + complex_state
                 collect_logs(str_log)
-                # render(request, "main.html", context=c)
-                # functioning_loop(request)
 
     return redirect('/main')
-    # return render(request, "main.html", context=c)
 
 
+# выключает комплекс, либо отдельно выбранного стрижа
 def turn_off_bp(request):
     global c
 
@@ -539,21 +514,21 @@ def turn_off_bp(request):
             complex_state = get_complex_state(url)
             c['complex_state_dict'][strizh_name] = complex_state
             c['complex_state_json'] = json.dumps(c['complex_state_dict'])
-            c['logs'] = logs
             c['logs_list'] = logs_list
     # functioning_loop(request)
     return redirect('/main')
     # return render(request, "main.html", context=c)
 
 
+# записывает логи в словарь
 def show_logs(request):
-    global logs
-    c['logs'] = logs
     c['logs_list'] = logs_list
     return redirect('/main')
     # return render(request, "main.html", context=c)
 
 
+# обрабатывает форму для выбора карты,
+# записыавет выбор в словарь, который потом используется в js файле
 def get_map_form(request):
     global c
     if request.method == "POST":
@@ -566,6 +541,10 @@ def get_map_form(request):
         render(request, "journal.html", context=c)
 
 
+# обрабатывает кнопку выбора засечки для отображения в журнале
+# очищает промежуточную таблицу DroneJournal/DroneTrajectoryJournal из одного элемента
+# записывает туда информацию о выбранной засечке/траектории, чтобы потом взять эту инфу через js
+# по ссылкам drone_journal_view/drone_journal_view_traj соответственно
 def choose_drone_toshow(request):
     global c
     if request.method == 'POST':
@@ -626,6 +605,7 @@ def choose_drone_toshow(request):
     return render(request, "journal.html", context=c)
 
 
+# кнопка очищения выбора стрижа
 def reset_filter_strizh(request):
     global c
     c['filtered_strizhes'] = ''
@@ -633,6 +613,7 @@ def reset_filter_strizh(request):
     # return render(request, "journal.html", context=c)
 
 
+# кнопка очищения выбора скайпоинта
 def reset_filter_skypoint(request):
     global c
     c['filtered_skypoints'] = ''
@@ -640,6 +621,7 @@ def reset_filter_skypoint(request):
     # return render(request, "journal.html", context=c)
 
 
+# применение фильтра в журнале, действует после выбора стрижа, времени и тд
 def filter_all(request):
     global c
     xx = c
@@ -739,12 +721,9 @@ def filter_all(request):
     # return render(request, "journal.html", context=c)
 
 
+# начальный рендер страницы журнала
 def journal(request):
     global c
-    try:
-        c
-    except NameError:
-        c = init_content()
     c['start_datetime'] = c.get('start_datetime', '')
     c['end_datetime'] = c.get('end_datetime', '')
     c['page_picked'] = 'journal'
@@ -811,6 +790,7 @@ def journal(request):
     return render(request, "journal.html", context=c)
 
 
+# фильтрация по разным критериям (дефолт по времени детекции current_time)
 def apply_filter_table(request):
     if request.method == 'POST':
         table_filter = request.POST.get('field', c.get('table_filter'))
@@ -829,6 +809,7 @@ def apply_filter_table(request):
     # return render(request, "journal.html", context=c)
 
 
+# сортировка по убыванию/возрастанию (дефолт по убыванию)
 def apply_order_table(request):
     if request.method == 'POST':
         table_filter = 'current_time' if not c.get('table_filter') else c.get('table_filter')
@@ -849,6 +830,7 @@ def apply_order_table(request):
     # return render(request, "journal.html", context=c)
 
 
+#  форма StrizhFilterForm для выбора стрижа
 def filter_nomer_strizha(request):
     global c
     if request.method == 'POST':
@@ -857,9 +839,9 @@ def filter_nomer_strizha(request):
             filtered_strizhes = form_filter.cleaned_data.get('filtered_strizhes')
             c['filtered_strizhes'] = filtered_strizhes
     return redirect('/filter_all')
-    # return render(request, "journal.html", context=c)
 
 
+#  форма SkyPointFilterForm для выбора скайпоинта
 def filter_nomer_skypoint(request):
     global c
     if request.method == 'POST':
@@ -868,9 +850,9 @@ def filter_nomer_skypoint(request):
             filtered_skypoints = form_filter_skypoint.cleaned_data.get('filtered_skypoints')
             c['filtered_skypoints'] = filtered_skypoints
     return redirect('/filter_all')
-    # return render(request, "journal.html", context=c)
 
 
+# Применение выбранного периода
 def apply_period(request):
     global c, reset_time
     c['saved_table'] = False
@@ -900,6 +882,7 @@ def apply_period(request):
     # return render(request, "journal.html", context=c)
 
 
+# Обнуление фильтра, сброс фильтрации
 def reset_filter(request):
     global c
     c['filtered_strizhes'] = ''
@@ -945,6 +928,7 @@ def reset_filter(request):
     # return render(request, "journal.html", context=c)
 
 
+# запись отфильтрованной таблицы в csv (надо проверить куда сохраняет из докера)
 def export_csv(request):
     global c
     c['saved_table'] = False
@@ -974,6 +958,7 @@ def export_csv(request):
     # return render(request, "journal.html", context=c)
 
 
+# словарь для отправки команд в uniping
 lines_map = {'обогрев': 1,
              'вентилятор_команда': 2,
              'БП ПЭВМ': 3,
@@ -984,6 +969,7 @@ lines_map = {'обогрев': 1,
              'РЕЗЕТ': 15,
              }
 
+# словарь для проверки состояний блоков в uniping
 lines_control_map = {
     'вентилятор_команда': 2,
     'БП ПЭВМ': 4,
@@ -995,6 +981,7 @@ lines_control_map = {
 }
 
 
+# Получение всех стрижей (хз где юзается)
 def get_strizhes():
     geojson_strizhes = serialize('geojson', Strizh.objects.all())
     parsed_json = (json.loads(geojson_strizhes))
@@ -1005,6 +992,7 @@ def get_strizhes():
     return arr_strizh
 
 
+# получение состояния одного блока через url запрос
 def obtain_state(url, line_name, to_collect_logs=False):
     global lines_control_map
     result_state = 0
@@ -1026,6 +1014,7 @@ def obtain_state(url, line_name, to_collect_logs=False):
     return state
 
 
+# получение состояния всех блоков в комплексе
 def get_complex_state(url):
     states_map = {0: 'вентилятор', 1: "БП ПЭВМ",
                   2: 'БП Шелест', 3: "БП АПЕМ",
@@ -1044,12 +1033,10 @@ def get_complex_state(url):
                 complex_state += states_map[stat]
             else:
                 complex_state += f", {states_map[stat]}"
-    # complex_state = 'включен' if all([True if x == 'вкл' else False for x in states1]) else 'выключен вентилятор'
-    # complex_state = 'включен' if all([True if x == 'вкл' else False for x in states2]) else 'выключен'
-    print(complex_state)
     return complex_state
 
 
+# парсит время дрона, мб необязательно тк везде поменяли врменной формат на одинаковый
 def get_datetime_drone(time_dron):
     t1 = time_dron.split('-')
     t2 = t1[-1].split(' ')
@@ -1059,6 +1046,7 @@ def get_datetime_drone(time_dron):
                        minute=int(t3[1]), second=int(t3[2]))
 
 
+# проверка состояний типа температуры
 def check_condition(value, low_border, high_border, condition="температура"):
     assert low_border < high_border, 'error in defining low or high border'
     try:
@@ -1077,6 +1065,7 @@ def check_condition(value, low_border, high_border, condition="температ�
         print('error')
 
 
+# отправка импульса для включения ЭВМов
 def send_impulse(url, line_name, time_pulse=3, action=''):
     global auth, lines_map
     line = lines_map.get(line_name)
@@ -1093,6 +1082,7 @@ def send_impulse(url, line_name, time_pulse=3, action=''):
     time.sleep(time_pulse + 1)
 
 
+# отправка url команды для включения, выключение АПЕМ
 def send_line_command(url, line_name, arg):
     # arg = 0 or 1
     global auth, lines_map
@@ -1109,6 +1099,29 @@ def send_line_command(url, line_name, arg):
         collect_logs("{}".format(log_str))
     else:
         collect_logs("проверьте, выбран ли стриж")
+
+
+# Конфигуратор ( и все функции ниже не актуальны)
+def set_strizh(request):
+    global c
+    strizhes = Strizh.objects.order_by('-lon').all()
+    c['set_strizh_apem'] = ['None' for _ in range(len(strizhes))]
+    if request.method == 'POST':
+        form_strizh = StrizhForm(request.POST)
+        if form_strizh.is_valid():
+            set_strizh_apem = form_strizh.cleaned_data.get('chosen_strizh')
+            c['set_strizh_apem'][0] = set_strizh_apem.name
+            form_apem = ApemsConfigurationForm(request.POST)
+
+            form_apem.fields.get('apem_toshow').choices.field.queryset = form_apem.AllApems.filter(
+                strizh_name=c['set_strizh_apem'][0])
+            c['is_strizh_chosen'] = 'True'
+    else:
+        form_strizh = StrizhForm()
+        form_apem = ApemsConfigurationForm()
+    c['form_strizh'] = form_strizh
+    c['form_apem'] = form_apem
+    return render(request, "configuration.html", context=c)
 
 
 def choose_apem_toshow(request):
