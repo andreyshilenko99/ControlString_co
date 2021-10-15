@@ -14,7 +14,6 @@ from ControlString_co.check_uniping import main_check
 from ControlString_co.skyPoint import skypoint
 from ControlString_co.check_strig import check_strig
 
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ControlString_co.settings')
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
@@ -23,9 +22,7 @@ app = Celery('tasks', broker=CELERY_BROKER_URL)
 app.autodiscover_tasks()
 CELERYD_CONCURRENCY = 1
 CELERYD_PREFETCH_MULTIPLIER = 1
-CELERY_ACKS_LATE = True
-
-
+# CELERY_TACKS_LATE = True
 
 app.conf.beat_schedule = {
     # Execute the Speed Test every 10 minutes
@@ -54,10 +51,6 @@ def check():
     check_strig()
 
 
-
 @shared_task(name='aeroScope')
 def aeroScope():
     skypoint()
-
-
-

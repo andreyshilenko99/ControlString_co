@@ -10,6 +10,8 @@ import time
 def skypoint():
     port = 12000  # TODO Add port into models
     okos = apps.get_model('geo', 'SkyPoint').objects.all()
+    if len(okos) == 0:
+        print("Нет скайпоинтов в бд")
     # HOST = oko.ip
     okos_dict = {}
     try:

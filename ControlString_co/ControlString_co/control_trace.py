@@ -17,7 +17,7 @@ def check_state(host):
         data = s.recv(1024)
         data = data[9:-8]
         s.close()
-    except (socket.timeout, ConnectionRefusedError) as e:
+    except (socket.timeout, ConnectionRefusedError, OSError) as e:
         s.close()
         data = 'KAL'
     if data == b'\x00\x10\x00':

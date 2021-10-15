@@ -1,6 +1,8 @@
 from pysnmp.hlapi import *
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1902
+# import multiprocessing
+from pythonping import ping
 
 community_string = 'SWITCH'  # From file
 ip_address_host = '192.168.2.51'  # From file
@@ -56,6 +58,17 @@ def main_check(host):
     #               'wetness': '40'}
     ip_address_host = host
     try:
+        # target = snmp_get(community_string, ip_address_host, port_snmp, check_oids.get('npThermoStatus.n'))
+        # timeout = multiprocessing.Process(target=target)
+        # timeout.start()
+        # timeout.join(0.5)
+        # if timeout.is_alive():
+        #     timeout.terminate()
+        #     timeout.join()
+        #     raise ConnectionError
+        # else:
+        #     pass
+        # print(type(host, verbose=True))
         name = (snmp_get(community_string, ip_address_host, port_snmp, temperature))
         print('answer= ' + name)
         print(int(snmp_get(community_string, ip_address_host, port_snmp, check_oids.get('npThermoStatus.n'))))
