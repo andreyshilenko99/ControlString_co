@@ -273,10 +273,11 @@ class ApemsConfiguration(models.Model):
 
 
 class TimePick(models.Model):
-    # datetime = models.DateTimeField()
     time_now = datetime.datetime.now()
-    d_st = time_now.replace(year=2020).strftime('%Y-%m-%d %H:%M:%S')
-    d_end = time_now.replace(year=2050).strftime('%Y-%m-%d %H:%M:%S')
+    # d_st = time_now.replace(year=2020).strftime('%Y-%m-%d %H:%M:%S')
+    # d_end = time_now.replace(year=2050).strftime('%Y-%m-%d %H:%M:%S')
+    d_st = '2000-01-01 00:00:01'
+    d_end = '2100-01-01 00:00:01'
     datetime_start = models.DateTimeField(blank=True, default=d_st)
     datetime_end = models.DateTimeField(blank=True, default=d_end)
 
@@ -323,4 +324,3 @@ class StrigState(models.Model):
     class Meta:
         verbose_name = 'Состояние стрижа'
         verbose_name_plural = 'Состояния стрижей'
-

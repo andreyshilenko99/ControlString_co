@@ -30,7 +30,6 @@ urlpatterns = [
     path('menu', views.index),
 
     path('main', views.render_main_page),
-    path('back2main', views.back2main),
     path('choose_nomer_strizha', views.choose_nomer_strizha),
     # path('choose_all_strizhes', views.choose_all_strizhes),
     path('butt_scan', views.butt_scan),

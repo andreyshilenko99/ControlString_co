@@ -68,7 +68,7 @@ function clickZoom(e) {
     map.setView(e.target.getLatLng(), 15);
 }
 
-function get_map_init(set_view) {
+function get_map_init(chosen_map_link, set_view='') {
     var map = L.map(('map'))
     var strizhes_ajax = JSON.parse(get_strizhes_ajax());
     var skypoints_ajax = JSON.parse(get_skypoints_ajax());
@@ -96,15 +96,18 @@ function get_map_init(set_view) {
         if (map_link_default.length !== 0) {
             var map_link = map_link_default;
         } else {
-            map_link = 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png'
+            map_link = 'http://localhost:8000/static/Tiles/Satellite_1/{z}/{x}/{y}.png'
         }
     } else {
         map_link = chosen_map_link
+
     }
     if (set_view !== '') {
         map.fitBounds(L.latLngBounds(radius_border[1], radius_border[0]));
+    } else {
+        map.setView(initial_coords, 14);
     }
-    map.setView(initial_coords, 14);
+
     L.tileLayer(map_link, {
         attribution: '&copy; Cerrera'
     }).addTo(map);
@@ -153,7 +156,7 @@ function track_map_bounds(map, coords_arr) {
     let c2 = L.latLng(max_lat, max_lon);
     map.fitBounds(L.latLngBounds(c2, c1));
     // map.setZoom(map.getZoom() - 1);
-    map.setView(mean_coords, map.getZoom() - 1);
+    // map.setView(mean_coords, map.getZoom() - 1);
     return map
 }
 
@@ -191,7 +194,7 @@ function draw_tooltip_main(layer_group, coords, icon_url, size, tooltip_text, is
         .addTo(layer_group)
     if (tooltip_text) {
         tooltip_strizh.setContent(tooltip_text);
-        mark.bindTooltip(tooltip_strizh).openTooltip()
+        mark.bindTooltip(tooltip_strizh).openTooltip().on('click', clickZoom);
     }
     return layer_group
 }
@@ -253,4 +256,60 @@ function place_text(layer_group, coords, text) {
         .openTooltip();
     return layer_group
 }
+
+
+function place_number_detection(layer_group, coords, text, height) {
+
+    console.log('coords', coords)
+    console.log('coords latlng', [coords.lat, coords.lng])
+    var buildingPoints = [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [coords.lng, coords.lat]
+            },
+            "properties": {
+                "text": text,
+                "radius": 20,
+                "height": height
+            }
+        }
+    ];
+    var Classroomsamount = new L.geoJson(buildingPoints, {
+        pointToLayer: function (feature, latlng) {
+            return new L.CircleMarker([latlng.lat, latlng.lng], {radius: feature.properties.radius});
+        },
+        onEachFeature: function (feature, layer) {
+            var text2 = L.tooltip({
+                permanent: true,
+                direction: 'center',
+                className: 'text'
+            })
+                .setContent(feature.properties.text)
+                .setLatLng(layer.getLatLng());
+
+            console.log('layer.getLatLng()', layer.getLatLng())
+            text2.addTo(layer_group);
+            // var height_tooltip = L.tooltip({
+            //     direction: 'center',
+            //     noWrap: true,
+            //     permanent: true,
+            //     opacity: 1,
+            //     offset: L.point({x: -12, y: -12}),
+            //     className: 'leaflet-tooltip-height'
+            // })
+            //     .setContent(feature.properties.height)
+            //     .setLatLng(layer.getLatLng());
+            // height_tooltip.addTo(layer_group);
+
+        }
+    }).addTo(layer_group);
+
+
+    // height_tooltip.addTo(layer_group);
+
+    return layer_group
+}
+
 

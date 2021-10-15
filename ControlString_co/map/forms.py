@@ -1,3 +1,5 @@
+import json
+
 import django.forms
 from django.forms import ModelForm, Select, ModelChoiceField, ModelMultipleChoiceField, CharField, IntegerField, \
     TextInput, SelectMultiple
@@ -139,14 +141,10 @@ class ApemsChangingForm(ModelForm):
 
 
 class MapChoosingForm(ModelForm):
-    AllFields = tuple([
-        ('http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', 'Спутник'),
-        ('http://localhost:8000/static/TilesSatellite/{z}/{x}/{y}.png', 'Спутник 2'),
-        ('http://localhost:8000/static/max_tiles/{z}/{x}/{y}.png', 'Схема'),
-        ('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-         'Спутник Онлайн'),
-        ('http://{s}.tile.osm.org/{z}/{x}/{y}.png', 'OSM Онлайн'),
-    ])
+    with open("config.json", encoding='utf-8-sig') as json_cfg:
+        data_conf = json.load(json_cfg)
+    maps_array = data_conf['map_config']['tiles']
+    AllFields = tuple(maps_array)
     chosen_map = forms.ChoiceField(choices=AllFields, required=False,
                                    label="", initial="Спутник",
                                    widget=Select(attrs={'id': 'mapchoosing', 'onchange': 'submit();'}))

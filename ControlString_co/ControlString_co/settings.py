@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import json
+
+with open("config.json", encoding='utf-8-sig') as json_cfg:
+    data_conf = json.load(json_cfg)
+db_config = data_conf['db']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -100,16 +105,16 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432', }
 }
-
+#
 # DATABASES = {
 #     'default': {
 #         # 'ENGINE': 'django.contrib.gis.db.backends.postgis',
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': 'postgres',
-#         'HOST': 'db',
-#         'PORT': '5432', }
+#         'NAME': db_config.get('NAME'),
+#         'USER': db_config.get('USER'),
+#         'PASSWORD': db_config.get('PASSWORD'),
+#         'HOST': db_config.get('HOST'),
+#         'PORT': db_config.get('PORT')}
 # }
 
 # AUTH_PASSWORD_VALIDATORS = [
@@ -162,11 +167,7 @@ LEAFLET_CONFIG = {
     'MIN_ZOOM': 10,
     'MAX_ZOOM': 18,
     'TILES': [
-        # ('Open Street Maps SPB', 'http://localhost:8000/static/spb_osm_new/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
-            ('Open Street Maps Online', 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
-        # ('Satellite Online', 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {'attribution': '&copy; Strizh'}),
-        # ('try OSM', 'http://localhost:8000/static/q_tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
-        # ('Satellite', 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
+        ('Open Street Maps Online', 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {'attribution': '&copy; Strizh'}),
     ],
     'PLUGINS': {
         'draw': {
@@ -175,13 +176,6 @@ LEAFLET_CONFIG = {
                     '/static/styles/leaflet_custom.css',
                     '/static/styles/styles.css',
                     ],
-
-            #
-            #
-            # '/static/datepicker-widget.css',
-            # '/static/bootstrap-4.0.0/css/bootstrap.min.css',
-            # '/static/src/css/bootstrap-datetimepicker.css',
-            # ],
             'js': ['/static/node_modules/leaflet-draw/dist/leaflet.draw.js',
                    '/static/node_modules/leaflet-draw/dist/leaflet.draw-src.js',
                    '/static/src/leaflet.sector.js',
@@ -192,11 +186,8 @@ LEAFLET_CONFIG = {
         },
         'ajax': {'js': ['/static/src/leaflet.ajax.js'], 'auto-include': True},
         'jquery': {'js': ['/static/src/jquery.js'], 'auto-include': True},
-
     }
 }
 SERIALIZATION_MODULES = {
     "geojson": "django.contrib.gis.serializers.geojson",
 }
-
-# docker-compose -f docker-compose.yml up

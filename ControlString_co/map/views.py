@@ -15,7 +15,7 @@ from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
 
 from geo.models import Strizh, Point, DroneJournal, StrizhJournal, ApemsConfiguration, \
-    SkyPoint, AeroPoints, DroneTrajectoryJournal, Maps
+    SkyPoint, AeroPoints, DroneTrajectoryJournal, Maps, StrigState
 from .forms import StrizhForm, StrizhFilterForm, DroneFilterForm, ApemsConfigurationForm, ApemsChangingForm, \
     TableFilterForm, TableOrderForm, SkyPointFilterForm, MapChoosingForm
 from .forms import TimePickForm
@@ -31,22 +31,33 @@ low_t = 10
 high_t = 60
 low_h = 5
 high_h = 85
-auth = ('user', '555')
 message_condition = ''
 c = {}
 
+with open("config.json", encoding='utf-8-sig') as json_cfg:
+    data_conf = json.load(json_cfg)
+try:
+    auth = (data_conf.get('uniping').get('login'), data_conf.get('uniping').get('password'))
+except:
+    auth = ('user', '555')
 
+
+# initialization of dictionary c
 def init_content():
     c = dict(chosen_strizh=[], start_datetime='', end_datetime='')
     return c
 
 
+# render start page
 def index(request):
     global c
     c['page_picked'] = 'index'
     return render(request, "index.html", context=c)
 
 
+# получаем состояние комплекса с юнипинга с помощью отправки запросов.
+# Можно удалить эту функцию и заменить ее на celery check_uniping, проверяющий все состояния.
+# т.о. можно брать состояния из базы
 def return_conditions(url):
     global low_t, high_t, low_h, high_h, c
     global auth
@@ -81,27 +92,31 @@ def return_conditions(url):
     return temperature, humidity, weather_state
 
 
+# Получаем из модели StrigState информацию о состоянии комплекса для отрисовки на главном экране.
+# Кнопка становится красной в случае если система сканирования/подавления включилась
 def get_info_main(ip1, ip2, name):
     try:
-        # TODO UNCOMMENT for working check state
         # mode_ips = [check_state(ip1), check_state(ip2)]
-        mode_ips = ['all_stop' for _ in range(2)]
+        # mode_ips = ['Все остановлено' for _ in range(2)]
+        strizh_state = StrigState.objects.all().filter(strig_name=name).order_by('-pk')[0]
+        mode_ips = [strizh_state.ip1_state, strizh_state.ip2_state]
+        #
     except:
-        mode_ips = ['all_stop' for _ in range(2)]
+        mode_ips = ['Все остановлено' for _ in range(2)]
 
-    complex_mode = 'scan_on' if all(
-        [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-    complex_mode = 'jammer_on' if all(
-        [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+    complex_mode = 'Сканирование активно' if all(
+        [True if x == 'Сканирование активно' else False for x in mode_ips]) else 'Все остановлено'
+    complex_mode = 'Подавление активно' if all(
+        [True if x == 'Подавление активно' else False for x in mode_ips]) else complex_mode
     print(complex_mode)
 
-    if 'jammer_on' in complex_mode:
-        # if 'jammer_on' in mode_ips:
+    if 'Подавление активно' in complex_mode:
+        # if 'Подавление активно' in mode_ips:
         action_complex = 'включено'
         button_complex = 'red_jammer'
         complex_mode_rus = 'Глушение: '
-    elif 'scan_on' in complex_mode:
-        # elif 'scan_on' in mode_ips:
+    elif 'Сканирование активно' in complex_mode:
+        # elif 'Сканирование активно' in mode_ips:
         action_complex = 'включено'
         button_complex = 'red_scan'
         complex_mode_rus = 'Сканирование: '
@@ -115,6 +130,7 @@ def get_info_main(ip1, ip2, name):
     return complex_mode, button_complex, action_strizh
 
 
+# TODO понять зачем она нужна
 def journal_view(request):
     global c
     x = Point.objects.all().order_by('-current_time')
@@ -128,6 +144,8 @@ def journal_view(request):
     return HttpResponse(geom_as_geojson, content_type='geojson')
 
 
+# собирает логи о включении/выключени той или иной системы (Апем, аентилятор...)
+# для вывода на главной странице
 def collect_logs(log_string):
     global logs, logs_list
     time_obj = datetime.datetime.now().strftime("%Y-%d-%m  %H:%M:%S")
@@ -137,6 +155,8 @@ def collect_logs(log_string):
     print(log_one)
 
 
+# выставляет корректную температуру при запуске. Не позволяет включить комплекс при
+# неудовлетворительных условиях
 def set_correct_temperature(url, strizh_name, temperature_state):
     global c
     while temperature_state != 0:
@@ -150,10 +170,6 @@ def set_correct_temperature(url, strizh_name, temperature_state):
         elif temperature_state == -1:
             send_line_command(url, 'обогрев', 1)
         time.sleep(60)
-
-
-def back2main(request):
-    return redirect(request.META['HTTP_REFERER'])
 
 
 def choose_nomer_strizha(request):
@@ -192,6 +208,7 @@ def choose_nomer_strizha(request):
 
         if form.is_valid() and 'choose_all_strizhes' in request.POST:
             c['chosen_strizh'] = [strizh.name for strizh in strizhes]
+            c['chosen_strizh_json'] = json.dumps(c['chosen_strizh'])
             # form.fields['chosen_strizh'].initial = None
             # form.initial['chosen_strizh'] = [None]
             # c['form'] = form
@@ -214,31 +231,6 @@ def choose_nomer_strizha(request):
     return redirect('/main')
     # return render(request, "main.html", context=c)
     # return HttpResponse(c)
-
-
-# def choose_all_strizhes(request):
-#     global c
-#     strizhes = Strizh.objects.order_by('-lon').all()
-#     if request.method == 'POST':
-#         temperature_dict = {}
-#         humidity_dict = {}
-#         weather_state_dict = {}
-#         url_uniping_dict = {}
-#         c['chosen_strizh'] = [strizh.name for strizh in strizhes]
-#
-#         for strizh in strizhes:
-#             url_uniping_dict[strizh.name] = 'http://' + strizh.uniping_ip + '/'
-#             temperature_dict[strizh.name], humidity_dict[strizh.name], weather_state_dict[strizh.name] = \
-#                 return_conditions(url_uniping_dict[strizh.name])
-#             complex_mode, button_complex, action_strizh = get_info_main(strizh.ip1, strizh.ip2, strizh.name)
-#             c["button_complex"] = button_complex
-#             c['complex_mode_dict'][strizh.name] = complex_mode
-#             c["action_strizh"][strizh.name] = action_strizh
-#         c['temperature_dict'] = temperature_dict
-#         c['humidity_dict'] = humidity_dict
-#         c['weather_state_dict'] = weather_state_dict
-#         c['url_uniping_dict'] = url_uniping_dict
-#     return render(request, "main.html", context=c)
 
 
 def set_strizh(request):
@@ -269,7 +261,11 @@ def render_main_page(request):
     c['start_datetime'] = ''
     c['end_datetime'] = ''
     c['page_picked'] = 'main'
-    c['map_link_default'] = 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png'
+
+    with open("config.json", encoding='utf-8-sig') as json_cfg:
+        data_conf = json.load(json_cfg)
+
+    c['map_link_default'] = data_conf['map_config']['default_link']
 
     temperature_dict = {}
     humidity_dict = {}
@@ -358,14 +354,14 @@ def butt_scan(request):
                 if mode_ip1 != mode_ip2:
                     mode_ip2 = scan_on_off(strizh.ip2)
                 mode_ips = [mode_ip1, mode_ip2]
-                complex_mode = 'scan_on' if all(
-                    [True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-                complex_mode = 'jammer_on' if all(
+                complex_mode = 'Сканирование активно' if all(
+                    [True if x == 'scan_on' else False for x in mode_ips]) else 'Все остановлено'
+                complex_mode = 'Подавление активно' if all(
                     [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
                 print('complex_mode: ', complex_mode)
                 print('mode_ips: ', mode_ips)
-                action_complex = 'включено' if complex_mode == 'scan_on' else 'выключено'
-                button_complex = 'red_scan' if complex_mode == 'scan_on' else 'green'
+                action_complex = 'включено' if complex_mode == 'Сканирование активно' else 'выключено'
+                button_complex = 'red_scan' if complex_mode == 'Сканирование активно' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
                 c["action_strizh"][strizh.name] = 'Сканирование: ' + strizh.name + ' ' + action_complex
                 # ', '.join(str(_) for _ in mode_ips)
@@ -387,12 +383,12 @@ def butt_glush(request):
         for strizh in strizh_names:
 
             if strizh.name in c.get("chosen_strizh") and c.get("complex_state_dict")[strizh.name] == 'включен':
-                # if check_state(strizh.ip1) == 'scan_on':
+                # if check_state(strizh.ip1) == 'Сканирование активно':
                 #     scan_on_off(strizh.ip1)
-                # if check_state(strizh.ip2) == 'scan_on':
+                # if check_state(strizh.ip2) == 'Сканирование активно':
                 #     scan_on_off(strizh.ip2)
                 #
-                # if check_state(strizh.ip1) == 'all_stop' and check_state(strizh.ip2) == 'all_stop':
+                # if check_state(strizh.ip1) == 'Все остановлено' and check_state(strizh.ip2) == 'Все остановлено':
                 #     scan_on_off(strizh.ip1)
                 #     scan_on_off(strizh.ip2)
                 #     time.sleep(0.5)
@@ -411,23 +407,28 @@ def butt_glush(request):
                 # mode1 = check_state(strizh.ip1)
                 # mode2 = check_state(strizh.ip2)
                 # modes = [mode1, mode2]
-                # complex_mode = 'scan_on' if all([True if x == 'scan_on' else False for x in mode_ips]) else 'all_stop'
-                # complex_mode = 'jammer_on' if all(
-                #     [True if x == 'jammer_on' else False for x in mode_ips]) else complex_mode
+                # complex_mode = 'Сканирование активно' if all([True if x == 'Сканирование активно' else False for x in mode_ips]) else 'Все остановлено'
+                # complex_mode = 'Подавление активно' if all(
+                #     [True if x == 'Подавление активно' else False for x in mode_ips]) else complex_mode
 
-                for ip_host in [strizh.ip1, strizh.ip2]:
+                # strizh_state = StrigState.objects.all().filter(strig_name=strizh.name)
+                # mode_ips = [strizh_state.ip1_state, strizh_state.ip2_state]
+
+                for i, ip_host in enumerate([strizh.ip1, strizh.ip2]):
                     mode_ = check_state(ip_host)
-                    if mode_ == 'scan_on':
-                        # while check_state(strizh.ip2) != 'all_stop':
+                    # mode_ = mode_ips[i]
+
+                    if mode_ == 'Сканирование активно':
+                        # while check_state(strizh.ip2) != 'Все остановлено':
                         scan_on_off(ip_host)
                 mode = check_state(strizh.ip1)
                 print(mode)
-                if mode != 'scan_on':
+                if mode != 'Сканирование активно':
                     jammer_on_off(strizh.ip1)
                 mode = check_state(strizh.ip1)
                 # TODO check with connected apems
-                action_complex = 'включено' if mode == 'jammer_on' else 'выключено'
-                button_complex = 'red_jammer' if mode == 'jammer_on' else 'green'
+                action_complex = 'включено' if mode == 'Подавление активно' else 'выключено'
+                button_complex = 'red_jammer' if mode == 'Подавление активно' else 'green'
                 # mode_ips2 = [check_state(strizh.ip1), check_state(strizh.ip2)]
                 c["action_strizh"][strizh.name] = 'глушение: ' + strizh.name + ' ' + action_complex
                 c["button_complex"] = button_complex
@@ -492,8 +493,7 @@ def turn_on_bp(request):
                 collect_logs(str_log)
                 # render(request, "main.html", context=c)
                 # functioning_loop(request)
-        else:
-            print('EROOOOOOOORRR')
+
     return redirect('/main')
     # return render(request, "main.html", context=c)
 
@@ -747,9 +747,11 @@ def journal(request):
         c = init_content()
     c['start_datetime'] = c.get('start_datetime', '')
     c['end_datetime'] = c.get('end_datetime', '')
-    xx = c
     c['page_picked'] = 'journal'
-    c['map_link_default'] = 'http://localhost:8000/static/Tiles/{z}/{x}/{y}.png'
+
+    with open("config.json", encoding='utf-8-sig') as json_cfg:
+        data_conf = json.load(json_cfg)
+    c['map_link_default'] = data_conf['map_config']['default_link']
 
     for el_db in DroneTrajectoryJournal.objects.all():
         el_db.delete()
@@ -962,7 +964,8 @@ def export_csv(request):
         for dr in drones_filtered_strizh:
             writer = csv.writer(f)
             azimuth = int(re.findall('[0-9]+', dr.azimuth)[0])
-            row = dr.system_name, dr.strig_name, dr.drone_id, round(dr.center_freq / 1e9, 3), round(dr.brandwidth/1e6, 0), \
+            row = dr.system_name, dr.strig_name, dr.drone_id, round(dr.center_freq / 1e9, 3), round(dr.brandwidth / 1e6,
+                                                                                                    0), \
                   dr.current_time, dr.comment_string, (dr.drone_lat, dr.drone_lon), azimuth, \
                   dr.area_sector_start_grad, dr.area_sector_end_grad, dr.area_radius_m, dr.ip, dr.height
 
