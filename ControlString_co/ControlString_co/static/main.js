@@ -4,11 +4,15 @@ var last_id_sky = 0;
 
 function refresh() {
     $.getJSON('/geo/data/', function (data) {
-        var current_id = data.features[0].properties.pk;
+        var len_data = data.features.length;
+        if (len_data === 0) {
+            last_id = -1;
+            return
+        }
         if (last_id === 0) {
-            last_id = current_id;
-        } else if (last_id !== current_id && last_id !== 0) {
-            last_id = current_id;
+            last_id = len_data;
+        } else if (last_id !== len_data && last_id !== 0) {
+            last_id = len_data;
             $.ajax({
                 url: "main",
                 success: function (data) {
@@ -149,6 +153,7 @@ function map_init_basic() {
     var tooltip_radius = new L.tooltip();
 
     function refreshMarkers() {
+
         $.getJSON('/geo/skypoint_view/', function (skypoint_data) {
 
             if (initial_sky === 0) {
@@ -166,15 +171,18 @@ function map_init_basic() {
 
         });
 
+
         var drone_counter_dict = get_counter_dict()
         // get data from Point model - drone detections from strizhes
         $.getJSON('/geo/data/', function (data) {
+
                 let arc1;
                 let sector1;
                 let str1;
                 let str_radius;
                 // get data from Strizh model - strizhes information
                 $.getJSON('/geo/strizh_view/', function (strizh_data) {
+
                         let len_strizh_data = strizh_data.features.length;
                         let strizh_map_name = {};
                         let logoMarkerStyleStrizh = L.Icon.extend({
@@ -187,6 +195,19 @@ function map_init_basic() {
                         });
                         // каждые 10 итераций отрисовка стрижа и подписи к нему
                         var strizh_markers = {};
+
+                        var conditions_ajax = JSON.parse(get_conditions_ajax())
+
+                        var conditions_mode = {};
+                        for (let i = 0; i < conditions_ajax.features.length; i++) {
+                            var strig_name_ajax = conditions_ajax.features[i].properties.strig_name;
+                            conditions_mode[strig_name_ajax] = conditions_ajax.features[i].properties.ip1_state
+                        }
+
+
+                        console.log('conditions_mode', conditions_mode)
+
+
                         for (let j = 0; j < len_strizh_data; j++) {
                             let strizh_name = strizh_data.features[j].properties.name;
                             let strizh_coords = [strizh_data.features[j].properties.lat, strizh_data.features[j].properties.lon];
@@ -224,17 +245,16 @@ function map_init_basic() {
                                     offset: L.point({x: -12, y: -18}),
                                     className: 'leaflet-tooltip-radius'
                                 }).setContent(radius.toString() + ' м.');
-                                console.log('complex_state', complex_state);
                                 if (!strizh_layers[strizh_name]) {
                                     strizh_layers[strizh_name] = L.layerGroup().addTo(map);
                                 }
                                 if (complex_state[strizh_name] === 'включен' ||
                                     complex_state[strizh_name] === 'выключен вентилятор') {
-                                    if (complex_mode[strizh_name] === 'Сканирование активно') {
+                                    if (conditions_mode[strizh_name] === 'Сканирование активно') {
                                         // on and scan on, jammer off (3)
                                         col = '#17bd04'
                                         icon_url = 'static/icons/strizh_markers/green_pulse.gif'
-                                    } else if (complex_mode[strizh_name] === 'Подавление активно') {
+                                    } else if (conditions_mode[strizh_name] === 'Подавление активно') {
                                         // scan off and jammer on (5)
                                         col = '#ff1414'
                                         icon_url = 'static/icons/strizh_markers/red_pulse.gif'
@@ -287,11 +307,15 @@ function map_init_basic() {
                         if (data.features.length < 20) {
                             len_arr = data.features.length;
                         }
-                        let arr_drones = [];
-
-                        for (let step = 0; step < len_arr; step++) {
-                            arr_drones.push(data.features[step].properties.system_name)
+                        if (len_arr === 0) {
+                            initial_draw = 1;
                         }
+                        // let arr_drones = [];
+                        //
+                        // for (let step = 0; step < len_arr; step++) {
+                        //     arr_drones.push(data.features[step].properties.system_name)
+                        // }
+
 
                         for (let i = 0; i < len_arr; i++) {
                             var d_id = data.features[i].properties.pk;
@@ -307,6 +331,7 @@ function map_init_basic() {
                             if (ids_drawn.has(data.features[i].properties.pk)) {
                                 return
                             }
+
                             // не нарисован
                             else {
                                 // задан цвет
@@ -326,15 +351,14 @@ function map_init_basic() {
 
                             if (initial_draw === 0) {
                                 initial_draw = 1
-                                return
+                                return;
                             }
                             // Отрисовка сектора с обновлением + layer Drones
-                            // let r_y = 0.004499 //* 4 / 5
                             let r_y = radius * 0.000008998
-                            // let r_x = 0.008892 //* 4 / 5
-                            let r_x = radius * 0.000017784 //* 4 / 5
+                            let r_x = radius * 0.000017784
+
                             // scan on, glushenie off  (4)
-                            if (complex_mode[strizh_name] === 'Сканирование активно') {
+                            if (conditions_mode[strizh_name] === 'Сканирование активно') {
                                 tooltip_strizh.setContent(strizh_name);
 
                                 flag_state[strizh_name][d_id] = 1;
@@ -389,7 +413,6 @@ function map_init_basic() {
                             }
 
                             // Отрисовка подписи к дрону в секторе + layer Drones
-                            //TODO current_time
                             let podpis = "<dl style='max-width:400px;word-wrap: break-word;'> " +
                                 "<dt> Время </dt> "
                                 + "<dd>" + data.features[0].properties.current_time.substr(0, 19) + "</dd>"
@@ -422,7 +445,6 @@ function map_init_basic() {
                 );
             }
         )
-        console.log('complex_mode', complex_mode)
 
         // cycle to iterate through layers
         for (const [key, value] of Object.entries(drone_counter)) {
