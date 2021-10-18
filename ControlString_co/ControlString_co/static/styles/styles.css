@@ -267,6 +267,14 @@
     padding: 5px 8px;
 }
 
+#journal_button3 {
+    font-size: 15px;
+    padding: 5px 8px;
+    width: 210px;
+    /*background-color: #0f6674;*/
+}
+
+
 .button-csv {
     /*background-color: #ef9900;*/
     background-color: #04AA6D;
@@ -484,9 +492,6 @@ thead {
     width: calc(100% - 1em)
 }
 
-table {
-
-}
 
 
 /*border="1" width="100%" cellpadding="5"*/

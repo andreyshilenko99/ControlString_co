@@ -109,7 +109,7 @@ function map_init_basic() {
 // set view to chosen strizh
 
     var sound = new Howl({
-        src: ['static/sound2_3sec.mp3'],
+        src: ['static/sound2.mp3'],
         volume: 0.1,
         onend: function () {
             console.log('_______')

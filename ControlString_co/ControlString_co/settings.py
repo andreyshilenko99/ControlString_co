@@ -107,7 +107,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432', }
 }
-#
+
 # DATABASES = {
 #     'default': {
 #         # 'ENGINE': 'django.contrib.gis.db.backends.postgis',

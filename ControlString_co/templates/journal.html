@@ -243,6 +243,17 @@
                                 <!--                                </form>-->
                                 <!--                            </div>-->
                             </div>
+                            <div class="row text-left" style="margin-left: 5%">
+
+
+                                <!--                            <div class="col-4">-->
+                                <form action="journal" method='GET' style="margin-top: 10px;">
+                                    <!--                                    <button class="button-green-csv"> Экспорт CSV-->
+                                    <button class="btn btn-dark" id="journal_button3"> Обновить страницу
+                                    </button>
+                                </form>
+
+                            </div>
                         </div>
                     </div>
 
@@ -251,7 +262,7 @@
 
             </div>
         </div>
-        <div class="row" style="height: 100%; width:100%; margin-top: 1%;margin-left: 0px; border: 0.5vh">
+        <div class="row" style="height: 100%; width:100%; margin-top: 14px;margin-left: 0px; border: 0.5vh">
             <div class="information-bottom-left">
 
 
@@ -261,7 +272,7 @@
                     <div class="col-12 ">
 
                         <div id="detections" style="margin: 10px 0;
-                    width: 99%; height: 5%">
+                    width: 99%; ">
                             {% if all_drones_res.count != 0 %}
 
                             <table id="detections_table">
@@ -281,7 +292,7 @@
                                     <th>Отобразить</th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody style="height: 400px">
 
                                 {% for dron in all_drones_res %}
                                 <tr>
