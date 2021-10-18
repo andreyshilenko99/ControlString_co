@@ -11,7 +11,7 @@ def check_state(host):
     port = 10100  # The same port as used by the server
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        s.settimeout(5)
+        s.settimeout(1)
         s.connect((host, port))
         s.send(bytearray(lel))
         data = s.recv(1024)
@@ -30,7 +30,6 @@ def check_state(host):
         return "no_connect"
 
 
-
 def scan_on_off(host):
     # TODO Исключения
     message = con.TraceRemoteMessage()
@@ -44,7 +43,7 @@ def scan_on_off(host):
             state = check_state(host)
             while state == "jammer_on":
                 scan_on_off(host)
-                time.sleep(1.5)
+                time.sleep(1)
                 state = check_state(host)
     if check_state(host) == "all_stop":
         while _try < 3:

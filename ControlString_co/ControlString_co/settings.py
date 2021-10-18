@@ -9,7 +9,9 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+from kombu import Exchange, Queue
+from celery.schedules import crontab  # Настроить задачи по времени
+from datetime import timedelta
 from pathlib import Path
 import os
 import json
