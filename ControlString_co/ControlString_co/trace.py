@@ -9,6 +9,8 @@ from Trace import found_signal_params_pb2
 def trace():
     try:
         srizhes = apps.get_model('geo', 'Strizh').objects.all()
+        if len(srizhes) == 0:
+            print("Нет стрижей в бд")
         sstrizhes_dict = {}
         for strizh in srizhes:
             sstrizhes_dict[strizh.name] = [strizh.ip1, strizh.ip2]
@@ -44,5 +46,5 @@ def trace():
                                       height=0,
                                       strig_name=strizh)
                         point.save()
-    except ConnectionRefusedError:
+    except (ConnectionRefusedError, OSError) as e:
         print("Connection refused")

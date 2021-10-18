@@ -1,2 +1,0 @@
-ENTRYPOINT [ "/ControlString_co/sh" ]
-CMD [ "./docker.celery.sh" ]
